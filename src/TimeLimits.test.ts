@@ -2,9 +2,8 @@
 
 import {TimeLimit} from './TimeLimit'
 import {TimeLimits} from './TimeLimits'
-import {delay} from 'src/async/delay'
-import {PriorityQueue} from 'src/async/priority-queue'
-import {priorityCreate} from 'src/sync/priority'
+import {delay} from '@flemist/async-utils'
+import {PriorityQueue, priorityCreate} from '@flemist/priority-queue'
 import {TimeControllerMock} from '@flemist/time-controller'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'

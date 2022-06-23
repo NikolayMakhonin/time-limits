@@ -8,8 +8,10 @@ specifiers:
   '@babel/preset-env': 7.18.2
   '@babel/runtime-corejs3': 7.18.3
   '@flemist/abort-controller-fast': ^0.0.5
+  '@flemist/async-utils': ^0.0.1
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
+  '@flemist/priority-queue': ^0.0.0
   '@flemist/test-utils': 0.0.6
   '@flemist/test-variants': 0.0.14
   '@flemist/time-controller': ^0.0.1
@@ -55,6 +57,8 @@ specifiers:
 
 dependencies:
   '@flemist/abort-controller-fast': 0.0.5
+  '@flemist/async-utils': 0.0.1
+  '@flemist/priority-queue': 0.0.0
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
 
@@ -1308,6 +1312,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@flemist/async-utils/0.0.1:
+    resolution: {integrity: sha512-TlsQZj0bvaqNk/RW3kFwhfQk3VjMyaTIvFVRhgx+WdbNrMUzvZMVJJ183I5P74VqgtacNjZ03fjPZAZlk0xMmw==}
+    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
+    dependencies:
+      '@flemist/abort-controller-fast': 0.0.5
+      '@flemist/time-controller': 0.0.1
+      tslib: 2.4.0
+    dev: false
+
   /@flemist/copy-glob-flat/0.0.5:
     resolution: {integrity: sha512-nw2x3zS78uRv7jlR709oXiMXhtTlTS2+WJiy3aTabcayv50CNHMKXevv9WR7YjUJzS7743EdPJl5wAKjIq9Fdg==}
     hasBin: true
@@ -1326,6 +1339,17 @@ packages:
     resolution: {integrity: sha512-bsXb0bYvrhkibbWAURawIvcR09l5sgRsnFAAwGXr1F1TPZqBL9KMzB0QTlwmokKkd3ci5GqsUUWE1BzK80l6Rg==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     dependencies:
+      tslib: 2.4.0
+    dev: false
+
+  /@flemist/priority-queue/0.0.0:
+    resolution: {integrity: sha512-CWHu3gKUC+v4q0W68I4Ym/ALRkpXlEuYaLPe97u6gcn/cejjvOJpNecovTqhGWeeOJC0HOpoFoB3cn2VfkaaLA==}
+    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
+    dependencies:
+      '@flemist/abort-controller-fast': 0.0.5
+      '@flemist/async-utils': 0.0.1
+      '@flemist/pairing-heap': 0.0.1
+      '@flemist/time-controller': 0.0.1
       tslib: 2.4.0
     dev: false
 

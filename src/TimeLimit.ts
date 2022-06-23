@@ -1,9 +1,8 @@
 import {ITimeLimit, PromiseOrValue} from './contracts'
-import {CustomPromise} from 'src/async/custom-promise'
-import {PriorityQueue} from 'src/async/priority-queue'
-import {Priority} from 'src/sync/priority'
+import {CustomPromise} from '@flemist/async-utils'
+import {PriorityQueue, Priority} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {promiseToAbortable} from 'src/async/abort-controller-fast-utils'
+import {promiseToAbortable} from 'src/abort-controller-fast-utils'
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
 
 export class TimeLimit implements ITimeLimit {
