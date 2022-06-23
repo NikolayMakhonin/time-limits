@@ -1,5 +1,5 @@
 import {IAbortSignalFast, IUnsubscribe} from '@flemist/abort-controller-fast'
-import {CustomPromise} from 'src/async/custom-promise'
+import {CustomPromise} from '@flemist/async-utils'
 
 export async function funcToAbortable<T>(
   abortSignal: IAbortSignalFast|null,

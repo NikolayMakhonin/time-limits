@@ -13,24 +13,24 @@ describe('time-limits > TimeLimits', function () {
   type Mode = 'sync' | 'async' | 'random'
 
   async function awaiter() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       await Promise.resolve()
     }
   }
   
   const testVariants = createTestVariants(async ({
     withPriorityQueue,
-    mode,
-    maxCount,
     timeLimitsTree,
     asyncTime,
+    mode,
+    maxCount,
     timeMs,
   }: {
     withPriorityQueue?: boolean,
-    mode: Mode,
-    maxCount: number,
     timeLimitsTree?: boolean,
     asyncTime: number,
+    mode: Mode,
+    maxCount: number,
     timeMs: number,
   }) => {
     try {
@@ -88,7 +88,7 @@ describe('time-limits > TimeLimits', function () {
         }))
       }
 
-      await Promise.resolve()
+      await awaiter()
 
       if (mode === 'async' || mode === 'random') {
         timeController.addTime(asyncTime)
@@ -122,14 +122,14 @@ describe('time-limits > TimeLimits', function () {
       }
     }
     catch (err) {
-      console.log(JSON.stringify({
-        maxCount,
-        timeMs,
-        asyncTime,
-        mode,
-        withPriorityQueue,
-        timeLimitsTree,
-      }, null, 2))
+      // console.log(JSON.stringify({
+      //   maxCount,
+      //   timeMs,
+      //   asyncTime,
+      //   mode,
+      //   withPriorityQueue,
+      //   timeLimitsTree,
+      // }, null, 2))
       throw err
     }
   })
@@ -147,16 +147,16 @@ describe('time-limits > TimeLimits', function () {
 
   it('variants', async function () {
     await testVariants({
-      withPriorityQueue: [true, false],
-      mode             : ['sync', 'async', 'random'],
-      maxCount         : [1, 10],
+      withPriorityQueue: [false, true],
       timeLimitsTree   : [false, true],
       asyncTime        : ({mode}) => {
         return mode === 'async' ? [500]
           : mode === 'random' ? [200]
             : [0]
       },
-      timeMs: [1000],
+      mode    : ['sync', 'async', 'random'],
+      maxCount: [1, 10],
+      timeMs  : [1000],
     })()
   })
 })
