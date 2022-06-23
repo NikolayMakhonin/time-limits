@@ -28,6 +28,7 @@ export class TimeLimits implements ITimeLimit {
     return this._timeLimits.every(o => o.available())
   }
 
+
   async run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
@@ -37,19 +38,25 @@ export class TimeLimits implements ITimeLimit {
       await this._priorityQueue.run(null, priority, abortSignal)
     }
 
+    return this._run(func, priority, abortSignal)
+  }
+
+  private async _run<T>(
+    func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
+    priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+  ): Promise<T> {
     while (!this.available()) {
+      await this.tick(abortSignal)
       if (this._priorityQueue) {
-        await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-      }
-      else {
-        await this.tick(abortSignal)
+        await this._priorityQueue.run(null, priority, abortSignal)
       }
     }
 
     const waitPromise = new CustomPromise()
     const waitFunc = () => waitPromise.promise
     for (let i = 0; i < this._timeLimits.length; i++) {
-      void this._timeLimits[i].run(waitFunc)
+      void (this._timeLimits[i] as any)._run(waitFunc)
     }
 
     try {

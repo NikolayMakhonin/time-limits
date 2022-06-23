@@ -38,9 +38,11 @@ export class TimeLimit implements ITimeLimit {
   private readonly _releaseFunc: () => void
   private _release() {
     this._activeCount--
-    const tickPromise = this._tickPromise
-    this._tickPromise = new CustomPromise()
-    tickPromise.resolve()
+    if (this._activeCount === this._maxCount - 1) {
+      const tickPromise = this._tickPromise
+      this._tickPromise = new CustomPromise()
+      tickPromise.resolve()
+    }
   }
 
   private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
@@ -61,12 +63,18 @@ export class TimeLimit implements ITimeLimit {
       await this._priorityQueue.run(null, priority, abortSignal)
     }
 
+    return this._run(func, priority, abortSignal)
+  }
+
+  private async _run<T>(
+    func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
+    priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+  ): Promise<T> {
     while (!this.available()) {
+      await this.tick(abortSignal)
       if (this._priorityQueue) {
-        await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-      }
-      else {
-        await this.tick(abortSignal)
+        await this._priorityQueue.run(null, priority, abortSignal)
       }
     }
 
