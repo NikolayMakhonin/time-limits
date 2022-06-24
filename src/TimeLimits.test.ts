@@ -1,4 +1,4 @@
-/* eslint-disable no-loop-func */
+/* eslint-disable no-loop-func,no-unmodified-loop-condition */
 
 import {ITimeLimit, PromiseOrValue} from './contracts'
 import {TimeLimit} from './TimeLimit'
@@ -8,6 +8,7 @@ import {PriorityQueue, priorityCreate, Priority} from '@flemist/priority-queue'
 import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
+import {addAbortSignal} from "stream";
 
 // region old test
 
@@ -180,100 +181,17 @@ describe('time-limits > TimeLimits', function () {
     timeMs: number
     maxCount: number
   }
-  
-  class TimeLimitWrapper implements ITimeLimit {
-    instance: ITimeLimit
-    timeController: ITimeController
-    timeLog: number[]
-    limits: Limit[]
-    results: string[]
-    constructor({
-      instance,
-      timeController,
-      limits,
-      results,
-    }: {
-      instance: ITimeLimit,
-      timeController: ITimeController,
-      limits: Limit[]
-      results: string[]
-    }) {
-      this.instance = instance
-      this.timeController = timeController
-      this.limits = limits
-      this.results = results
-      this.timeLog = []
-      assert.ok(this.limits.length > 0)
-    }
 
-    private _checkTimeLimits() {
-      const now = this.timeController.now()
-      let maxCountTotal = 0
-      for (let i = 0; i < this.limits.length; i++) {
-        const limit = this.limits[i]
-        if (limit.maxCount > maxCountTotal) {
-          maxCountTotal = limit.maxCount
-        }
-        if (this.timeLog.length >= limit.maxCount) {
-          const prevTime = this.timeLog[this.timeLog.length - limit.maxCount]
-          const elapsedTime = now - prevTime
-          if (elapsedTime < limit.timeMs) {
-            this.results.push(`ERROR: elapsedTime(${elapsedTime}) < limit.timeMs(${limit.timeMs})`)
-          }
-        }
-      }
-
-      // shift
-      const deleteSize = this.timeLog.length - maxCountTotal
-      if (deleteSize > 0) {
-        for (let i = 0; i < maxCountTotal; i++) {
-          this.timeLog[i] = this.timeLog[i + deleteSize]
-        }
-        this.timeLog.length = maxCountTotal
-      }
-    }
-
-    private _onCompleted() {
-      const now = this.timeController.now()
-      this.timeLog.push(now)
-    }
-
-    available(): boolean {
-      return this.instance.available()
-    }
-
-    async run<T>(
-      func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
-      priority?: Priority,
-      abortSignal?: IAbortSignalFast,
-      ignorePriority?: boolean,
-    ): Promise<T> {
-      const result = await this.instance.run(
-        (abortSignal?: IAbortSignalFast) => {
-          this._checkTimeLimits()
-          return func(abortSignal)
-          this._onCompleted()
-        },
-        priority,
-        abortSignal,
-        ignorePriority,
-      )
-      return result
-    }
-
-    tick(abortSignal?: IAbortSignalFast): Promise<void> {
-      return this.instance.tick(abortSignal)
-    }
-  }
+  type Result = string|number
 
   // region createCheckedFunc
 
-  type Func = (abortSignal?: IAbortSignalFast) => PromiseOrValue<string>
+  type Func = (abortSignal?: IAbortSignalFast) => PromiseOrValue<number>
   type CheckedFuncContext = {
     timeController: ITimeController,
     timeLog: number[]
     limits: Limit[]
-    results: string[]
+    results: Result[]
   }
 
   function checkedFuncCheckTimeLimits({
@@ -322,7 +240,7 @@ describe('time-limits > TimeLimits', function () {
     func: Func,
     timeController: ITimeController
     limits: Limit[]
-    results: string[]
+    results: Result[]
   }) {
     const context: CheckedFuncContext = {
       timeController,
@@ -332,19 +250,192 @@ describe('time-limits > TimeLimits', function () {
     }
     return async function _checkTimeLimitsFunc(abortSignal?: IAbortSignalFast) {
       checkedFuncCheckTimeLimits(context)
-      const result = await func(abortSignal)
-      checkedFuncOnCompleted(context)
+      try {
+        const result = await func(abortSignal)
+        return result
+      }
+      finally {
+        checkedFuncOnCompleted(context)
+      }
     }
   }
 
   // endregion
 
   const testVariants = createTestVariants(({
-    a,
-  }: {
-    a: number,
-  }) => {
+    withPriorityQueue,
 
+    timeLimit1,
+    timeLimit2,
+    timeLimit3,
+
+    maxCount1,
+    maxCount2,
+    maxCount3,
+  }: {
+    withPriorityQueue: boolean,
+
+    timeLimit1: number
+    timeLimit2: number
+    timeLimit3: number
+
+    maxCount1: number
+    maxCount2: number
+    maxCount3: number
+  }) => {
+    const priorityQueue = withPriorityQueue && new PriorityQueue()
+    const timeController = new TimeControllerMock()
+    const abortSignal: IAbortSignalFast = null
+
+    const timeLimits: {
+      instance: ITimeLimit,
+      limits: Limit[],
+    }[] = []
+
+    function addTimeLimit({
+      timeMs,
+      maxCount,
+    }: {
+      timeMs: number
+      maxCount: number
+    }) {
+      const instance = new TimeLimit({
+        maxCount,
+        timeMs,
+        priorityQueue,
+        timeController,
+      })
+      timeLimits.push({
+        instance,
+        limits: [{
+          maxCount,
+          timeMs,
+        }],
+      })
+    }
+
+    if (timeLimits.length === 1) {
+      timeLimits.push({
+        instance: new TimeLimits({
+          timeLimits: [timeLimits[0].instance],
+          priorityQueue,
+        }),
+        limits: timeLimits[0].limits,
+      })
+    }
+    else if (timeLimits.length === 2) {
+      timeLimits.push({
+        instance: new TimeLimits({
+          timeLimits: [timeLimits[0].instance, timeLimits[1].instance],
+          priorityQueue,
+        }),
+        limits: [timeLimits[0].limits[0], timeLimits[1].limits[0]],
+      })
+    }
+    else if (timeLimits.length === 3) {
+      timeLimits.push({
+        instance: new TimeLimits({
+          timeLimits: [timeLimits[0].instance],
+          priorityQueue,
+        }),
+        limits: timeLimits[0].limits,
+      })
+      timeLimits.push({
+        instance: new TimeLimits({
+          timeLimits: [timeLimits[1].instance, timeLimits[2].instance],
+          priorityQueue,
+        }),
+        limits: [timeLimits[1].limits[0], timeLimits[2].limits[0]],
+      })
+      timeLimits.push({
+        instance: new TimeLimits({
+          timeLimits: [timeLimits[3].instance, timeLimits[4].instance],
+          priorityQueue,
+        }),
+        limits: [timeLimits[0].limits[0], timeLimits[1].limits[0], timeLimits[2].limits[0]],
+      })
+    }
+
+    const countPerTimeLimitHalf = 5
+    const countPerTimeLimit = countPerTimeLimitHalf * 2
+
+    const results: Result[] = []
+    const promises: Promise<Result>[] = []
+    const count = timeLimits.length * countPerTimeLimit
+    const countOrdered = timeLimits.length * countPerTimeLimitHalf
+    const values: number[] = []
+    const checkPromiseResults: number[] = []
+
+    for (let i = 0; i < timeLimits.length; i++) {
+      const timeLimit = timeLimits[i]
+      for (let j = 0; j < countPerTimeLimit; j++) {
+        const index = i * countPerTimeLimit + j
+        const startTime = ((index + 3) * 4294967291) % 2 === 0
+          ? 0
+          : ((index + 3) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
+        const order = ((index + 1) * 4294967291) % countOrdered // pseudo random without duplicates
+          + (startTime ? 10000 : 0)
+        const runTime = ((index + 2) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
+
+        const func = createCheckedFunc({
+          func(abortSignal) {
+            if (runTime) {
+              return delay(runTime, abortSignal, timeController).then(() => order)
+            }
+            values.push(order)
+            return order
+          },
+          limits : timeLimit.limits,
+          results: results,
+          timeController,
+        })
+
+        if (startTime) {
+          timeController.setTimeout(() => {
+            checkPromiseResults.push(order)
+            promises.push(timeLimit.instance.run(func, priorityCreate(order), abortSignal))
+          }, startTime)
+        }
+        else {
+          checkPromiseResults.push(order)
+          promises.push(timeLimit.instance.run(func, priorityCreate(order), abortSignal))
+        }
+      }
+    }
+
+    async function run() {
+      timeController.addTime(0)
+      while (timeController.now() < 1000 && values.length < count) {
+        for (let i = 0; i < 40; i++) {
+          // eslint-disable-next-line @typescript-eslint/await-thenable
+          await 0
+        }
+        timeController.addTime(1)
+      }
+
+      assert.strictEqual(values.length, count)
+
+      const promiseResults = await Promise.all(promises)
+
+      assert.strictEqual(promiseResults.length, count)
+      assert.deepStrictEqual(promiseResults, checkPromiseResults)
+
+      assert.strictEqual(values.length, count)
+
+      for (let i = 0; i < countOrdered; i++) {
+        const value = values[i]
+        assert.strictEqual(value, i)
+      }
+
+      values.sort((o1, o2) => o1 > o2 ? 1 : -1)
+
+      for (let i = countOrdered; i < count; i++) {
+        const value = values[i]
+        assert.strictEqual(value, i + 1000)
+      }
+    }
+
+    return run()
   })
 
   it('variants', function () {
