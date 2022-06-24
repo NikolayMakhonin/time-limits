@@ -13,7 +13,7 @@ describe('time-limits > TimeLimits', function () {
   type Mode = 'sync' | 'async' | 'random'
 
   async function awaiter() {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 40; i++) {
       await Promise.resolve()
     }
   }
@@ -21,15 +21,15 @@ describe('time-limits > TimeLimits', function () {
   const testVariants = createTestVariants(async ({
     withPriorityQueue,
     timeLimitsTree,
-    asyncTime,
     mode,
+    asyncTime,
     maxCount,
     timeMs,
   }: {
     withPriorityQueue?: boolean,
     timeLimitsTree?: boolean,
-    asyncTime: number,
     mode: Mode,
+    asyncTime: number,
     maxCount: number,
     timeMs: number,
   }) => {
@@ -99,20 +99,26 @@ describe('time-limits > TimeLimits', function () {
 
       timeController.addTime(timeMs)
       await awaiter()
-      timeController.addTime(asyncTime)
-      await awaiter()
+      if (mode === 'async' || mode === 'random') {
+        timeController.addTime(asyncTime)
+        await awaiter()
+      }
       assert.strictEqual(completedCount, maxCount * 2)
 
       timeController.addTime(timeMs)
       await awaiter()
-      timeController.addTime(asyncTime)
-      await awaiter()
+      if (mode === 'async' || mode === 'random') {
+        timeController.addTime(asyncTime)
+        await awaiter()
+      }
       assert.strictEqual(completedCount, maxCount * 3)
 
       timeController.addTime(timeMs)
       await awaiter()
-      timeController.addTime(asyncTime)
-      await awaiter()
+      if (mode === 'async' || mode === 'random') {
+        timeController.addTime(asyncTime)
+        await awaiter()
+      }
       assert.strictEqual(completedCount, maxCount * 3)
 
       await Promise.all(promises)
@@ -149,14 +155,16 @@ describe('time-limits > TimeLimits', function () {
     await testVariants({
       withPriorityQueue: [false, true],
       timeLimitsTree   : [false, true],
+      mode             : ['sync', 'async', 'random'],
       asyncTime        : ({mode}) => {
-        return mode === 'async' ? [500]
-          : mode === 'random' ? [200]
+        return mode === 'async' ? [5]
+          : mode === 'random' ? [2]
             : [0]
       },
-      mode    : ['sync', 'async', 'random'],
-      maxCount: [1, 10],
-      timeMs  : [1000],
+      maxCount: [1, 2, 3, 10],
+      timeMs  : ({mode}) => mode === 'random'
+        ? [3, 5, 10]
+        : [0, 1, 2, 5, 10],
     })()
   })
 })
