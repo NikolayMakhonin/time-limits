@@ -1,4 +1,4 @@
-import {ITimeLimit, PromiseOrValue} from './contracts'
+import {ITimeLimit, PromiseOrValue, TimeLimitsParams} from './contracts'
 import {CustomPromise} from '@flemist/async-utils'
 import {PriorityQueue, Priority} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
@@ -10,10 +10,7 @@ export class TimeLimits implements ITimeLimit {
   constructor({
     timeLimits,
     priorityQueue,
-  }: {
-    timeLimits: ITimeLimit[],
-    priorityQueue?: PriorityQueue,
-  }) {
+  }: TimeLimitsParams) {
     this._timeLimits = timeLimits
     this._priorityQueue = priorityQueue
     this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
@@ -28,27 +25,19 @@ export class TimeLimits implements ITimeLimit {
     return this._timeLimits.every(o => o.available())
   }
 
-
   async run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
+    ignorePriority?: boolean,
   ): Promise<T> {
-    if (this._priorityQueue) {
+    if (!ignorePriority && this._priorityQueue) {
       await this._priorityQueue.run(null, priority, abortSignal)
     }
 
-    return this._run(func, priority, abortSignal)
-  }
-
-  private async _run<T>(
-    func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-  ): Promise<T> {
     while (!this.available()) {
       await this.tick(abortSignal)
-      if (this._priorityQueue) {
+      if (!ignorePriority && this._priorityQueue) {
         await this._priorityQueue.run(null, priority, abortSignal)
       }
     }
@@ -56,7 +45,7 @@ export class TimeLimits implements ITimeLimit {
     const waitPromise = new CustomPromise()
     const waitFunc = () => waitPromise.promise
     for (let i = 0; i < this._timeLimits.length; i++) {
-      void (this._timeLimits[i] as any)._run(waitFunc)
+      void this._timeLimits[i].run(waitFunc, null, null, true)
     }
 
     try {
