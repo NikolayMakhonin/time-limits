@@ -4,11 +4,10 @@ import {ITimeLimit, PromiseOrValue} from './contracts'
 import {TimeLimit} from './TimeLimit'
 import {TimeLimits} from './TimeLimits'
 import {delay} from '@flemist/async-utils'
-import {PriorityQueue, priorityCreate, Priority} from '@flemist/priority-queue'
+import {PriorityQueue, priorityCreate} from '@flemist/priority-queue'
 import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
-import {addAbortSignal} from "stream";
 
 // region old test
 
@@ -314,6 +313,29 @@ describe('time-limits > TimeLimits', function () {
       })
     }
 
+    if (maxCount1) {
+      addTimeLimit({
+        maxCount: maxCount1,
+        timeMs  : timeLimit1,
+      })
+    }
+    if (maxCount2) {
+      addTimeLimit({
+        maxCount: maxCount2,
+        timeMs  : timeLimit2,
+      })
+    }
+    if (maxCount3) {
+      addTimeLimit({
+        maxCount: maxCount3,
+        timeMs  : timeLimit3,
+      })
+    }
+
+    if (timeLimits.length === 0) {
+      return
+    }
+
     if (timeLimits.length === 1) {
       timeLimits.push({
         instance: new TimeLimits({
@@ -356,35 +378,40 @@ describe('time-limits > TimeLimits', function () {
       })
     }
 
-    const countPerTimeLimitHalf = 5
-    const countPerTimeLimit = countPerTimeLimitHalf * 2
-
+    const countPerTimeLimit = 10
     const results: Result[] = []
     const promises: Promise<Result>[] = []
-    const count = timeLimits.length * countPerTimeLimit
-    const countOrdered = timeLimits.length * countPerTimeLimitHalf
     const values: number[] = []
     const checkPromiseResults: number[] = []
+    // const count = timeLimits.length * countPerTimeLimit
+    const count = countPerTimeLimit
 
-    for (let i = 0; i < timeLimits.length; i++) {
+    // for (let i = 0; i < timeLimits.length; i++) {
+    {
+      const i = timeLimits.length - 1
       const timeLimit = timeLimits[i]
       for (let j = 0; j < countPerTimeLimit; j++) {
         const index = i * countPerTimeLimit + j
         const startTime = ((index + 3) * 4294967291) % 2 === 0
           ? 0
           : ((index + 3) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
-        const order = ((index + 1) * 4294967291) % countOrdered // pseudo random without duplicates
+        const order = ((index + 1) * 4294967291) % count // pseudo random without duplicates
           + startTime * 10000
         const runTime = ((index + 2) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
 
         const func = createCheckedFunc({
-          func(abortSignal) {
-            if (runTime) {
-              return delay(runTime, abortSignal, timeController).then(() => order)
+          func: runTime
+            ? async (abortSignal) => {
+              if (runTime) {
+                await delay(runTime, abortSignal, timeController)
+              }
+              values.push(order)
+              return order
             }
-            values.push(order)
-            return order
-          },
+            : (abortSignal) => {
+              values.push(order)
+              return order
+            },
           limits : timeLimit.limits,
           results: results,
           timeController,
@@ -422,11 +449,18 @@ describe('time-limits > TimeLimits', function () {
 
       assert.strictEqual(values.length, count)
 
-      let prevValue: number = values[0]
-      for (let i = 1; i < count; i++) {
-        const value = values[i]
-        assert.ok(value > prevValue)
-        prevValue = value
+      if (withPriorityQueue) {
+        let prevValue: number = values[0]
+        for (let i = 1; i < count; i++) {
+          const value = values[i]
+          if (value <= prevValue) {
+            assert.deepStrictEqual(
+              values,
+              values.slice().sort((o1, o2) => o1 > o2 ? 1 : -1),
+            )
+          }
+          prevValue = value
+        }
       }
 
       // values.sort((o1, o2) => o1 > o2 ? 1 : -1)
@@ -441,6 +475,8 @@ describe('time-limits > TimeLimits', function () {
   })
 
   it('variants', async function () {
+    this.timeout(600000)
+
     await testVariants({
       withPriorityQueue: [false, true],
 
