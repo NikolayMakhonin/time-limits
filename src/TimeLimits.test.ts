@@ -374,7 +374,7 @@ describe('time-limits > TimeLimits', function () {
           ? 0
           : ((index + 3) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
         const order = ((index + 1) * 4294967291) % countOrdered // pseudo random without duplicates
-          + (startTime ? 10000 : 0)
+          + startTime * 10000
         const runTime = ((index + 2) * 4294967291) % Math.min(3, Math.round(countPerTimeLimit / 5))
 
         const func = createCheckedFunc({
@@ -422,23 +422,35 @@ describe('time-limits > TimeLimits', function () {
 
       assert.strictEqual(values.length, count)
 
-      for (let i = 0; i < countOrdered; i++) {
+      let prevValue: number = values[0]
+      for (let i = 1; i < count; i++) {
         const value = values[i]
-        assert.strictEqual(value, i)
+        assert.ok(value > prevValue)
+        prevValue = value
       }
 
-      values.sort((o1, o2) => o1 > o2 ? 1 : -1)
-
-      for (let i = countOrdered; i < count; i++) {
-        const value = values[i]
-        assert.strictEqual(value, i + 1000)
-      }
+      // values.sort((o1, o2) => o1 > o2 ? 1 : -1)
+      //
+      // for (let i = countOrdered; i < count; i++) {
+      //   const value = values[i]
+      //   assert.strictEqual(value, i + 1000)
+      // }
     }
 
     return run()
   })
 
-  it('variants', function () {
+  it('variants', async function () {
+    await testVariants({
+      withPriorityQueue: [false, true],
 
+      timeLimit1: [1, 2, 5, 10],
+      timeLimit2: [1, 2, 5, 10],
+      timeLimit3: [1, 2, 5, 10],
+
+      maxCount1: [0, 1, 2, 5],
+      maxCount2: [0, 1, 2, 5],
+      maxCount3: [0, 1, 2, 5],
+    })()
   })
 })
