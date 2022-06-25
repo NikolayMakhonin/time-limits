@@ -402,10 +402,10 @@ describe('time-limits > TimeLimits', function () {
         const func = createCheckedFunc({
           func: runTime
             ? async (abortSignal) => {
+              values.push(order)
               if (runTime) {
                 await delay(runTime, abortSignal, timeController)
               }
-              values.push(order)
               return order
             }
             : (abortSignal) => {

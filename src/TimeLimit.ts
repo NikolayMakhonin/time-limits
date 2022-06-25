@@ -60,9 +60,11 @@ export class TimeLimit implements ITimeLimit {
     }
 
     while (!this.available()) {
-      await this.tick(abortSignal)
       if (!ignorePriority && this._priorityQueue) {
-        await this._priorityQueue.run(null, priority, abortSignal)
+        await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
+      }
+      else {
+        await this.tick(abortSignal)
       }
     }
 
