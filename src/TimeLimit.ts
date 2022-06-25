@@ -4,12 +4,14 @@ import {PriorityQueue, Priority} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {promiseToAbortable} from 'src/abort-controller-fast-utils'
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
+import {Task} from '@flemist/priority-queue/dist/lib/priority-queue/contracts'
 
 export class TimeLimit implements ITimeLimit {
   private readonly _timeController: ITimeController
   private readonly _maxCount: number
   private readonly _timeMs: number
   private readonly _priorityQueue: PriorityQueue
+  private readonly _tasks: Set<Task<any>> = new Set()
 
   constructor({
     maxCount,
@@ -20,7 +22,7 @@ export class TimeLimit implements ITimeLimit {
     this._timeController = timeController || timeControllerDefault
     this._maxCount = maxCount
     this._timeMs = timeMs
-    this._priorityQueue = priorityQueue
+    this._priorityQueue = priorityQueue || new PriorityQueue()
     this._releaseFunc = () => {
       this._release()
     }
@@ -37,6 +39,9 @@ export class TimeLimit implements ITimeLimit {
       const tickPromise = this._tickPromise
       this._tickPromise = new CustomPromise()
       tickPromise.resolve()
+      this._tasks.forEach(task => {
+        task.setReadyToRun(true)
+      })
     }
   }
 
@@ -53,23 +58,35 @@ export class TimeLimit implements ITimeLimit {
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    ignorePriority?: boolean,
+    force?: boolean,
   ): Promise<T> {
-    if (!ignorePriority && this._priorityQueue) {
-      await this._priorityQueue.run(null, priority, abortSignal)
-    }
-
-    while (!this.available()) {
-      if (!ignorePriority && this._priorityQueue) {
-        await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-      }
-      else {
-        await this.tick(abortSignal)
+    const onRun = () => {
+      this._activeCount++
+      if (this._activeCount === this._maxCount) {
+        this._tasks.forEach(task => {
+          task.setReadyToRun(false)
+        })
       }
     }
 
-    this._activeCount++
     try {
+      if (!force) {
+        const task = this._priorityQueue.runTask(
+          (abortSignal) => {
+            this._tasks.delete(task)
+            onRun()
+          },
+          priority,
+          abortSignal,
+        )
+
+        this._tasks.add(task)
+        task.setReadyToRun(this.available())
+
+        await task.result
+      } else {
+        onRun()
+      }
       const result = await func(abortSignal)
       return result
     }

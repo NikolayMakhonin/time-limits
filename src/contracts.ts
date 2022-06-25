@@ -11,7 +11,7 @@ export interface ITimeLimit {
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    ignorePriority?: boolean,
+    force?: boolean,
   ): Promise<T>;
 }
 

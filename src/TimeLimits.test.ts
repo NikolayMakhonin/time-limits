@@ -16,8 +16,9 @@ describe('time-limits > TimeLimits Old', function () {
 
   type Mode = 'sync' | 'async' | 'random'
 
-  async function awaiter() {
+  async function awaiter(timeController: TimeControllerMock) {
     for (let i = 0; i < 40; i++) {
+      timeController.addTime(0)
       await Promise.resolve()
     }
   }
@@ -92,36 +93,36 @@ describe('time-limits > TimeLimits Old', function () {
         }))
       }
 
-      await awaiter()
+      await awaiter(timeController)
 
       if (mode === 'async' || mode === 'random') {
         timeController.addTime(asyncTime)
       }
-      await awaiter()
-      await awaiter()
+      await awaiter(timeController)
+      await awaiter(timeController)
       assert.strictEqual(completedCount, maxCount)
 
       timeController.addTime(timeMs)
-      await awaiter()
+      await awaiter(timeController)
       if (mode === 'async' || mode === 'random') {
         timeController.addTime(asyncTime)
-        await awaiter()
+        await awaiter(timeController)
       }
       assert.strictEqual(completedCount, maxCount * 2)
 
       timeController.addTime(timeMs)
-      await awaiter()
+      await awaiter(timeController)
       if (mode === 'async' || mode === 'random') {
         timeController.addTime(asyncTime)
-        await awaiter()
+        await awaiter(timeController)
       }
       assert.strictEqual(completedCount, maxCount * 3)
 
       timeController.addTime(timeMs)
-      await awaiter()
+      await awaiter(timeController)
       if (mode === 'async' || mode === 'random') {
         timeController.addTime(asyncTime)
-        await awaiter()
+        await awaiter(timeController)
       }
       assert.strictEqual(completedCount, maxCount * 3)
 
@@ -168,7 +169,7 @@ describe('time-limits > TimeLimits Old', function () {
       maxCount: [1, 2, 3, 10],
       timeMs  : ({mode}) => mode === 'random'
         ? [3, 5, 10]
-        : [0, 1, 2, 5, 10],
+        : [1, 2, 5, 10],
     })()
   })
 })
