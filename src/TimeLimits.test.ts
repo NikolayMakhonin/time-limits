@@ -169,7 +169,7 @@ describe('time-limits > TimeLimits Old', function () {
       maxCount: [1, 2, 3, 10],
       timeMs  : ({mode}) => mode === 'random'
         ? [3, 5, 10]
-        : [1, 2, 5, 10],
+        : [1, 2, 5, 10], // TODO 0,
     })()
   })
 })

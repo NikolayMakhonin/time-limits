@@ -11,7 +11,7 @@ export class TimeLimit implements ITimeLimit {
   private readonly _maxCount: number
   private readonly _timeMs: number
   private readonly _priorityQueue: PriorityQueue
-  private readonly _tasks: Set<Task<any>> = new Set()
+  private readonly _tasks: Set<Task<any>>
 
   constructor({
     maxCount,
@@ -27,11 +27,21 @@ export class TimeLimit implements ITimeLimit {
       this._release()
     }
     this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
+    this._tasks = new Set()
   }
 
   private _activeCount: number = 0
   private _tickPromise: CustomPromise<void> = new CustomPromise()
 
+  private _hold() {
+    this._activeCount++
+    if (this._activeCount === this._maxCount) {
+      this._tasks.forEach(task => {
+        task.setReadyToRun(false)
+      })
+    }
+  }
+  
   private readonly _releaseFunc: () => void
   private _release() {
     this._activeCount--
@@ -60,33 +70,19 @@ export class TimeLimit implements ITimeLimit {
     abortSignal?: IAbortSignalFast,
     force?: boolean,
   ): Promise<T> {
-    const onRun = () => {
-      this._activeCount++
-      if (this._activeCount === this._maxCount) {
-        this._tasks.forEach(task => {
-          task.setReadyToRun(false)
-        })
-      }
+    if (!force) {
+      const task = this._priorityQueue.runTask(null, priority, abortSignal)
+
+      this._tasks.add(task)
+      task.setReadyToRun(this.available())
+
+      await task.result
+      this._tasks.delete(task)
     }
 
+    this._hold()
+
     try {
-      if (!force) {
-        const task = this._priorityQueue.runTask(
-          (abortSignal) => {
-            this._tasks.delete(task)
-            onRun()
-          },
-          priority,
-          abortSignal,
-        )
-
-        this._tasks.add(task)
-        task.setReadyToRun(this.available())
-
-        await task.result
-      } else {
-        onRun()
-      }
       const result = await func(abortSignal)
       return result
     }
