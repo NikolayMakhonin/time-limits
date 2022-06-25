@@ -462,13 +462,6 @@ describe('time-limits > TimeLimits', function () {
           prevValue = value
         }
       }
-
-      // values.sort((o1, o2) => o1 > o2 ? 1 : -1)
-      //
-      // for (let i = countOrdered; i < count; i++) {
-      //   const value = values[i]
-      //   assert.strictEqual(value, i + 1000)
-      // }
     }
 
     return run()
