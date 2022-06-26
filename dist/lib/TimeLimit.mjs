@@ -1,5 +1,6 @@
 import { __awaiter } from 'tslib';
 import { CustomPromise } from '@flemist/async-utils';
+import { PriorityQueue } from '@flemist/priority-queue';
 import { promiseToAbortable } from './abort-controller-fast-utils/promiseToAbortable.mjs';
 import { timeControllerDefault } from '@flemist/time-controller';
 
@@ -10,11 +11,20 @@ class TimeLimit {
         this._timeController = timeController || timeControllerDefault;
         this._maxCount = maxCount;
         this._timeMs = timeMs;
-        this._priorityQueue = priorityQueue;
+        this._priorityQueue = priorityQueue || new PriorityQueue();
         this._releaseFunc = () => {
             this._release();
         };
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
+        this._tasks = new Set();
+    }
+    _hold() {
+        this._activeCount++;
+        if (this._activeCount === this._maxCount) {
+            this._tasks.forEach(task => {
+                task.setReadyToRun(false);
+            });
+        }
     }
     _release() {
         this._activeCount--;
@@ -22,6 +32,9 @@ class TimeLimit {
             const tickPromise = this._tickPromise;
             this._tickPromise = new CustomPromise();
             tickPromise.resolve();
+            this._tasks.forEach(task => {
+                task.setReadyToRun(true);
+            });
         }
     }
     tick(abortSignal) {
@@ -30,23 +43,16 @@ class TimeLimit {
     available() {
         return this._activeCount < this._maxCount;
     }
-    run(func, priority, abortSignal) {
+    run(func, priority, abortSignal, force) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this._priorityQueue) {
-                yield this._priorityQueue.run(null, priority, abortSignal);
+            if (!force) {
+                const task = this._priorityQueue.runTask(null, priority, abortSignal);
+                this._tasks.add(task);
+                task.setReadyToRun(this.available());
+                yield task.result;
+                this._tasks.delete(task);
             }
-            return this._run(func, priority, abortSignal);
-        });
-    }
-    _run(func, priority, abortSignal) {
-        return __awaiter(this, void 0, void 0, function* () {
-            while (!this.available()) {
-                yield this.tick(abortSignal);
-                if (this._priorityQueue) {
-                    yield this._priorityQueue.run(null, priority, abortSignal);
-                }
-            }
-            this._activeCount++;
+            this._hold();
             try {
                 const result = yield func(abortSignal);
                 return result;

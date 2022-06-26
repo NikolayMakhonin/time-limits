@@ -11,7 +11,7 @@ specifiers:
   '@flemist/async-utils': ^0.0.1
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
-  '@flemist/priority-queue': ^0.0.3
+  '@flemist/priority-queue': link:D:/projects/my/node/modules/priority-queue
   '@flemist/test-utils': 0.0.7
   '@flemist/test-variants': 0.0.14
   '@flemist/time-controller': ^0.0.1
