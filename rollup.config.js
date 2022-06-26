@@ -16,6 +16,7 @@ import nycrc from './nyc.config.mjs'
 import { terser } from 'rollup-plugin-terser'
 import path from 'path'
 import pkg from './package.json'
+import { createFilter } from '@rollup/pluginutils'
 
 const dev = !!process.env.ROLLUP_WATCH
 
@@ -115,9 +116,11 @@ const nodeConfig = ({
   onwarn  : onwarnRollup,
   external: createFilter([
     'src/**/*.{js,cjs,mjs}',
-    ...Object.keys(pkg.dependencies),
-    ...Object.keys(pkg.devDependencies),
-    ...require('module').builtinModules || Object.keys(process.binding('natives')),
+    ...[
+      ...Object.keys(pkg.dependencies),
+      ...Object.keys(pkg.devDependencies),
+      ...require('module').builtinModules || Object.keys(process.binding('natives')),
+    ].map(o => 'node_modules/' + o),
   ]),
 })
 
