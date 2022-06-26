@@ -11,7 +11,7 @@ specifiers:
   '@flemist/async-utils': ^0.0.1
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
-  '@flemist/priority-queue': ^0.0.2
+  '@flemist/priority-queue': ^0.0.3
   '@flemist/test-utils': 0.0.7
   '@flemist/test-variants': 0.0.14
   '@flemist/time-controller': ^0.0.1
@@ -59,7 +59,7 @@ specifiers:
 dependencies:
   '@flemist/abort-controller-fast': 0.0.5
   '@flemist/async-utils': 0.0.1
-  '@flemist/priority-queue': 0.0.2
+  '@flemist/priority-queue': 0.0.3
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
 
@@ -1351,8 +1351,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@flemist/priority-queue/0.0.2:
-    resolution: {integrity: sha512-e6w9WK0ySUqK7cz0VKOdc64Xs6l7CA5jBxSegaEd0DWNSkH898yMMPSehabGgymPpnetS0tqjkpROqcajZ6RwQ==}
+  /@flemist/priority-queue/0.0.3:
+    resolution: {integrity: sha512-I1W/4F2RKf5ts02PnvdM4T3hRhG4DCiQhuZG8w4ZJvslBF1IEeGb2xB3G+et4PZvDRtgwMcA2IMMCWiHp2fyGQ==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     dependencies:
       '@flemist/abort-controller-fast': 0.0.5
