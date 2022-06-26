@@ -41,7 +41,7 @@ export class TimeLimit implements ITimeLimit {
       })
     }
   }
-  
+
   release() {
     this._timeController.setTimeout(this._releaseFunc, this._timeMs)
   }

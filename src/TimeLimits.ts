@@ -29,6 +29,7 @@ export class TimeLimits implements ITimeLimit {
       })
     }
   }
+
   release() {
     for (let i = 0; i < this._timeLimits.length; i++) {
       this._timeLimits[i].release()
