@@ -22,7 +22,7 @@ describe('time-limits > TimeLimits perf', function () {
       priorityQueue,
     })
 
-    const count = 2
+    const count = 100
 
     const result = await calcPerformanceAsync(
       60000,
