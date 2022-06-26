@@ -25,6 +25,18 @@ export class TimeLimits implements ITimeLimit {
     return this._timeLimits.every(o => o.available())
   }
 
+  hold() {
+    for (let i = 0; i < this._timeLimits.length; i++) {
+      this._timeLimits[i].hold()
+    }
+  }
+
+  release() {
+    for (let i = 0; i < this._timeLimits.length; i++) {
+      this._timeLimits[i].release()
+    }
+  }
+
   async run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
@@ -44,18 +56,13 @@ export class TimeLimits implements ITimeLimit {
       }
     }
 
-    const waitPromise = new CustomPromise()
-    const waitFunc = () => waitPromise.promise
-    for (let i = 0; i < this._timeLimits.length; i++) {
-      void this._timeLimits[i].run(waitFunc, null, null, true)
-    }
-
+    this.hold()
     try {
       const result = await func(abortSignal)
       return result
     }
     finally {
-      waitPromise.resolve()
+      this.release()
     }
   }
 }

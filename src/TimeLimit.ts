@@ -31,6 +31,10 @@ export class TimeLimit implements ITimeLimit {
   private _tickPromise: CustomPromise<void> = new CustomPromise()
 
   private readonly _releaseFunc: () => void
+  release() {
+    this._timeController.setTimeout(this._releaseFunc, this._timeMs)
+  }
+
   private _release() {
     this._activeCount--
     if (this._activeCount === this._maxCount - 1) {
@@ -38,6 +42,10 @@ export class TimeLimit implements ITimeLimit {
       this._tickPromise = new CustomPromise()
       tickPromise.resolve()
     }
+  }
+
+  hold() {
+    this._activeCount++
   }
 
   private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
@@ -68,13 +76,13 @@ export class TimeLimit implements ITimeLimit {
       }
     }
 
-    this._activeCount++
+    this.hold()
     try {
       const result = await func(abortSignal)
       return result
     }
     finally {
-      this._timeController.setTimeout(this._releaseFunc, this._timeMs)
+      this.release()
     }
   }
 }

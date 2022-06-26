@@ -7,6 +7,8 @@ export type PromiseOrValue<T> = T | Promise<T>
 export interface ITimeLimit {
   tick(abortSignal?: IAbortSignalFast): Promise<void>
   available(): boolean
+  hold(): void
+  release(): void
   run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
