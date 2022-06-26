@@ -107,24 +107,20 @@ r&&r(),n(t)})).catch(o),t&&(r=t.subscribe(o)))}))
 }(t,this._tickPromise.promise)
 },t.prototype.available=function(){
 return this._activeCount<this._maxCount
-},t.prototype.run=function(t,i,r){
+},t.prototype.run=function(t,i,r,s){
 return e(this,void 0,void 0,(function(){
 return n(this,(function(e){switch(e.label){case 0:
-return this._priorityQueue?[4,this._priorityQueue.run(null,i,r)]:[3,2]
+return s||!this._priorityQueue?[3,2]:[4,this._priorityQueue.run(null,i,r)]
 ;case 1:e.sent(),e.label=2;case 2:
-return[2,this._run(t,i,r)]}}))}))
-},t.prototype._run=function(t,i,r){
-return e(this,void 0,void 0,(function(){
-return n(this,(function(e){switch(e.label){case 0:
-return this.available()?[3,4]:[4,this.tick(r)]
-;case 1:
-return e.sent(),this._priorityQueue?[4,this._priorityQueue.run(null,i,r)]:[3,3]
-;case 2:e.sent(),e.label=3;case 3:return[3,0]
-;case 4:this._activeCount++,e.label=5;case 5:
-return e.trys.push([5,,7,8]),[4,t(r)];case 6:
-return[2,e.sent()];case 7:
+return this.available()?[3,7]:s||!this._priorityQueue?[3,4]:[4,this._priorityQueue.run(this._tickFunc,i,r)]
+;case 3:return e.sent(),[3,6];case 4:
+return[4,this.tick(r)];case 5:e.sent(),e.label=6
+;case 6:return[3,2];case 7:
+this._activeCount++,e.label=8;case 8:
+return e.trys.push([8,,10,11]),[4,t(r)];case 9:
+return[2,e.sent()];case 10:
 return this._timeController.setTimeout(this._releaseFunc,this._timeMs),
-[7];case 8:return[2]}}))}))},t}(),p=function(){
+[7];case 11:return[2]}}))}))},t}(),p=function(){
 function t(t){
 var e=t.timeLimits,n=t.priorityQueue,i=this
 ;this._timeLimits=e,this._priorityQueue=n,
@@ -135,25 +131,21 @@ return e.tick(t)})))
 },t.prototype.available=function(){
 return this._timeLimits.every((function(t){
 return t.available()}))
-},t.prototype.run=function(t,i,r){
-return e(this,void 0,void 0,(function(){
-return n(this,(function(e){switch(e.label){case 0:
-return this._priorityQueue?[4,this._priorityQueue.run(null,i,r)]:[3,2]
-;case 1:e.sent(),e.label=2;case 2:
-return[2,this._run(t,i,r)]}}))}))
-},t.prototype._run=function(t,i,r){
-return e(this,void 0,void 0,(function(){var e,s,o
+},t.prototype.run=function(t,i,r,s){
+return e(this,void 0,void 0,(function(){var e,o,u
 ;return n(this,(function(n){switch(n.label){
 case 0:
-return this.available()?[3,4]:[4,this.tick(r)]
-;case 1:
-return n.sent(),this._priorityQueue?[4,this._priorityQueue.run(null,i,r)]:[3,3]
-;case 2:n.sent(),n.label=3;case 3:return[3,0]
-;case 4:for(e=new l,s=function(){return e.promise
-},o=0;o<this._timeLimits.length;o++)this._timeLimits[o]._run(s)
-;n.label=5;case 5:
-return n.trys.push([5,,7,8]),[4,t(r)];case 6:
-return[2,n.sent()];case 7:return e.resolve(),[7]
-;case 8:return[2]}}))}))},t}()
+return s||!this._priorityQueue?[3,2]:[4,this._priorityQueue.run(null,i,r)]
+;case 1:n.sent(),n.label=2;case 2:
+return this.available()?[3,7]:s||!this._priorityQueue?[3,4]:[4,this._priorityQueue.run(this._tickFunc,i,r)]
+;case 3:return n.sent(),[3,6];case 4:
+return[4,this.tick(r)];case 5:n.sent(),n.label=6
+;case 6:return[3,2];case 7:
+for(e=new l,o=function(){return e.promise
+},u=0;u<this._timeLimits.length;u++)this._timeLimits[u].run(o,null,null,!0)
+;n.label=8;case 8:
+return n.trys.push([8,,10,11]),[4,t(r)];case 9:
+return[2,n.sent()];case 10:return e.resolve(),[7]
+;case 11:return[2]}}))}))},t}()
 ;t.TimeLimit=_,t.TimeLimits=p,Object.defineProperty(t,"__esModule",{
 value:!0})}({});

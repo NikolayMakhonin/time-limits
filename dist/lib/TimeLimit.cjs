@@ -34,20 +34,17 @@ class TimeLimit {
     available() {
         return this._activeCount < this._maxCount;
     }
-    run(func, priority, abortSignal) {
+    run(func, priority, abortSignal, ignorePriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            if (this._priorityQueue) {
+            if (!ignorePriority && this._priorityQueue) {
                 yield this._priorityQueue.run(null, priority, abortSignal);
             }
-            return this._run(func, priority, abortSignal);
-        });
-    }
-    _run(func, priority, abortSignal) {
-        return tslib.__awaiter(this, void 0, void 0, function* () {
             while (!this.available()) {
-                yield this.tick(abortSignal);
-                if (this._priorityQueue) {
-                    yield this._priorityQueue.run(null, priority, abortSignal);
+                if (!ignorePriority && this._priorityQueue) {
+                    yield this._priorityQueue.run(this._tickFunc, priority, abortSignal);
+                }
+                else {
+                    yield this.tick(abortSignal);
                 }
             }
             this._activeCount++;
