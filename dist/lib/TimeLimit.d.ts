@@ -9,10 +9,12 @@ export declare class TimeLimit implements ITimeLimit {
     constructor({ maxCount, timeMs, priorityQueue, timeController, }: TimeLimitParams);
     private _activeCount;
     private _tickPromise;
+    hold(): void;
+    release(): void;
     private readonly _releaseFunc;
     private _release;
+    available(): boolean;
     private readonly _tickFunc;
     tick(abortSignal?: IAbortSignalFast): Promise<void>;
-    available(): boolean;
-    run<T>(func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>, priority?: Priority, abortSignal?: IAbortSignalFast, ignorePriority?: boolean): Promise<T>;
+    run<T>(func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>, priority?: Priority, abortSignal?: IAbortSignalFast, force?: boolean): Promise<T>;
 }

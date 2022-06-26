@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import {calcPerformanceAsync} from 'src/test/calcPerformanceAsync'
 import {TimeLimit} from 'src/TimeLimit'
 import {TimeControllerMock} from '@flemist/time-controller'

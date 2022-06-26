@@ -16,6 +16,12 @@ class TimeLimit {
         };
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
     }
+    hold() {
+        this._activeCount++;
+    }
+    release() {
+        this._timeController.setTimeout(this._releaseFunc, this._timeMs);
+    }
     _release() {
         this._activeCount--;
         if (this._activeCount === this._maxCount - 1) {
@@ -24,32 +30,32 @@ class TimeLimit {
             tickPromise.resolve();
         }
     }
-    tick(abortSignal) {
-        return promiseToAbortable(abortSignal, this._tickPromise.promise);
-    }
     available() {
         return this._activeCount < this._maxCount;
     }
-    run(func, priority, abortSignal, ignorePriority) {
+    tick(abortSignal) {
+        return promiseToAbortable(abortSignal, this._tickPromise.promise);
+    }
+    run(func, priority, abortSignal, force) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!ignorePriority && this._priorityQueue) {
+            if (!force && this._priorityQueue) {
                 yield this._priorityQueue.run(null, priority, abortSignal);
             }
             while (!this.available()) {
-                if (!ignorePriority && this._priorityQueue) {
+                if (!force && this._priorityQueue) {
                     yield this._priorityQueue.run(this._tickFunc, priority, abortSignal);
                 }
                 else {
                     yield this.tick(abortSignal);
                 }
             }
-            this._activeCount++;
+            this.hold();
             try {
                 const result = yield func(abortSignal);
                 return result;
             }
             finally {
-                this._timeController.setTimeout(this._releaseFunc, this._timeMs);
+                this.release();
             }
         });
     }

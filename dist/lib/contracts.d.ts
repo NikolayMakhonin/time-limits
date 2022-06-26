@@ -3,9 +3,11 @@ import { Priority, PriorityQueue } from '@flemist/priority-queue';
 import { ITimeController } from '@flemist/time-controller';
 export declare type PromiseOrValue<T> = T | Promise<T>;
 export interface ITimeLimit {
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
+    hold(): void;
+    release(): void;
     available(): boolean;
-    run<T>(func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>, priority?: Priority, abortSignal?: IAbortSignalFast, ignorePriority?: boolean): Promise<T>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void>;
+    run<T>(func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>, priority?: Priority, abortSignal?: IAbortSignalFast, force?: boolean): Promise<T>;
 }
 export declare type TimeLimitParams = {
     maxCount: number;

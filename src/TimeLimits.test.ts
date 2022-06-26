@@ -471,15 +471,23 @@ describe('time-limits > TimeLimits', function () {
     this.timeout(600000)
 
     await testVariants({
-      withPriorityQueue: [false, true],
+      withPriorityQueue: typeof window !== 'undefined'
+        ? [true]
+        : [false, true],
 
       timeLimit1: [1, 2, 5, 10],
       timeLimit2: [1, 2, 5, 10],
       timeLimit3: [1, 2, 5, 10],
 
-      maxCount1: [0, 1, 2, 5],
-      maxCount2: [0, 1, 2, 5],
-      maxCount3: [0, 1, 2, 5],
+      maxCount1: typeof window !== 'undefined'
+        ? [1, 2, 5]
+        : [0, 1, 2, 5],
+      maxCount2: typeof window !== 'undefined'
+        ? [1, 2, 5]
+        : [0, 1, 2, 5],
+      maxCount3: typeof window !== 'undefined'
+        ? [1, 2, 5]
+        : [0, 1, 2, 5],
     })()
   })
 })

@@ -3,7 +3,6 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var tslib = require('tslib');
-var asyncUtils = require('@flemist/async-utils');
 
 class TimeLimits {
     constructor({ timeLimits, priorityQueue, }) {
@@ -11,36 +10,42 @@ class TimeLimits {
         this._priorityQueue = priorityQueue;
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
     }
-    tick(abortSignal) {
-        return Promise.race(this._timeLimits.map(o => o.tick(abortSignal)));
+    hold() {
+        for (let i = 0; i < this._timeLimits.length; i++) {
+            this._timeLimits[i].hold();
+        }
+    }
+    release() {
+        for (let i = 0; i < this._timeLimits.length; i++) {
+            this._timeLimits[i].release();
+        }
     }
     available() {
         return this._timeLimits.every(o => o.available());
     }
-    run(func, priority, abortSignal, ignorePriority) {
+    tick(abortSignal) {
+        return Promise.race(this._timeLimits.map(o => o.tick(abortSignal)));
+    }
+    run(func, priority, abortSignal, force) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            if (!ignorePriority && this._priorityQueue) {
+            if (!force && this._priorityQueue) {
                 yield this._priorityQueue.run(null, priority, abortSignal);
             }
             while (!this.available()) {
-                if (!ignorePriority && this._priorityQueue) {
+                if (!force && this._priorityQueue) {
                     yield this._priorityQueue.run(this._tickFunc, priority, abortSignal);
                 }
                 else {
                     yield this.tick(abortSignal);
                 }
             }
-            const waitPromise = new asyncUtils.CustomPromise();
-            const waitFunc = () => waitPromise.promise;
-            for (let i = 0; i < this._timeLimits.length; i++) {
-                void this._timeLimits[i].run(waitFunc, null, null, true);
-            }
+            this.hold();
             try {
                 const result = yield func(abortSignal);
                 return result;
             }
             finally {
-                waitPromise.resolve();
+                this.release();
             }
         });
     }
