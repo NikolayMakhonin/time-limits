@@ -1,5 +1,4 @@
 import {ITimeLimit, PromiseOrValue, TimeLimitsParams} from './contracts'
-import {CustomPromise} from '@flemist/async-utils'
 import {PriorityQueue, Priority} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {Task} from '@flemist/priority-queue/dist/lib/priority-queue/contracts'
@@ -20,27 +19,29 @@ export class TimeLimits implements ITimeLimit {
     void this._availableUpdater()
   }
 
-  private _hold() {
-    const waitPromise = new CustomPromise()
-    const waitFunc = () => waitPromise.promise
+  hold() {
     for (let i = 0; i < this._timeLimits.length; i++) {
-      void this._timeLimits[i].run(waitFunc, null, null, true)
+      this._timeLimits[i].hold()
     }
-
     if (!this.available()) {
       this._tasks.forEach(task => {
         task.setReadyToRun(false)
       })
     }
-
-    return () => {
-      waitPromise.resolve()
-      if (this.available()) {
-        this._tasks.forEach(task => {
-          task.setReadyToRun(true)
-        })
-      }
+  }
+  release() {
+    for (let i = 0; i < this._timeLimits.length; i++) {
+      this._timeLimits[i].release()
     }
+    if (this.available()) {
+      this._tasks.forEach(task => {
+        task.setReadyToRun(true)
+      })
+    }
+  }
+
+  available() {
+    return this._timeLimits.every(o => o.available())
   }
 
   private readonly _tickFunc: () => Promise<void>
@@ -59,10 +60,6 @@ export class TimeLimits implements ITimeLimit {
     }
   }
 
-  available() {
-    return this._timeLimits.every(o => o.available())
-  }
-
   async run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
@@ -79,14 +76,14 @@ export class TimeLimits implements ITimeLimit {
       this._tasks.delete(task)
     }
 
-    const release = this._hold()
+    this.hold()
 
     try {
       const result = await func(abortSignal)
       return result
     }
     finally {
-      release()
+      this.release()
     }
   }
 }

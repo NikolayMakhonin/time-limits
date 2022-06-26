@@ -22,13 +22,16 @@ class TimeLimit {
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
         this._tasks = new Set();
     }
-    _hold() {
+    hold() {
         this._activeCount++;
         if (this._activeCount === this._maxCount) {
             this._tasks.forEach(task => {
                 task.setReadyToRun(false);
             });
         }
+    }
+    release() {
+        this._timeController.setTimeout(this._releaseFunc, this._timeMs);
     }
     _release() {
         this._activeCount--;
@@ -41,11 +44,11 @@ class TimeLimit {
             });
         }
     }
-    tick(abortSignal) {
-        return abortControllerFastUtils_promiseToAbortable.promiseToAbortable(abortSignal, this._tickPromise.promise);
-    }
     available() {
         return this._activeCount < this._maxCount;
+    }
+    tick(abortSignal) {
+        return abortControllerFastUtils_promiseToAbortable.promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
     run(func, priority, abortSignal, force) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
@@ -56,13 +59,13 @@ class TimeLimit {
                 yield task.result;
                 this._tasks.delete(task);
             }
-            this._hold();
+            this.hold();
             try {
                 const result = yield func(abortSignal);
                 return result;
             }
             finally {
-                this._timeController.setTimeout(this._releaseFunc, this._timeMs);
+                this.release();
             }
         });
     }

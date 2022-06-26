@@ -1,5 +1,4 @@
 import { __awaiter } from 'tslib';
-import { CustomPromise } from '@flemist/async-utils';
 import { PriorityQueue } from '@flemist/priority-queue';
 
 class TimeLimits {
@@ -10,25 +9,28 @@ class TimeLimits {
         this._tasks = new Set();
         void this._availableUpdater();
     }
-    _hold() {
-        const waitPromise = new CustomPromise();
-        const waitFunc = () => waitPromise.promise;
+    hold() {
         for (let i = 0; i < this._timeLimits.length; i++) {
-            void this._timeLimits[i].run(waitFunc, null, null, true);
+            this._timeLimits[i].hold();
         }
         if (!this.available()) {
             this._tasks.forEach(task => {
                 task.setReadyToRun(false);
             });
         }
-        return () => {
-            waitPromise.resolve();
-            if (this.available()) {
-                this._tasks.forEach(task => {
-                    task.setReadyToRun(true);
-                });
-            }
-        };
+    }
+    release() {
+        for (let i = 0; i < this._timeLimits.length; i++) {
+            this._timeLimits[i].release();
+        }
+        if (this.available()) {
+            this._tasks.forEach(task => {
+                task.setReadyToRun(true);
+            });
+        }
+    }
+    available() {
+        return this._timeLimits.every(o => o.available());
     }
     tick(abortSignal) {
         return Promise.race(this._timeLimits.map(o => o.tick(abortSignal)));
@@ -45,9 +47,6 @@ class TimeLimits {
             }
         });
     }
-    available() {
-        return this._timeLimits.every(o => o.available());
-    }
     run(func, priority, abortSignal, force) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!force) {
@@ -57,13 +56,13 @@ class TimeLimits {
                 yield task.result;
                 this._tasks.delete(task);
             }
-            const release = this._hold();
+            this.hold();
             try {
                 const result = yield func(abortSignal);
                 return result;
             }
             finally {
-                release();
+                this.release();
             }
         });
     }

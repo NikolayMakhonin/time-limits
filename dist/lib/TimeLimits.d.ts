@@ -6,10 +6,11 @@ export declare class TimeLimits implements ITimeLimit {
     private readonly _priorityQueue;
     private readonly _tasks;
     constructor({ timeLimits, priorityQueue, }: TimeLimitsParams);
-    private _hold;
+    hold(): void;
+    release(): void;
+    available(): boolean;
     private readonly _tickFunc;
     tick(abortSignal?: IAbortSignalFast): Promise<void>;
     _availableUpdater(): Promise<void>;
-    available(): boolean;
     run<T>(func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>, priority?: Priority, abortSignal?: IAbortSignalFast, force?: boolean): Promise<T>;
 }

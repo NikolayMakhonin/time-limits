@@ -33,7 +33,7 @@ export class TimeLimit implements ITimeLimit {
   private _activeCount: number = 0
   private _tickPromise: CustomPromise<void> = new CustomPromise()
 
-  private _hold() {
+  hold() {
     this._activeCount++
     if (this._activeCount === this._maxCount) {
       this._tasks.forEach(task => {
@@ -42,6 +42,10 @@ export class TimeLimit implements ITimeLimit {
     }
   }
   
+  release() {
+    this._timeController.setTimeout(this._releaseFunc, this._timeMs)
+  }
+
   private readonly _releaseFunc: () => void
   private _release() {
     this._activeCount--
@@ -55,13 +59,13 @@ export class TimeLimit implements ITimeLimit {
     }
   }
 
+  available() {
+    return this._activeCount < this._maxCount
+  }
+
   private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
   tick(abortSignal?: IAbortSignalFast): Promise<void> {
     return promiseToAbortable(abortSignal, this._tickPromise.promise)
-  }
-
-  available() {
-    return this._activeCount < this._maxCount
   }
 
   async run<T>(
@@ -80,14 +84,14 @@ export class TimeLimit implements ITimeLimit {
       this._tasks.delete(task)
     }
 
-    this._hold()
+    this.hold()
 
     try {
       const result = await func(abortSignal)
       return result
     }
     finally {
-      this._timeController.setTimeout(this._releaseFunc, this._timeMs)
+      this.release()
     }
   }
 }
