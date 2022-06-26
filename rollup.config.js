@@ -93,6 +93,14 @@ const nodeConfig = ({
       declarationDir: outputDir,
       declaration   : true,
       transformers  : {
+        before: [
+          {
+            type   : 'program',
+            factory: (program) => {
+              return tsTransformPaths(program).before
+            },
+          },
+        ],
         afterDeclarations: [
           {
             type   : 'program',
@@ -105,10 +113,12 @@ const nodeConfig = ({
     }),
   ],
   onwarn  : onwarnRollup,
-  external: []
-    .concat(Object.keys(pkg.dependencies))
-    .concat(Object.keys(pkg.devDependencies))
-    .concat(require('module').builtinModules || Object.keys(process.binding('natives'))),
+  external: createFilter([
+    'src/**/*.{js,cjs,mjs}',
+    ...Object.keys(pkg.dependencies),
+    ...Object.keys(pkg.devDependencies),
+    ...require('module').builtinModules || Object.keys(process.binding('natives')),
+  ]),
 })
 
 const browserConfig = ({input, outputDir, outputFile}) => ({

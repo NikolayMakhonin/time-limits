@@ -24,6 +24,7 @@ specifiers:
   '@rollup/plugin-node-resolve': 13.3.0
   '@rollup/plugin-replace': 4.0.0
   '@rollup/plugin-typescript': 8.3.3
+  '@rollup/pluginutils': ^4.2.1
   '@types/assert': 1.5.6
   '@types/fs-extra': 9.0.13
   '@types/mocha': 9.1.1
@@ -43,7 +44,7 @@ specifiers:
   mocha: 9.2.2
   nodemon: 2.0.16
   nyc: 15.1.0
-  rdtsc: 2.0.0
+  rdtsc: 3.0.0
   rimraf: 3.0.2
   rollup: 2.75.7
   rollup-plugin-delete: 2.0.0
@@ -83,6 +84,7 @@ devDependencies:
   '@rollup/plugin-node-resolve': 13.3.0_rollup@2.75.7
   '@rollup/plugin-replace': 4.0.0_rollup@2.75.7
   '@rollup/plugin-typescript': 8.3.3_g4qkabtmybowem44p7ts7jnbqm
+  '@rollup/pluginutils': 4.2.1
   '@types/assert': 1.5.6
   '@types/fs-extra': 9.0.13
   '@types/mocha': 9.1.1
@@ -102,7 +104,7 @@ devDependencies:
   mocha: 9.2.2
   nodemon: 2.0.16
   nyc: 15.1.0
-  rdtsc: 2.0.0
+  rdtsc: 3.0.0
   rimraf: 3.0.2
   rollup: 2.75.7
   rollup-plugin-delete: 2.0.0
@@ -5303,10 +5305,11 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
 
-  /rdtsc/2.0.0:
-    resolution: {integrity: sha512-Uol+smiNk1M9zWYZnC0EOAGrogW9IldsKbl1aLS1C5tOOVScLgdozldL5BGsf+wTjtNYOdzeNRiv/WBU2jN0Bw==}
-    engines: {node: '>= 12.4.0'}
-    requiresBuild: true
+  /rdtsc/3.0.0:
+    resolution: {integrity: sha512-VrHxlpsl9rM04sLnZ0ezIC9Ne6LrtIQLfS4FuM+SkaR7PUKU/rlBnSyFw1XRRHqu9wPTORTiGRQxgTIRAKQLJg==}
+    engines: {node: '>=12.4.0', pnpm: ^7.1.6}
+    dependencies:
+      tslib: 2.4.0
     dev: true
 
   /read-pkg-up/7.0.1:
