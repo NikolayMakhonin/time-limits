@@ -30,11 +30,15 @@ export class TimeLimit implements ITimeLimit {
   private _activeCount: number = 0
   private _tickPromise: CustomPromise<void> = new CustomPromise()
 
-  private readonly _releaseFunc: () => void
+  hold() {
+    this._activeCount++
+  }
+
   release() {
     this._timeController.setTimeout(this._releaseFunc, this._timeMs)
   }
 
+  private readonly _releaseFunc: () => void
   private _release() {
     this._activeCount--
     if (this._activeCount === this._maxCount - 1) {
@@ -44,8 +48,8 @@ export class TimeLimit implements ITimeLimit {
     }
   }
 
-  hold() {
-    this._activeCount++
+  available() {
+    return this._activeCount < this._maxCount
   }
 
   private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
@@ -53,22 +57,18 @@ export class TimeLimit implements ITimeLimit {
     return promiseToAbortable(abortSignal, this._tickPromise.promise)
   }
 
-  available() {
-    return this._activeCount < this._maxCount
-  }
-
   async run<T>(
     func: (abortSignal?: IAbortSignalFast) => PromiseOrValue<T>,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    ignorePriority?: boolean,
+    force?: boolean,
   ): Promise<T> {
-    if (!ignorePriority && this._priorityQueue) {
+    if (!force && this._priorityQueue) {
       await this._priorityQueue.run(null, priority, abortSignal)
     }
 
     while (!this.available()) {
-      if (!ignorePriority && this._priorityQueue) {
+      if (!force && this._priorityQueue) {
         await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
       }
       else {
@@ -77,6 +77,7 @@ export class TimeLimit implements ITimeLimit {
     }
 
     this.hold()
+
     try {
       const result = await func(abortSignal)
       return result
