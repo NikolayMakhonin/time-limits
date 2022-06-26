@@ -59,7 +59,7 @@ specifiers:
 dependencies:
   '@flemist/abort-controller-fast': 0.0.5
   '@flemist/async-utils': 0.0.1
-  '@flemist/priority-queue': 0.0.3
+  '@flemist/priority-queue': link:../priority-queue
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
 
@@ -1341,24 +1341,6 @@ packages:
     resolution: {integrity: sha512-bsXb0bYvrhkibbWAURawIvcR09l5sgRsnFAAwGXr1F1TPZqBL9KMzB0QTlwmokKkd3ci5GqsUUWE1BzK80l6Rg==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     dependencies:
-      tslib: 2.4.0
-    dev: false
-
-  /@flemist/pairing-heap/0.0.7:
-    resolution: {integrity: sha512-6t5LhqU5ahJzhsrnf5I2clbq1FWZbpEp+41mVEatQxm5/G9x2jk8OlLScEMSlGubcx/ZFLiS8ndge6a7ZiZ/cQ==}
-    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
-    dependencies:
-      tslib: 2.4.0
-    dev: false
-
-  /@flemist/priority-queue/0.0.3:
-    resolution: {integrity: sha512-I1W/4F2RKf5ts02PnvdM4T3hRhG4DCiQhuZG8w4ZJvslBF1IEeGb2xB3G+et4PZvDRtgwMcA2IMMCWiHp2fyGQ==}
-    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
-    dependencies:
-      '@flemist/abort-controller-fast': 0.0.5
-      '@flemist/async-utils': 0.0.1
-      '@flemist/pairing-heap': 0.0.7
-      '@flemist/time-controller': 0.0.1
       tslib: 2.4.0
     dev: false
 
