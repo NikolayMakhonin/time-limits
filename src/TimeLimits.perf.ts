@@ -22,35 +22,41 @@ describe('time-limits > TimeLimits perf', function () {
       priorityQueue,
     })
 
+    const count = 100
+
     const result = await calcPerformanceAsync(
       60000,
       () => {
 
       },
+      // async () => {
+      //   const promises = []
+      //   for (let i = 0; i < count; i++) {
+      //     promises.push(timeLimit.run(emptyFunc))
+      //   }
+      //   for (let i = 0; i < count; i++) {
+      //     timeController.addTime(1)
+      //     await 0
+      //     await 0
+      //     await 0
+      //   }
+      //   timeController.addTime(1)
+      //   await Promise.all(promises)
+      // },
       async () => {
-        const promises = [
-          timeLimit.run(emptyFunc),
-          timeLimit.run(emptyFunc),
-        ]
-        timeController.addTime(1)
-        await 0
-        await 0
-        await 0
-        timeController.addTime(1)
-        await Promise.all(promises)
-      },
-      async () => {
-        const promises = [
-          timeLimits.run(emptyFunc),
-          timeLimits.run(emptyFunc),
-        ]
-        timeController.addTime(1)
-        await 0
-        await 0
-        await 0
-        await 0
-        await 0
-        await 0
+        const promises = []
+        for (let i = 0; i < count; i++) {
+          promises.push(timeLimits.run(emptyFunc))
+        }
+        for (let i = 0; i < count; i++) {
+          timeController.addTime(1)
+          await 0
+          await 0
+          await 0
+          await 0
+          await 0
+          await 0
+        }
         timeController.addTime(1)
         await Promise.all(promises)
       },
