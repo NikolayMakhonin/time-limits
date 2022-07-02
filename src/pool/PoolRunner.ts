@@ -2,20 +2,21 @@ import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IPriorityQueue, Priority} from '@flemist/priority-queue'
 import {IPool} from './Pool'
 
-export interface IPoolRunner extends IPriorityQueue {
+export interface IPoolRunner {
   pool: IPool
-}
-
-export type PoolRunnerParams = {
-  pool: IPool
+  run<T>(
+    count: number,
+    func: (abortSignal?: IAbortSignalFast) => Promise<T> | T,
+    abortSignal?: IAbortSignalFast,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
+  ): Promise<T>
 }
 
 export class PoolRunner implements IPoolRunner {
   private readonly _pool: IPool
 
-  constructor({
-    pool,
-  }: PoolRunnerParams) {
+  constructor(pool: IPool) {
     this._pool = pool
   }
 
@@ -24,11 +25,13 @@ export class PoolRunner implements IPoolRunner {
   }
 
   async run<T>(
+    count: number,
     func: (abortSignal?: IAbortSignalFast) => Promise<T> | T,
-    priority?: Priority,
     abortSignal?: IAbortSignalFast,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ): Promise<T> {
-    await this._pool.holdWait(1, priority, abortSignal)
+    await this._pool.holdWait(count, abortSignal, priorityQueue, priority)
 
     try {
       const result = await func(abortSignal)

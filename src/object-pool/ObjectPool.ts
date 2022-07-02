@@ -1,7 +1,8 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
-import {IPool, Pool} from 'src/pool'
+import {IPool, Pool, Pools} from 'src/pool'
 import {isPromiseLike} from '@flemist/async-utils'
+import {IPriorityQueue, Priority} from '@flemist/priority-queue'
 
 export interface IObjectPool<TObject extends object> {
   readonly pool: IPool
@@ -42,20 +43,21 @@ export type ObjectPoolArgs<TObject extends object> = {
 
 export class ObjectPool<TObject extends object> implements IObjectPool<TObject> {
   private readonly _pool: IPool
+  private readonly _allocatePool: IPool
   private readonly _availableObjects: IStackPool<TObject>
   private readonly _holdObjects: Set<TObject>
   private readonly _create?: () => Promise<TObject> | TObject
   private readonly _destroy?: (obj: TObject) => Promise<void>|void
 
   constructor({
-    maxSize,
     pool,
     availableObjects,
     holdObjects,
     destroy,
     create,
   }: ObjectPoolArgs<TObject>) {
-    this._pool = pool || new Pool({maxSize})
+    this._allocatePool = new Pool(pool.maxSize)
+    this._pool = new Pools(pool, this._allocatePool)
     this._availableObjects = availableObjects || new StackPool()
     this._holdObjects = holdObjects === true ? new Set<TObject>() : holdObjects || null
     this._create = create
@@ -115,8 +117,13 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     return this._pool.tick()
   }
 
-  async getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]> {
-    await this._pool.holdWait(count, null, abortSignal)
+  async getWait(
+    count: number,
+    abortSignal?: IAbortSignalFast,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
+  ): Promise<TObject[]> {
+    await this._pool.holdWait(count, abortSignal, priorityQueue, priority)
     return this.get(count)
   }
 

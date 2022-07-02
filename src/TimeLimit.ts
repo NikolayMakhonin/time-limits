@@ -20,10 +20,7 @@ export class TimeLimit implements ITimeLimit {
   }: TimeLimitParams) {
     this._timeController = timeController || timeControllerDefault
     this._maxCount = maxCount
-    this._pool = pool || new Pool({
-      maxSize: maxCount,
-      priorityQueue,
-    })
+    this._pool = pool || new Pool(maxCount)
     this._time = time
     this._priorityQueue = priorityQueue
     this._releaseFunc = () => {
@@ -72,7 +69,16 @@ export class TimeLimit implements ITimeLimit {
     abortSignal?: IAbortSignalFast,
     force?: boolean,
   ): Promise<T> {
-    await this._pool.holdWait(1, priority, abortSignal, force)
+    if (force) {
+      if (!this._pool.hold(1)) {
+        if (force) {
+          throw new Error(`hold count (${1}) > holdAvailable (${this._pool.size})`)
+        }
+      }
+    }
+    else {
+      await this._pool.holdWait(1, abortSignal, this._priorityQueue, priority)
+    }
     // if (!force && this._priorityQueue) {
     //   await this._priorityQueue.run(null, priority, abortSignal)
     // }

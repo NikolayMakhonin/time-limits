@@ -2,12 +2,14 @@
 
 var tslib = require('tslib');
 var rdtsc = require('rdtsc');
-var TimeLimit = require('./TimeLimit.cjs');
 var timeController = require('@flemist/time-controller');
-var TimeLimits = require('./TimeLimits.cjs');
 var priorityQueue = require('@flemist/priority-queue');
-require('./pool/Pool.cjs');
+var timeLimit_TimeLimitPool = require('./TimeLimitPool.cjs');
+var pool_Pool = require('../pool/Pool.cjs');
+var pool_Pools = require('../pool/Pools.cjs');
+var pool_PoolRunner = require('../pool/PoolRunner.cjs');
 require('@flemist/async-utils');
+require('../pool/PoolWrapper.cjs');
 
 describe('time-limits > TimeLimits perf', function () {
     this.timeout(600000);
@@ -16,16 +18,15 @@ describe('time-limits > TimeLimits perf', function () {
             const emptyFunc = o => o;
             const priorityQueue$1 = new priorityQueue.PriorityQueue();
             const timeController$1 = new timeController.TimeControllerMock();
-            const timeLimit = new TimeLimit.TimeLimit({
-                time: 1,
-                maxCount: 1,
-                priorityQueue: priorityQueue$1,
-                timeController: timeController$1,
-            });
-            const timeLimits = new TimeLimits.TimeLimits({
-                timeLimits: [timeLimit],
-                priorityQueue: priorityQueue$1,
-            });
+            const timeLimit = new pool_PoolRunner.PoolRunner({ pool: new timeLimit_TimeLimitPool.TimeLimitPool({
+                    pool: new pool_Pool.Pool({ maxSize: 1, priorityQueue: priorityQueue$1 }),
+                    time: 1,
+                    timeController: timeController$1,
+                }) });
+            const timeLimits = new pool_PoolRunner.PoolRunner({ pool: new pool_Pools.Pools({
+                    pools: [timeLimit.pool],
+                    priorityQueue: priorityQueue$1,
+                }) });
             const count = 100;
             const result = yield rdtsc.calcPerformanceAsync(10000, () => {
             }, 
@@ -50,6 +51,8 @@ describe('time-limits > TimeLimits perf', function () {
                 }
                 for (let i = 0; i < count; i++) {
                     timeController$1.addTime(1);
+                    yield 0;
+                    yield 0;
                     yield 0;
                     yield 0;
                     yield 0;

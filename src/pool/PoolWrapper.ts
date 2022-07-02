@@ -1,21 +1,15 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority} from '@flemist/priority-queue'
+import {IPriorityQueue, Priority} from '@flemist/priority-queue'
 import {IPool} from 'src/pool/Pool'
 
 export interface IPoolWrapper extends IPool {
 
 }
 
-export type PoolWrapperParams = {
-  pool: IPool,
-}
-
 export class PoolWrapper implements IPoolWrapper {
   protected readonly _pool: IPool
 
-  constructor({
-    pool,
-  }: PoolWrapperParams) {
+  constructor(pool: IPool) {
     this._pool = pool
   }
 
@@ -49,10 +43,10 @@ export class PoolWrapper implements IPoolWrapper {
 
   holdWait(
     count: number,
-    priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    force?: boolean,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ): Promise<void> {
-    return this._pool.holdWait(count, priority, abortSignal, force)
+    return this._pool.holdWait(count, abortSignal, priorityQueue, priority)
   }
 }

@@ -1,11 +1,13 @@
 import { __awaiter } from 'tslib';
 import { calcPerformanceAsync } from 'rdtsc';
-import { TimeLimit } from './TimeLimit.mjs';
 import { TimeControllerMock } from '@flemist/time-controller';
-import { TimeLimits } from './TimeLimits.mjs';
 import { PriorityQueue } from '@flemist/priority-queue';
-import './pool/Pool.mjs';
+import { TimeLimitPool } from './TimeLimitPool.mjs';
+import { Pool } from '../pool/Pool.mjs';
+import { Pools } from '../pool/Pools.mjs';
+import { PoolRunner } from '../pool/PoolRunner.mjs';
 import '@flemist/async-utils';
+import '../pool/PoolWrapper.mjs';
 
 describe('time-limits > TimeLimits perf', function () {
     this.timeout(600000);
@@ -14,16 +16,15 @@ describe('time-limits > TimeLimits perf', function () {
             const emptyFunc = o => o;
             const priorityQueue = new PriorityQueue();
             const timeController = new TimeControllerMock();
-            const timeLimit = new TimeLimit({
-                time: 1,
-                maxCount: 1,
-                priorityQueue,
-                timeController,
-            });
-            const timeLimits = new TimeLimits({
-                timeLimits: [timeLimit],
-                priorityQueue,
-            });
+            const timeLimit = new PoolRunner({ pool: new TimeLimitPool({
+                    pool: new Pool({ maxSize: 1, priorityQueue }),
+                    time: 1,
+                    timeController,
+                }) });
+            const timeLimits = new PoolRunner({ pool: new Pools({
+                    pools: [timeLimit.pool],
+                    priorityQueue,
+                }) });
             const count = 100;
             const result = yield calcPerformanceAsync(10000, () => {
             }, 
@@ -48,6 +49,8 @@ describe('time-limits > TimeLimits perf', function () {
                 }
                 for (let i = 0; i < count; i++) {
                     timeController.addTime(1);
+                    yield 0;
+                    yield 0;
                     yield 0;
                     yield 0;
                     yield 0;

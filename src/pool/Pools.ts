@@ -5,20 +5,12 @@ import {IPool} from './Pool'
 
 export class Pools implements IPool {
   private readonly _pools: IPool[]
-  private readonly _priorityQueue: IPriorityQueue
 
-  constructor({
-    pools,
-    priorityQueue,
-  }: {
-    pools: IPool[],
-    priorityQueue?: IPriorityQueue,
-  }) {
+  constructor(...pools: IPool[]) {
     if (!pools?.length) {
       throw new Error('pools should not be empty')
     }
     this._pools = pools
-    this._priorityQueue = priorityQueue
     this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
   }
 
@@ -100,33 +92,28 @@ export class Pools implements IPool {
 
   async holdWait(
     count: number,
-    priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    force?: boolean,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
     }
 
-    if (!force) {
-      if (this._priorityQueue) {
-        await this._priorityQueue.run(null, priority, abortSignal)
-      }
+    if (priorityQueue) {
+      await priorityQueue.run(null, priority, abortSignal)
+    }
 
-      while (count > this.size) {
-        if (this._priorityQueue) {
-          await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-        }
-        else {
-          await this.tick(abortSignal)
-        }
+    while (count > this.size) {
+      if (priorityQueue) {
+        await priorityQueue.run(this._tickFunc, priority, abortSignal)
+      }
+      else {
+        await this.tick(abortSignal)
       }
     }
 
     if (!this.hold(count)) {
-      if (force) {
-        throw new Error(`hold count (${count}) > holdAvailable (${this.size})`)
-      }
       throw new Error('Unexpected behavior')
     }
   }

@@ -61,24 +61,18 @@ describe('object-pool > ObjectPool', function () {
       }
 
     const pool = usePools
-      ? new Pools({
-        pools: [
-          new Pool({maxSize}),
-          new Pools({
-            pools: [
-              new Pool({maxSize}),
-              new Pool({maxSize: maxSize + 1}),
-            ],
-          }),
-          new Pool({maxSize: maxSize + 2}),
-        ],
-      },
+      ? new Pools(
+        new Pool(maxSize),
+        new Pools(
+          new Pool(maxSize),
+          new Pool(maxSize + 1),
+        ),
+        new Pool(maxSize + 2),
       )
-      : void 0
+      : new Pool(maxSize)
 
     const objectPool: IObjectPool<IObject> =
       new ObjectPool<IObject>({
-        maxSize,
         pool,
         holdObjects,
         create : createObject,

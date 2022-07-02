@@ -11,7 +11,6 @@ export interface IPool {
   hold(count: number): boolean
 
   /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
-
   releaseAvailable: number
 
   release(count: number): Promise<number> | number
@@ -22,33 +21,22 @@ export interface IPool {
   /** wait size > 0 and hold, use this for concurrency hold */
   holdWait(
     count: number,
-    priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    /** throws error if count < holdAvailable */
-    force?: boolean,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ): Promise<void>
-}
-
-export type PoolParams = {
-  maxSize?: number,
-  priorityQueue?: IPriorityQueue,
 }
 
 export class Pool implements IPool {
   private readonly _maxSize: number = 0
-  private readonly _priorityQueue: IPriorityQueue
   private _size: number = 0
 
-  constructor({
-    maxSize,
-    priorityQueue,
-  }: PoolParams) {
+  constructor(maxSize: number) {
     if (!maxSize) {
       throw new Error('maxSize should be > 0')
     }
     this._maxSize = maxSize
     this._size = maxSize
-    this._priorityQueue = priorityQueue
     this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
   }
 
@@ -107,33 +95,28 @@ export class Pool implements IPool {
 
   async holdWait(
     count: number,
-    priority?: Priority,
     abortSignal?: IAbortSignalFast,
-    force?: boolean,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
     }
 
-    if (!force) {
-      if (this._priorityQueue) {
-        await this._priorityQueue.run(null, priority, abortSignal)
-      }
+    if (priorityQueue) {
+      await priorityQueue.run(null, priority, abortSignal)
+    }
 
-      while (count > this._size) {
-        if (this._priorityQueue) {
-          await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-        }
-        else {
-          await this.tick(abortSignal)
-        }
+    while (count > this._size) {
+      if (priorityQueue) {
+        await priorityQueue.run(this._tickFunc, priority, abortSignal)
+      }
+      else {
+        await this.tick(abortSignal)
       }
     }
 
     if (!this.hold(count)) {
-      if (force) {
-        throw new Error(`hold count (${count}) > holdAvailable (${this._size})`)
-      }
       throw new Error('Unexpected behavior')
     }
   }

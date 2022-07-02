@@ -4,11 +4,10 @@ import { IAbortSignalFast } from '@flemist/abort-controller-fast';
 export declare class TimeLimit implements ITimeLimit {
     private readonly _timeController;
     private readonly _maxCount;
-    private readonly _timeMs;
+    private readonly _pool;
+    private readonly _time;
     private readonly _priorityQueue;
-    constructor({ maxCount, timeMs, priorityQueue, timeController, }: TimeLimitParams);
-    private _activeCount;
-    private _tickPromise;
+    constructor({ maxCount, pool, time, priorityQueue, timeController, }: TimeLimitParams);
     hold(): void;
     release(): void;
     private readonly _releaseFunc;

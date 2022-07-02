@@ -1,36 +1,38 @@
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
 import {delay} from '@flemist/async-utils'
-import {IPoolWrapper, PoolWrapper, PoolWrapperParams} from 'src/pool/PoolWrapper'
+import {IPoolWrapper, PoolWrapper} from 'src/pool/PoolWrapper'
+import {IPool} from 'src/pool'
 
 export interface ITimeLimitPool extends IPoolWrapper {
-  releaseDelay: number
+  time: number
 }
 
-export type TimeLimitPoolParams = PoolWrapperParams & {
-  releaseDelay: number,
+export type TimeLimitPoolParams = {
+  pool: IPool,
+  time: number,
   timeController?: ITimeController,
 }
 
 export class TimeLimitPool extends PoolWrapper implements ITimeLimitPool {
-  private readonly _releaseDelay: number
+  private readonly _time: number
   private readonly _timeController: ITimeController
 
   constructor({
     pool,
-    releaseDelay,
+    time,
     timeController,
   }: TimeLimitPoolParams) {
-    super({pool})
-    this._releaseDelay = releaseDelay
+    super(pool)
+    this._time = time
     this._timeController = timeController || timeControllerDefault
   }
 
-  get releaseDelay(): number {
-    return this._releaseDelay
+  get time(): number {
+    return this._time
   }
 
   async release(count: number) {
-    await delay(this._releaseDelay, null, this._timeController)
+    await delay(this._time, null, this._timeController)
     return this._release(count)
   }
 
