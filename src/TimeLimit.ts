@@ -1,25 +1,31 @@
 import {ITimeLimit, PromiseOrValue, TimeLimitParams} from './contracts'
-import {CustomPromise} from '@flemist/async-utils'
-import {PriorityQueue, Priority} from '@flemist/priority-queue'
+import {Priority, PriorityQueue} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {promiseToAbortable} from 'src/abort-controller-fast-utils'
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
+import {IPool} from 'src/object-pool/contracts'
+import {Pool} from 'src/object-pool/Pool'
 
 export class TimeLimit implements ITimeLimit {
   private readonly _timeController: ITimeController
   private readonly _maxCount: number
-  private readonly _timeMs: number
+  private readonly _pool: IPool
+  private readonly _time: number
   private readonly _priorityQueue: PriorityQueue
 
   constructor({
     maxCount,
-    timeMs,
+    pool,
+    time,
     priorityQueue,
     timeController,
   }: TimeLimitParams) {
     this._timeController = timeController || timeControllerDefault
     this._maxCount = maxCount
-    this._timeMs = timeMs
+    this._pool = pool || new Pool({
+      maxSize: maxCount,
+      priorityQueue,
+    })
+    this._time = time
     this._priorityQueue = priorityQueue
     this._releaseFunc = () => {
       this._release()
@@ -27,34 +33,38 @@ export class TimeLimit implements ITimeLimit {
     this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
   }
 
-  private _activeCount: number = 0
-  private _tickPromise: CustomPromise<void> = new CustomPromise()
+  // private _activeCount: number = 0
+  // private _tickPromise: CustomPromise<void> = new CustomPromise()
 
   hold() {
-    this._activeCount++
+    this._pool.hold(1)
+    // this._activeCount++
   }
 
   release() {
-    this._timeController.setTimeout(this._releaseFunc, this._timeMs)
+    this._timeController.setTimeout(this._releaseFunc, this._time)
   }
 
   private readonly _releaseFunc: () => void
   private _release() {
-    this._activeCount--
-    if (this._activeCount === this._maxCount - 1) {
-      const tickPromise = this._tickPromise
-      this._tickPromise = new CustomPromise()
-      tickPromise.resolve()
-    }
+    this._pool.release(1)
+    // this._activeCount--
+    // if (this._activeCount === this._maxCount - 1) {
+    //   const tickPromise = this._tickPromise
+    //   this._tickPromise = new CustomPromise()
+    //   tickPromise.resolve()
+    // }
   }
 
   available() {
-    return this._activeCount < this._maxCount
+    return this._pool.size > 0
+    // return this._activeCount < this._maxCount
   }
 
   private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
   tick(abortSignal?: IAbortSignalFast): Promise<void> {
-    return promiseToAbortable(abortSignal, this._tickPromise.promise)
+    return this._pool.tick(abortSignal)
+    // return promiseToAbortable(abortSignal, this._tickPromise.promise)
   }
 
   async run<T>(
@@ -63,20 +73,21 @@ export class TimeLimit implements ITimeLimit {
     abortSignal?: IAbortSignalFast,
     force?: boolean,
   ): Promise<T> {
-    if (!force && this._priorityQueue) {
-      await this._priorityQueue.run(null, priority, abortSignal)
-    }
-
-    while (!this.available()) {
-      if (!force && this._priorityQueue) {
-        await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
-      }
-      else {
-        await this.tick(abortSignal)
-      }
-    }
-
-    this.hold()
+    await this._pool.holdWait(1, priority, abortSignal, force)
+    // if (!force && this._priorityQueue) {
+    //   await this._priorityQueue.run(null, priority, abortSignal)
+    // }
+    //
+    // while (!this.available()) {
+    //   if (!force && this._priorityQueue) {
+    //     await this._priorityQueue.run(this._tickFunc, priority, abortSignal)
+    //   }
+    //   else {
+    //     await this.tick(abortSignal)
+    //   }
+    // }
+    //
+    // this.hold()
 
     try {
       const result = await func(abortSignal)

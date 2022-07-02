@@ -21,7 +21,7 @@ describe('time-limits > TimeLimits Old', function () {
       await Promise.resolve()
     }
   }
-  
+
   const testVariants = createTestVariants(async ({
     withPriorityQueue,
     timeLimitsTree,
@@ -44,23 +44,23 @@ describe('time-limits > TimeLimits Old', function () {
         ? new TimeLimits({
           priorityQueue,
           timeLimits: [
-            new TimeLimit({maxCount, timeMs, priorityQueue, timeController}),
+            new TimeLimit({maxCount, time: timeMs, priorityQueue, timeController}),
             new TimeLimits({
               priorityQueue,
               timeLimits: [
                 new TimeLimits({
                   priorityQueue,
                   timeLimits: [
-                    new TimeLimit({maxCount, timeMs, priorityQueue, timeController}),
-                    new TimeLimit({maxCount, timeMs, priorityQueue, timeController}),
+                    new TimeLimit({maxCount, time: timeMs, priorityQueue, timeController}),
+                    new TimeLimit({maxCount, time: timeMs, priorityQueue, timeController}),
                   ],
                 }),
-                new TimeLimit({maxCount, timeMs, priorityQueue, timeController}),
+                new TimeLimit({maxCount, time: timeMs, priorityQueue, timeController}),
               ],
             }),
           ],
         })
-        : new TimeLimit({maxCount, timeMs, priorityQueue, timeController})
+        : new TimeLimit({maxCount, time: timeMs, priorityQueue, timeController})
 
       let completedCount = 0
 
@@ -300,7 +300,7 @@ describe('time-limits > TimeLimits', function () {
     }) {
       const instance = new TimeLimit({
         maxCount,
-        timeMs,
+        time: timeMs,
         priorityQueue,
         timeController,
       })

@@ -8,7 +8,7 @@ specifiers:
   '@babel/preset-env': 7.18.2
   '@babel/runtime-corejs3': 7.18.3
   '@flemist/abort-controller-fast': ^0.0.5
-  '@flemist/async-utils': ^0.0.1
+  '@flemist/async-utils': ^0.0.9
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
   '@flemist/priority-queue': ^0.0.4
@@ -24,7 +24,7 @@ specifiers:
   '@rollup/plugin-node-resolve': 13.3.0
   '@rollup/plugin-replace': 4.0.0
   '@rollup/plugin-typescript': 8.3.3
-  '@rollup/pluginutils': ^4.2.1
+  '@rollup/pluginutils': 4.2.1
   '@types/assert': 1.5.6
   '@types/fs-extra': 9.0.13
   '@types/mocha': 9.1.1
@@ -44,7 +44,7 @@ specifiers:
   mocha: 9.2.2
   nodemon: 2.0.16
   nyc: 15.1.0
-  rdtsc: 3.0.0
+  rdtsc: 3.0.3
   rimraf: 3.0.2
   rollup: 2.75.7
   rollup-plugin-delete: 2.0.0
@@ -59,7 +59,7 @@ specifiers:
 
 dependencies:
   '@flemist/abort-controller-fast': 0.0.5
-  '@flemist/async-utils': 0.0.1
+  '@flemist/async-utils': 0.0.9
   '@flemist/priority-queue': 0.0.4
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
@@ -104,7 +104,7 @@ devDependencies:
   mocha: 9.2.2
   nodemon: 2.0.16
   nyc: 15.1.0
-  rdtsc: 3.0.0
+  rdtsc: 3.0.3
   rimraf: 3.0.2
   rollup: 2.75.7
   rollup-plugin-delete: 2.0.0
@@ -1318,6 +1318,15 @@ packages:
 
   /@flemist/async-utils/0.0.1:
     resolution: {integrity: sha512-TlsQZj0bvaqNk/RW3kFwhfQk3VjMyaTIvFVRhgx+WdbNrMUzvZMVJJ183I5P74VqgtacNjZ03fjPZAZlk0xMmw==}
+    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
+    dependencies:
+      '@flemist/abort-controller-fast': 0.0.5
+      '@flemist/time-controller': 0.0.1
+      tslib: 2.4.0
+    dev: false
+
+  /@flemist/async-utils/0.0.9:
+    resolution: {integrity: sha512-hCJrhkTwlXT91DlEWKqTCeP6KVJ9xr5K+JLCR59uuXtHZlSAIcTLkQx/CUfXJjsJrhI8+HCmd6H6r3KSGDA59Q==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     dependencies:
       '@flemist/abort-controller-fast': 0.0.5
@@ -5305,9 +5314,10 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
 
-  /rdtsc/3.0.0:
-    resolution: {integrity: sha512-VrHxlpsl9rM04sLnZ0ezIC9Ne6LrtIQLfS4FuM+SkaR7PUKU/rlBnSyFw1XRRHqu9wPTORTiGRQxgTIRAKQLJg==}
+  /rdtsc/3.0.3:
+    resolution: {integrity: sha512-q3aPiS+toAcB5HYykDk6gcl3aZIZ21sJ37qZ+Sa5NRiGOod/9QnP0EyBT25uZV7C0L4xPtstzZ3KkbZjg8yNHw==}
     engines: {node: '>=12.4.0', pnpm: ^7.1.6}
+    requiresBuild: true
     dependencies:
       tslib: 2.4.0
     dev: true

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {calcPerformanceAsync} from 'src/test/calcPerformanceAsync'
+import {calcPerformanceAsync} from 'rdtsc'
 import {TimeLimit} from 'src/TimeLimit'
 import {TimeControllerMock} from '@flemist/time-controller'
 import {TimeLimits} from 'src/TimeLimits'
@@ -13,7 +13,7 @@ describe('time-limits > TimeLimits perf', function () {
     const priorityQueue = new PriorityQueue()
     const timeController = new TimeControllerMock()
     const timeLimit = new TimeLimit({
-      timeMs  : 1,
+      time  : 1,
       maxCount: 1,
       priorityQueue,
       timeController,
@@ -26,7 +26,7 @@ describe('time-limits > TimeLimits perf', function () {
     const count = 100
 
     const result = await calcPerformanceAsync(
-      60000,
+      10000,
       () => {
 
       },
