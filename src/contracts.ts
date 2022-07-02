@@ -1,7 +1,7 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, PriorityQueue} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue} from '@flemist/priority-queue'
 import {ITimeController} from '@flemist/time-controller'
-import {IPool} from "src/object-pool";
+import {IPool} from 'src/pool'
 
 export type PromiseOrValue<T> = T | Promise<T>
 
@@ -22,11 +22,11 @@ export type TimeLimitParams = {
   maxCount?: number,
   pool?: IPool,
   time: number,
-  priorityQueue?: PriorityQueue,
+  priorityQueue?: IPriorityQueue,
   timeController?: ITimeController,
 }
 
 export type TimeLimitsParams = {
   timeLimits: ITimeLimit[],
-  priorityQueue?: PriorityQueue,
+  priorityQueue?: IPriorityQueue,
 }

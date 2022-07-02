@@ -1,6 +1,6 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {IPool} from 'src/object-pool/contracts'
-import { Priority } from '@flemist/priority-queue'
+import {Priority} from '@flemist/priority-queue'
+import {IPool} from 'src/pool/Pool'
 
 export interface IPoolWrapper extends IPool {
 

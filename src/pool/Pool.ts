@@ -1,16 +1,42 @@
-import {IPool} from './contracts'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {promiseToAbortable, CustomPromise} from '@flemist/async-utils'
-import {PriorityQueue, Priority} from '@flemist/priority-queue'
+import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
+import {Priority, IPriorityQueue} from '@flemist/priority-queue'
+
+export interface IPool {
+  readonly size: number
+  readonly maxSize: number
+
+  holdAvailable: number
+
+  hold(count: number): boolean
+
+  /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
+
+  releaseAvailable: number
+
+  release(count: number): Promise<number> | number
+
+  /** it will resolve when size > 0 */
+  tick(abortSignal?: IAbortSignalFast): Promise<void>
+
+  /** wait size > 0 and hold, use this for concurrency hold */
+  holdWait(
+    count: number,
+    priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    /** throws error if count < holdAvailable */
+    force?: boolean,
+  ): Promise<void>
+}
 
 export type PoolParams = {
   maxSize?: number,
-  priorityQueue?: PriorityQueue,
+  priorityQueue?: IPriorityQueue,
 }
 
 export class Pool implements IPool {
   private readonly _maxSize: number = 0
-  private readonly _priorityQueue: PriorityQueue
+  private readonly _priorityQueue: IPriorityQueue
   private _size: number = 0
 
   constructor({

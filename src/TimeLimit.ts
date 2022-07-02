@@ -1,16 +1,15 @@
 import {ITimeLimit, PromiseOrValue, TimeLimitParams} from './contracts'
-import {Priority, PriorityQueue} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
-import {IPool} from 'src/object-pool/contracts'
-import {Pool} from 'src/object-pool/Pool'
+import {IPool, Pool} from 'src/pool/Pool'
 
 export class TimeLimit implements ITimeLimit {
   private readonly _timeController: ITimeController
   private readonly _maxCount: number
   private readonly _pool: IPool
   private readonly _time: number
-  private readonly _priorityQueue: PriorityQueue
+  private readonly _priorityQueue: IPriorityQueue
 
   constructor({
     maxCount,
@@ -47,7 +46,7 @@ export class TimeLimit implements ITimeLimit {
 
   private readonly _releaseFunc: () => void
   private _release() {
-    this._pool.release(1)
+    void this._pool.release(1)
     // this._activeCount--
     // if (this._activeCount === this._maxCount - 1) {
     //   const tickPromise = this._tickPromise

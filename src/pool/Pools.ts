@@ -1,17 +1,18 @@
-import {IPool} from './contracts'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, PriorityQueue} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue} from '@flemist/priority-queue'
+import {isPromiseLike} from '@flemist/async-utils'
+import {IPool} from './Pool'
 
 export class Pools implements IPool {
   private readonly _pools: IPool[]
-  private readonly _priorityQueue: PriorityQueue
+  private readonly _priorityQueue: IPriorityQueue
 
   constructor({
     pools,
     priorityQueue,
   }: {
     pools: IPool[],
-    priorityQueue?: PriorityQueue,
+    priorityQueue?: IPriorityQueue,
   }) {
     if (!pools?.length) {
       throw new Error('pools should not be empty')
@@ -65,7 +66,7 @@ export class Pools implements IPool {
     return this.maxSize - this.size
   }
 
-  release(count: number): number {
+  release(count: number): Promise<number> | number {
     const size = this.size
     const maxReleaseCount = this.maxSize - size
     if (count > maxReleaseCount) {
@@ -73,8 +74,20 @@ export class Pools implements IPool {
     }
     if (count > 0) {
       const pools = this._pools
+      let promises: Promise<number>[] = null
       for (let i = 0, len = pools.length; i < len; i++) {
-        pools[i].release(count)
+        const promise = pools[i].release(count)
+        if (isPromiseLike(promise)) {
+          if (!promises) {
+            promises = [promise as Promise<number>]
+          }
+          else {
+            promises.push(promise as Promise<number>)
+          }
+        }
+      }
+      if (promises) {
+        return Promise.all(promises).then(() => count)
       }
     }
     return count

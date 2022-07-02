@@ -1,10 +1,10 @@
 import {ITimeLimit, PromiseOrValue, TimeLimitsParams} from './contracts'
-import {PriorityQueue, Priority} from '@flemist/priority-queue'
+import {IPriorityQueue, Priority} from '@flemist/priority-queue'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 
 export class TimeLimits implements ITimeLimit {
   private readonly _timeLimits: ITimeLimit[]
-  private readonly _priorityQueue: PriorityQueue
+  private readonly _priorityQueue: IPriorityQueue
 
   constructor({
     timeLimits,

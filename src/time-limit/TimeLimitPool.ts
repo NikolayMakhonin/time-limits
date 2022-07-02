@@ -1,17 +1,17 @@
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
 import {delay} from '@flemist/async-utils'
-import {IPoolWrapper, PoolWrapper, PoolWrapperParams} from 'src/PoolWrapper'
+import {IPoolWrapper, PoolWrapper, PoolWrapperParams} from 'src/pool/PoolWrapper'
 
-export interface IReleaseDelayPool extends IPoolWrapper {
+export interface ITimeLimitPool extends IPoolWrapper {
   releaseDelay: number
 }
 
-export type ReleaseDelayPoolParams = PoolWrapperParams & {
+export type TimeLimitPoolParams = PoolWrapperParams & {
   releaseDelay: number,
   timeController?: ITimeController,
 }
 
-export class ReleaseDelayPool extends PoolWrapper implements IReleaseDelayPool {
+export class TimeLimitPool extends PoolWrapper implements ITimeLimitPool {
   private readonly _releaseDelay: number
   private readonly _timeController: ITimeController
 
@@ -19,7 +19,7 @@ export class ReleaseDelayPool extends PoolWrapper implements IReleaseDelayPool {
     pool,
     releaseDelay,
     timeController,
-  }: ReleaseDelayPoolParams) {
+  }: TimeLimitPoolParams) {
     super({pool})
     this._releaseDelay = releaseDelay
     this._timeController = timeController || timeControllerDefault

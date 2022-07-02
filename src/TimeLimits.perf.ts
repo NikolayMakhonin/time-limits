@@ -13,7 +13,7 @@ describe('time-limits > TimeLimits perf', function () {
     const priorityQueue = new PriorityQueue()
     const timeController = new TimeControllerMock()
     const timeLimit = new TimeLimit({
-      time  : 1,
+      time    : 1,
       maxCount: 1,
       priorityQueue,
       timeController,
