@@ -90,24 +90,24 @@ const n=t.subscribe((function(t){r(t)}))
 ;this.resolve=function(t){n(),e(t)
 },this.reject=function(t){n(),r(t)}
 }else this.resolve=e,this.reject=r}}}
-var d={},_={},v={}
-;Object.defineProperty(v,"__esModule",{value:!0})
-;class y extends Error{constructor(t,e){
-super(t),Object.setPrototypeOf(this,y.prototype),
+var _={},d={},y={}
+;Object.defineProperty(y,"__esModule",{value:!0})
+;class v extends Error{constructor(t,e){
+super(t),Object.setPrototypeOf(this,v.prototype),
 this.reason=e,this.name="AbortError",
 this._internal=!1}}
-v.AbortError=y,Object.defineProperty(_,"__esModule",{
-value:!0});var g=v
-;_.toAbortController=function(t,e){
+y.AbortError=v,Object.defineProperty(d,"__esModule",{
+value:!0});var g=y
+;d.toAbortController=function(t,e){
 return t.signal.subscribe((t=>{
 t instanceof g.AbortError&&t._internal&&(t=t.reason),
 e.abort(t)})),e
-},_.toAbortControllerFast=function(t,e){
+},d.toAbortControllerFast=function(t,e){
 return t.signal.addEventListener("abort",(function(){
 e.abort(this.reason)})),e
-},_.toAbortSignal=function(t,e){
+},d.toAbortSignal=function(t,e){
 return t.subscribe((t=>{e.abort(t)})),e.signal
-},_.toAbortSignalFast=function(t,e){
+},d.toAbortSignalFast=function(t,e){
 return t.addEventListener("abort",(function(t){
 e.abort(t)})),e.signal};var j={},m={}
 ;Object.defineProperty(m,"__esModule",{value:!0})
@@ -126,17 +126,17 @@ t.call(this,this.reason)})),this._callbacks=void 0
 }throwIfAborted(){
 if(this.aborted)throw this.reason}
 },Object.defineProperty(j,"__esModule",{value:!0})
-;var P=m,O=v;j.AbortControllerFast=class{
+;var P=m,O=y;j.AbortControllerFast=class{
 constructor(){this.signal=new P.AbortSignalFast}
 abort(t){
 this.signal.aborted||(void 0===t&&((t=new O.AbortError("Aborted with no reason",t))._internal=!0),
 this.signal.abort(t))}
-},Object.defineProperty(d,"__esModule",{value:!0})
-;var A=_,z=j,S=v
-;d.toAbortController=A.toAbortController,d.toAbortControllerFast=A.toAbortControllerFast,
-d.toAbortSignal=A.toAbortSignal,
-d.toAbortSignalFast=A.toAbortSignalFast,d.AbortControllerFast=z.AbortControllerFast,
-d.AbortError=S.AbortError;var k=function(){
+},Object.defineProperty(_,"__esModule",{value:!0})
+;var A=d,z=j,S=y
+;_.toAbortController=A.toAbortController,_.toAbortControllerFast=A.toAbortControllerFast,
+_.toAbortSignal=A.toAbortSignal,
+_.toAbortSignalFast=A.toAbortSignalFast,_.AbortControllerFast=z.AbortControllerFast,
+_.AbortError=S.AbortError;var k=function(){
 function t(t){var e=this
 ;if(this._maxSize=0,this._size=0,this._tickPromise=new p,
 !t)throw new Error("maxSize should be > 0")
@@ -311,26 +311,26 @@ return r(this,void 0,void 0,(function(){
 return n(this,(function(r){switch(r.label){case 0:
 return[4,this._pool.holdWait(t,e,o,i)];case 1:
 return r.sent(),[2,this.get(t)]}}))}))
-},t.prototype.use=function(t,e,o){
+},t.prototype.use=function(t,e,o,i,s){
 return r(this,void 0,void 0,(function(){
-var r,i,s,c,l,a;return n(this,(function(n){
-switch(n.label){case 0:return[4,this.getWait(t,o)]
-;case 1:
+var r,c,l,a,u,h;return n(this,(function(n){
+switch(n.label){case 0:
+return[4,this.getWait(t,o,i,s)];case 1:
 if(r=n.sent(),!this._create)throw new Error("You should specify create function in the constructor")
-;r?i=r.length:(r=new Array(t),i=0),c=i,n.label=2
-;case 2:return c<t?[4,this._create()]:[3,5]
+;r?c=r.length:(r=new Array(t),c=0),a=c,n.label=2
+;case 2:return a<t?[4,this._create()]:[3,5]
 ;case 3:
-if(null==(a=n.sent()))throw new Error("create function should return not null object")
-;this._holdObjects&&this._holdObjects.add(a),
-r[c]=a,n.label=4;case 4:return c++,[3,2];case 5:
+if(null==(h=n.sent()))throw new Error("create function should return not null object")
+;this._holdObjects&&this._holdObjects.add(h),
+r[a]=h,n.label=4;case 4:return a++,[3,2];case 5:
 return n.trys.push([5,,7,13]),[4,e(r,o)];case 6:
 return[2,n.sent()];case 7:
 return[4,this.release(r)];case 8:
-if(s=n.sent(),!this._destroy)return[3,12]
-;c=s,l=r.length,n.label=9;case 9:
-return c<l?(a=r[c],[4,this._destroy(a)]):[3,12]
+if(l=n.sent(),!this._destroy)return[3,12]
+;a=l,u=r.length,n.label=9;case 9:
+return a<u?(h=r[a],[4,this._destroy(h)]):[3,12]
 ;case 10:n.sent(),n.label=11;case 11:
-return c++,[3,9];case 12:return[7];case 13:
+return a++,[3,9];case 12:return[7];case 13:
 return[2]}}))}))
 },t.prototype.allocate=function(t){
 if(!this._create)throw new Error("You should specify create function in the constructor")
@@ -355,7 +355,28 @@ for(var h=0;h<i;h++){var f=this._create()
 ;if(l(f))e.push(a(f));else{var b=this.release([f])
 ;l(b)&&e.push(u(b))}}
 return e.length?Promise.all(e).then((function(t){
-return s})):s},t}(),W=function(t){function o(e){
+return s})):s},t}(),W=function(){function t(t){
+this._objectPool=t}
+return Object.defineProperty(t.prototype,"availableObjects",{
+get:function(){
+return this._objectPool.availableObjects},
+enumerable:!1,configurable:!0
+}),Object.defineProperty(t.prototype,"pool",{
+get:function(){return this._objectPool.pool},
+enumerable:!1,configurable:!0
+}),t.prototype.allocate=function(t){
+return this._objectPool.allocate(t)
+},t.prototype.get=function(t){
+return this._objectPool.get(t)
+},t.prototype.getWait=function(t,e){
+return this._objectPool.getWait(t,e)
+},t.prototype.release=function(t,e,r){
+return this._objectPool.release(t,e,r)
+},t.prototype.tick=function(t){
+return this._objectPool.tick(t)
+},t.prototype.use=function(t,e,r,n,o){
+return this._objectPool.use(t,e,r,n,o)},t
+}(),M=function(t){function o(e){
 var r=e.pool,n=e.time,o=e.timeController,i=t.call(this,r)||this
 ;return i._time=n,i._timeController=o||s,i}
 return function(t,r){
@@ -377,7 +398,7 @@ i.clearTimeout(l),c(t,e)})))})))];case 1:
 return e.sent(),[2,this._release(t)]}var r,n,o}))
 }))},o.prototype._release=function(t){
 return this._pool.release(t)},o}(C)
-;t.ObjectPool=T,t.Pool=k,t.PoolRunner=E,t.PoolWrapper=C,
-t.Pools=x,t.StackPool=F,
-t.TimeLimitPool=W,Object.defineProperty(t,"__esModule",{
+;t.ObjectPool=T,t.ObjectPoolWrapper=W,t.Pool=k,
+t.PoolRunner=E,t.PoolWrapper=C,t.Pools=x,
+t.StackPool=F,t.TimeLimitPool=M,Object.defineProperty(t,"__esModule",{
 value:!0})}({});

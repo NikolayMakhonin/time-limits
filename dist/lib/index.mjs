@@ -4,6 +4,7 @@ export { PoolRunner } from './pool/PoolRunner.mjs';
 export { PoolWrapper } from './pool/PoolWrapper.mjs';
 export { StackPool } from './object-pool/StackPool.mjs';
 export { ObjectPool } from './object-pool/ObjectPool.mjs';
+export { ObjectPoolWrapper } from './object-pool/ObjectPoolWrapper.mjs';
 export { TimeLimitPool } from './time-limit/TimeLimitPool.mjs';
 import 'tslib';
 import '@flemist/async-utils';

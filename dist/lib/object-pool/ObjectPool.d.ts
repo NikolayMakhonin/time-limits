@@ -13,7 +13,7 @@ export interface IObjectPool<TObject extends object> {
     tick(abortSignal?: IAbortSignalFast): Promise<void>;
     /** wait available > 0 and get, use this for concurrency get */
     getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast): Promise<TResult>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }
 export declare type ObjectPoolArgs<TObject extends object> = {
@@ -39,6 +39,6 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
     tick(abortSignal?: IAbortSignalFast): Promise<void>;
     getWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast): Promise<TResult>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }

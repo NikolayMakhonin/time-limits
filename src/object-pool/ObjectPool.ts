@@ -25,6 +25,8 @@ export interface IObjectPool<TObject extends object> {
     count: number,
     func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult,
     abortSignal?: IAbortSignalFast,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ): Promise<TResult>
 
   allocate(
@@ -131,8 +133,10 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     count: number,
     func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult,
     abortSignal?: IAbortSignalFast,
+    priorityQueue?: IPriorityQueue,
+    priority?: Priority,
   ): Promise<TResult> {
-    let objects = await this.getWait(count, abortSignal)
+    let objects = await this.getWait(count, abortSignal, priorityQueue, priority)
     if (!this._create) {
       throw new Error('You should specify create function in the constructor')
     }

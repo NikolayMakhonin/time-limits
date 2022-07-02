@@ -46,11 +46,3 @@ export class PoolWrapper implements IPool {
     return this._pool.holdWait(count, abortSignal, priorityQueue, priority)
   }
 }
-
-// export class PoolWrapperSync extends PoolWrapper implements IPoolSync {
-//   constructor(pool: IPoolSync) {
-//     super(pool)
-//   }
-//
-//   readonly release: (count: number) => number
-// }
