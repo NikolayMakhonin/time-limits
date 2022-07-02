@@ -9,7 +9,7 @@ var pool_PoolWrapper = require('../pool/PoolWrapper.cjs');
 
 class TimeLimitPool extends pool_PoolWrapper.PoolWrapper {
     constructor({ pool, time, timeController: timeController$1, }) {
-        super({ pool });
+        super(pool);
         this._time = time;
         this._timeController = timeController$1 || timeController.timeControllerDefault;
     }

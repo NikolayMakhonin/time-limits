@@ -1,6 +1,7 @@
 import { IAbortSignalFast } from '@flemist/abort-controller-fast';
 import { IStackPool } from "./StackPool";
 import { IPool } from "../pool";
+import { IPriorityQueue, Priority } from '@flemist/priority-queue';
 export interface IObjectPool<TObject extends object> {
     readonly pool: IPool;
     readonly availableObjects: ReadonlyArray<TObject>;
@@ -25,18 +26,19 @@ export declare type ObjectPoolArgs<TObject extends object> = {
 };
 export declare class ObjectPool<TObject extends object> implements IObjectPool<TObject> {
     private readonly _pool;
+    private readonly _allocatePool;
     private readonly _availableObjects;
     private readonly _holdObjects;
     private readonly _create?;
     private readonly _destroy?;
-    constructor({ maxSize, pool, availableObjects, holdObjects, destroy, create, }: ObjectPoolArgs<TObject>);
+    constructor({ pool, availableObjects, holdObjects, destroy, create, }: ObjectPoolArgs<TObject>);
     get pool(): IPool;
     get availableObjects(): ReadonlyArray<TObject>;
     get holdObjects(): ReadonlySet<TObject>;
     get(count: number): TObject[];
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
     tick(abortSignal?: IAbortSignalFast): Promise<void>;
-    getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]>;
+    getWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TObject[]>;
     use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }

@@ -1,15 +1,13 @@
 import { IAbortSignalFast } from '@flemist/abort-controller-fast';
 import { IPriorityQueue, Priority } from '@flemist/priority-queue';
 import { IPool } from './Pool';
-export interface IPoolRunner extends IPriorityQueue {
+export interface IPoolRunner {
     pool: IPool;
+    run<T>(count: number, func: (abortSignal?: IAbortSignalFast) => Promise<T> | T, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<T>;
 }
-export declare type PoolRunnerParams = {
-    pool: IPool;
-};
 export declare class PoolRunner implements IPoolRunner {
     private readonly _pool;
-    constructor({ pool, }: PoolRunnerParams);
+    constructor(pool: IPool);
     get pool(): IPool;
-    run<T>(func: (abortSignal?: IAbortSignalFast) => Promise<T> | T, priority?: Priority, abortSignal?: IAbortSignalFast): Promise<T>;
+    run<T>(count: number, func: (abortSignal?: IAbortSignalFast) => Promise<T> | T, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<T>;
 }

@@ -27,6 +27,10 @@ export interface IPool {
   ): Promise<void>
 }
 
+// export interface IPoolSync extends IPool {
+//   release(count: number): number
+// }
+
 export class Pool implements IPool {
   private readonly _maxSize: number = 0
   private _size: number = 0
@@ -121,3 +125,4 @@ export class Pool implements IPool {
     }
   }
 }
+

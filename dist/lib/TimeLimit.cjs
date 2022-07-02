@@ -11,10 +11,7 @@ class TimeLimit {
     constructor({ maxCount, pool, time, priorityQueue, timeController: timeController$1, }) {
         this._timeController = timeController$1 || timeController.timeControllerDefault;
         this._maxCount = maxCount;
-        this._pool = pool || new pool_Pool.Pool({
-            maxSize: maxCount,
-            priorityQueue,
-        });
+        this._pool = pool || new pool_Pool.Pool(maxCount);
         this._time = time;
         this._priorityQueue = priorityQueue;
         this._releaseFunc = () => {
@@ -58,7 +55,7 @@ class TimeLimit {
                 }
             }
             else {
-                yield this._pool.holdWait(1, priority, abortSignal);
+                yield this._pool.holdWait(1, abortSignal, this._priorityQueue, priority);
             }
             // if (!force && this._priorityQueue) {
             //   await this._priorityQueue.run(null, priority, abortSignal)

@@ -1,11 +1,13 @@
 import { __awaiter } from 'tslib';
 import { StackPool } from './StackPool.mjs';
 import { Pool } from '../pool/Pool.mjs';
+import { Pools } from '../pool/Pools.mjs';
 import { isPromiseLike } from '@flemist/async-utils';
 
 class ObjectPool {
-    constructor({ maxSize, pool, availableObjects, holdObjects, destroy, create, }) {
-        this._pool = pool || new Pool({ maxSize });
+    constructor({ pool, availableObjects, holdObjects, destroy, create, }) {
+        this._allocatePool = new Pool(pool.maxSize);
+        this._pool = new Pools(pool, this._allocatePool);
         this._availableObjects = availableObjects || new StackPool();
         this._holdObjects = holdObjects === true ? new Set() : holdObjects || null;
         this._create = create;
@@ -57,9 +59,9 @@ class ObjectPool {
     tick(abortSignal) {
         return this._pool.tick();
     }
-    getWait(count, abortSignal) {
+    getWait(count, abortSignal, priorityQueue, priority) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, null, abortSignal);
+            yield this._pool.holdWait(count, abortSignal, priorityQueue, priority);
             return this.get(count);
         });
     }
@@ -107,14 +109,14 @@ class ObjectPool {
             throw new Error('You should specify create function in the constructor');
         }
         const promises = [];
-        let tryHoldCount = this._pool.size - this._availableObjects.size;
+        let tryHoldCount = this._allocatePool.size - this._availableObjects.size;
         if (size != null && size < tryHoldCount) {
             tryHoldCount = size;
         }
         if (tryHoldCount < 0) {
             throw new Error('Unexpected behavior: tryHoldCount < 0');
         }
-        const holdCount = this._pool.hold(tryHoldCount) ? tryHoldCount : 0;
+        const holdCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0;
         let allocatedCount = 0;
         const _this = this;
         function releasePromiseObject(objectPromise) {
@@ -124,7 +126,7 @@ class ObjectPool {
                     obj = yield objectPromise;
                 }
                 catch (err) {
-                    yield _this._pool.release(1);
+                    yield _this._allocatePool.release(1);
                     throw err;
                 }
                 const count = yield _this.release([obj]);

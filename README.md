@@ -3,7 +3,7 @@
 [![Build Status][github-image]][github-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
-setTimeout and Date.now() mock for fast testing
+TODO
 
 # License
 

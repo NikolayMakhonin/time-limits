@@ -1,15 +1,15 @@
 import { __awaiter } from 'tslib';
 
 class PoolRunner {
-    constructor({ pool, }) {
+    constructor(pool) {
         this._pool = pool;
     }
     get pool() {
         return this._pool;
     }
-    run(func, priority, abortSignal) {
+    run(count, func, abortSignal, priorityQueue, priority) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(1, priority, abortSignal);
+            yield this._pool.holdWait(count, abortSignal, priorityQueue, priority);
             try {
                 const result = yield func(abortSignal);
                 return result;

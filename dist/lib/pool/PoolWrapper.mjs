@@ -1,5 +1,5 @@
 class PoolWrapper {
-    constructor({ pool, }) {
+    constructor(pool) {
         this._pool = pool;
     }
     get size() {
@@ -23,9 +23,16 @@ class PoolWrapper {
     tick(abortSignal) {
         return this._pool.tick(abortSignal);
     }
-    holdWait(count, priority, abortSignal) {
-        return this._pool.holdWait(count, priority, abortSignal);
+    holdWait(count, abortSignal, priorityQueue, priority) {
+        return this._pool.holdWait(count, abortSignal, priorityQueue, priority);
     }
 }
+// export class PoolWrapperSync extends PoolWrapper implements IPoolSync {
+//   constructor(pool: IPoolSync) {
+//     super(pool)
+//   }
+//
+//   readonly release: (count: number) => number
+// }
 
 export { PoolWrapper };

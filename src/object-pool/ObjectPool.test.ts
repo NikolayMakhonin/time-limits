@@ -211,7 +211,7 @@ describe('object-pool > ObjectPool', function () {
         }
     }
 
-    const totalCount = maxSize * 10
+    const totalCount = maxSize * 5
     for (let i = 0; i < totalCount; i++) {
       const func = createFunc(i)
       const abortController = abort && new AbortControllerFast()
@@ -250,13 +250,13 @@ describe('object-pool > ObjectPool', function () {
   it('variants', async function () {
     this.timeout(600000)
     await testVariants({
-      countObjects   : [1, 2, 3, 7, 10],
+      countObjects   : [1, 2, 3, 5],
       usePools       : [false, true],
       holdObjects    : [false, true],
-      preAllocateSize: [void 0, null, 0, 1, 2, 9, 10],
+      preAllocateSize: [void 0, null, 0, 1, 2, 5],
       abort          : [false, true],
       async          : [false, true],
-      maxSize        : ({countObjects}) => [0, 1, 9].map(o => o + countObjects),
+      maxSize        : ({countObjects}) => [0, 1, 4].map(o => o + countObjects),
     })()
   })
 })

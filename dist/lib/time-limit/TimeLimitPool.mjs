@@ -5,7 +5,7 @@ import { PoolWrapper } from '../pool/PoolWrapper.mjs';
 
 class TimeLimitPool extends PoolWrapper {
     constructor({ pool, time, timeController, }) {
-        super({ pool });
+        super(pool);
         this._time = time;
         this._timeController = timeController || timeControllerDefault;
     }

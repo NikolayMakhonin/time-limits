@@ -3,3 +3,4 @@ export { ObjectPool } from './ObjectPool.mjs';
 import 'tslib';
 import '../pool/Pool.mjs';
 import '@flemist/async-utils';
+import '../pool/Pools.mjs';

@@ -7,6 +7,7 @@ var objectPool_ObjectPool = require('./ObjectPool.cjs');
 require('tslib');
 require('../pool/Pool.cjs');
 require('@flemist/async-utils');
+require('../pool/Pools.cjs');
 
 
 

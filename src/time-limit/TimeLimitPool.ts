@@ -1,9 +1,9 @@
 import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
 import {delay} from '@flemist/async-utils'
-import {IPoolWrapper, PoolWrapper} from 'src/pool/PoolWrapper'
+import {PoolWrapper} from 'src/pool/PoolWrapper'
 import {IPool} from 'src/pool'
 
-export interface ITimeLimitPool extends IPoolWrapper {
+export interface ITimeLimitPool extends IPool {
   time: number
 }
 

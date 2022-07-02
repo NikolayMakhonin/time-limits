@@ -18,15 +18,12 @@ describe('time-limits > TimeLimits perf', function () {
             const emptyFunc = o => o;
             const priorityQueue$1 = new priorityQueue.PriorityQueue();
             const timeController$1 = new timeController.TimeControllerMock();
-            const timeLimit = new pool_PoolRunner.PoolRunner({ pool: new timeLimit_TimeLimitPool.TimeLimitPool({
-                    pool: new pool_Pool.Pool({ maxSize: 1, priorityQueue: priorityQueue$1 }),
-                    time: 1,
-                    timeController: timeController$1,
-                }) });
-            const timeLimits = new pool_PoolRunner.PoolRunner({ pool: new pool_Pools.Pools({
-                    pools: [timeLimit.pool],
-                    priorityQueue: priorityQueue$1,
-                }) });
+            const timeLimit = new pool_PoolRunner.PoolRunner(new timeLimit_TimeLimitPool.TimeLimitPool({
+                pool: new pool_Pool.Pool(1),
+                time: 1,
+                timeController: timeController$1,
+            }));
+            const timeLimits = new pool_PoolRunner.PoolRunner(new pool_Pools.Pools(timeLimit.pool));
             const count = 100;
             const result = yield rdtsc.calcPerformanceAsync(10000, () => {
             }, 
@@ -47,7 +44,7 @@ describe('time-limits > TimeLimits perf', function () {
             () => tslib.__awaiter(this, void 0, void 0, function* () {
                 const promises = [];
                 for (let i = 0; i < count; i++) {
-                    promises.push(timeLimits.run(emptyFunc));
+                    promises.push(timeLimits.run(1, emptyFunc, null, priorityQueue$1));
                 }
                 for (let i = 0; i < count; i++) {
                     timeController$1.addTime(1);

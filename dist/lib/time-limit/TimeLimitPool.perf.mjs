@@ -16,15 +16,12 @@ describe('time-limits > TimeLimits perf', function () {
             const emptyFunc = o => o;
             const priorityQueue = new PriorityQueue();
             const timeController = new TimeControllerMock();
-            const timeLimit = new PoolRunner({ pool: new TimeLimitPool({
-                    pool: new Pool({ maxSize: 1, priorityQueue }),
-                    time: 1,
-                    timeController,
-                }) });
-            const timeLimits = new PoolRunner({ pool: new Pools({
-                    pools: [timeLimit.pool],
-                    priorityQueue,
-                }) });
+            const timeLimit = new PoolRunner(new TimeLimitPool({
+                pool: new Pool(1),
+                time: 1,
+                timeController,
+            }));
+            const timeLimits = new PoolRunner(new Pools(timeLimit.pool));
             const count = 100;
             const result = yield calcPerformanceAsync(10000, () => {
             }, 
@@ -45,7 +42,7 @@ describe('time-limits > TimeLimits perf', function () {
             () => __awaiter(this, void 0, void 0, function* () {
                 const promises = [];
                 for (let i = 0; i < count; i++) {
-                    promises.push(timeLimits.run(emptyFunc));
+                    promises.push(timeLimits.run(1, emptyFunc, null, priorityQueue));
                 }
                 for (let i = 0; i < count; i++) {
                     timeController.addTime(1);

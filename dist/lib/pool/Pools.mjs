@@ -2,12 +2,11 @@ import { __awaiter } from 'tslib';
 import { isPromiseLike } from '@flemist/async-utils';
 
 class Pools {
-    constructor({ pools, priorityQueue, }) {
+    constructor(...pools) {
         if (!(pools === null || pools === void 0 ? void 0 : pools.length)) {
             throw new Error('pools should not be empty');
         }
         this._pools = pools;
-        this._priorityQueue = priorityQueue;
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
     }
     get maxSize() {
@@ -78,17 +77,17 @@ class Pools {
     tick(abortSignal) {
         return Promise.race(this._pools.map(o => o.tick(abortSignal)));
     }
-    holdWait(count, priority, abortSignal) {
+    holdWait(count, abortSignal, priorityQueue, priority) {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
-            if (this._priorityQueue) {
-                yield this._priorityQueue.run(null, priority, abortSignal);
+            if (priorityQueue) {
+                yield priorityQueue.run(null, priority, abortSignal);
             }
             while (count > this.size) {
-                if (this._priorityQueue) {
-                    yield this._priorityQueue.run(this._tickFunc, priority, abortSignal);
+                if (priorityQueue) {
+                    yield priorityQueue.run(this._tickFunc, priority, abortSignal);
                 }
                 else {
                     yield this.tick(abortSignal);

@@ -1,8 +1,11 @@
 import { __awaiter } from 'tslib';
 import { CustomPromise, promiseToAbortable } from '@flemist/async-utils';
 
+// export interface IPoolSync extends IPool {
+//   release(count: number): number
+// }
 class Pool {
-    constructor({ maxSize, priorityQueue, }) {
+    constructor(maxSize) {
         this._maxSize = 0;
         this._size = 0;
         this._tickPromise = new CustomPromise();
@@ -11,7 +14,6 @@ class Pool {
         }
         this._maxSize = maxSize;
         this._size = maxSize;
-        this._priorityQueue = priorityQueue;
         this._tickFunc = (abortSignal) => this.tick(abortSignal);
     }
     get maxSize() {
@@ -56,17 +58,17 @@ class Pool {
         }
         return promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
-    holdWait(count, priority, abortSignal) {
+    holdWait(count, abortSignal, priorityQueue, priority) {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
-            if (this._priorityQueue) {
-                yield this._priorityQueue.run(null, priority, abortSignal);
+            if (priorityQueue) {
+                yield priorityQueue.run(null, priority, abortSignal);
             }
             while (count > this._size) {
-                if (this._priorityQueue) {
-                    yield this._priorityQueue.run(this._tickFunc, priority, abortSignal);
+                if (priorityQueue) {
+                    yield priorityQueue.run(this._tickFunc, priority, abortSignal);
                 }
                 else {
                     yield this.tick(abortSignal);

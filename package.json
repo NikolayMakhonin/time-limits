@@ -1,6 +1,6 @@
 {
   "name": "@flemist/time-limits",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "TODO",
   "main": "dist/lib/index.cjs",
   "module": "dist/lib/index.mjs",
@@ -76,7 +76,7 @@
     "@zerollup/ts-transform-paths": "1.7.18",
     "cpy-cli": "=3.1.1",
     "eslint": "8.18.0",
-    "eslint-config-pro": "3.0.14",
+    "eslint-config-pro": "3.0.16",
     "fs-extra": "10.1.0",
     "globby": "=11.1.0",
     "karma": "6.4.0",
@@ -102,7 +102,7 @@
   },
   "dependencies": {
     "@flemist/abort-controller-fast": "^0.0.5",
-    "@flemist/async-utils": "^0.0.9",
+    "@flemist/async-utils": "^0.0.10",
     "@flemist/priority-queue": "^0.0.5",
     "@flemist/time-controller": "^0.0.1",
     "tslib": "^2.4.0"

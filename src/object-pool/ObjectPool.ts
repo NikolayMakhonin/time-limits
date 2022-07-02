@@ -178,14 +178,14 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       throw new Error('You should specify create function in the constructor')
     }
     const promises: Promise<void>[] = []
-    let tryHoldCount = this._pool.size - this._availableObjects.size
+    let tryHoldCount = this._allocatePool.size - this._availableObjects.size
     if (size != null && size < tryHoldCount) {
       tryHoldCount = size
     }
     if (tryHoldCount < 0) {
       throw new Error('Unexpected behavior: tryHoldCount < 0')
     }
-    const holdCount = this._pool.hold(tryHoldCount) ? tryHoldCount : 0
+    const holdCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0
 
     let allocatedCount = 0
     const _this = this
@@ -195,7 +195,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
         obj = await objectPromise
       }
       catch (err) {
-        await _this._pool.release(1)
+        await _this._allocatePool.release(1)
         throw err
       }
       const count = await _this.release([obj])
