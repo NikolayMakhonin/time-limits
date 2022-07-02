@@ -8,6 +8,7 @@ import {PriorityQueue, priorityCreate} from '@flemist/priority-queue'
 import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
+import {awaitTime} from '@flemist/test-utils'
 
 // region old test
 
@@ -431,14 +432,7 @@ describe('time-limits > TimeLimits', function () {
     }
 
     async function run() {
-      timeController.addTime(0)
-      while (timeController.now() < 1000 && values.length < count) {
-        for (let i = 0; i < 40; i++) {
-          // eslint-disable-next-line @typescript-eslint/await-thenable
-          await 0
-        }
-        timeController.addTime(1)
-      }
+      await awaitTime(timeController, 95, 6)
 
       assert.strictEqual(values.length, count)
 

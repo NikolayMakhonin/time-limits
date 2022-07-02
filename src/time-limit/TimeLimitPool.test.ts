@@ -8,6 +8,7 @@ import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
 import {IPoolRunner, Pool, PoolRunner, Pools} from 'src/pool'
 import {TimeLimitPool} from 'src/time-limit/TimeLimitPool'
+import {awaitTime} from '@flemist/test-utils'
 
 // region old test
 
@@ -426,14 +427,7 @@ describe('time-limits > TimeLimits', function () {
     }
 
     async function run() {
-      timeController.addTime(0)
-      while (timeController.now() < 1000 && values.length < count) {
-        for (let i = 0; i < 40; i++) {
-          // eslint-disable-next-line @typescript-eslint/await-thenable
-          await 0
-        }
-        timeController.addTime(1)
-      }
+      await awaitTime(timeController, 95, 8)
 
       assert.strictEqual(values.length, count)
 
