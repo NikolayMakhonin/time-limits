@@ -1,6 +1,5 @@
 /* eslint-disable no-loop-func,no-unmodified-loop-condition */
 
-import {PromiseOrValue} from '../contracts'
 import {delay} from '@flemist/async-utils'
 import {PriorityQueue, priorityCreate} from '@flemist/priority-queue'
 import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
@@ -197,7 +196,7 @@ describe('time-limits > TimeLimits', function () {
 
   // region createCheckedFunc
 
-  type Func = (abortSignal?: IAbortSignalFast) => PromiseOrValue<number>
+  type Func = (abortSignal?: IAbortSignalFast) => Promise<number> | number
   type CheckedFuncContext = {
     timeController: ITimeController,
     timeLog: number[]
