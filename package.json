@@ -1,6 +1,6 @@
 {
   "name": "@flemist/time-limits",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "TODO",
   "main": "dist/lib/index.cjs",
   "module": "dist/lib/index.mjs",
@@ -102,7 +102,7 @@
   },
   "dependencies": {
     "@flemist/abort-controller-fast": "^0.0.5",
-    "@flemist/async-utils": "^0.0.10",
+    "@flemist/async-utils": "^0.0.11",
     "@flemist/priority-queue": "^0.0.7",
     "@flemist/time-controller": "^0.0.1",
     "tslib": "^2.4.0"
