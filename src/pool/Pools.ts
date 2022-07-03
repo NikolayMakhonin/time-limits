@@ -1,5 +1,5 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, IPriorityQueue} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue, priorityQueueDefault} from '@flemist/priority-queue'
 import {isPromiseLike} from '@flemist/async-utils'
 import {IPool} from './Pool'
 
@@ -85,9 +85,26 @@ export class Pools implements IPool {
     return count
   }
 
-  private readonly _tickFunc: () => Promise<void>
-  tick(abortSignal?: IAbortSignalFast): Promise<void> {
-    return Promise.race(this._pools.map(o => o.tick(abortSignal)))
+  private readonly _tickFunc: () => Promise<void> | void
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+    let promises: Promise<void>[]
+    for (let i = 0, len = this._pools.length; i < len; i++) {
+      const promise = this._pools[i].tick(abortSignal)
+      if (promise) {
+        if (!promises) {
+          promises = [promise]
+        }
+        else {
+          promises.push(promise)
+        }
+      }
+    }
+
+    if (!promises) {
+      return null
+    }
+
+    return Promise.race(promises)
   }
 
   async holdWait(
@@ -98,6 +115,10 @@ export class Pools implements IPool {
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
+    }
+
+    if (!priorityQueue) {
+      // priorityQueue = priorityQueueDefault
     }
 
     if (priorityQueue) {

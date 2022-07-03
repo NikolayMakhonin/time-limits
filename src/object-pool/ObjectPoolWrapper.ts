@@ -34,7 +34,7 @@ export class ObjectPoolWrapper<TObject extends object> implements IObjectPool<TO
     return this._objectPool.release(objects, start, count)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> {
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     return this._objectPool.tick(abortSignal)
   }
 

@@ -1,6 +1,6 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
-import {Priority, IPriorityQueue} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue, priorityQueueDefault} from '@flemist/priority-queue'
 
 export interface IPool {
   readonly size: number
@@ -16,7 +16,7 @@ export interface IPool {
   release(count: number): Promise<number> | number
 
   /** it will resolve when size > 0 */
-  tick(abortSignal?: IAbortSignalFast): Promise<void>
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void
 
   /** wait size > 0 and hold, use this for concurrency hold */
   holdWait(
@@ -88,9 +88,12 @@ export class Pool implements IPool {
     return count
   }
 
-  private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void>
+  private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void> | void
   private _tickPromise: CustomPromise<void> = new CustomPromise()
-  tick(abortSignal?: IAbortSignalFast): Promise<void> {
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+    if (this._size > 0) {
+      return
+    }
     if (!this._tickPromise) {
       this._tickPromise = new CustomPromise()
     }
@@ -105,6 +108,10 @@ export class Pool implements IPool {
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
+    }
+
+    if (!priorityQueue) {
+      // priorityQueue = priorityQueueDefault
     }
 
     if (priorityQueue) {

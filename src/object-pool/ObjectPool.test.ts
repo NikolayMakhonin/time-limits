@@ -5,9 +5,13 @@ import {IObjectPool, ObjectPool} from './ObjectPool'
 import {Pool, Pools} from 'src/pool'
 import {TimeControllerMock} from '@flemist/time-controller'
 import {awaitTime} from '@flemist/test-utils'
+import {PriorityQueue} from '@flemist/priority-queue'
 
 describe('object-pool > ObjectPool', function () {
+  let iteration = 0
+
   const testVariants = createTestVariants(async ({
+    withPriorityQueue,
     countObjects,
     usePools,
     holdObjects,
@@ -16,6 +20,7 @@ describe('object-pool > ObjectPool', function () {
     async,
     maxSize,
   }: {
+    withPriorityQueue?: boolean,
     countObjects: number,
     usePools: boolean,
     holdObjects: boolean,
@@ -34,7 +39,10 @@ describe('object-pool > ObjectPool', function () {
     //   maxSize,
     // })
 
+    iteration++
+
     const timeController = new TimeControllerMock()
+    const priorityQueue = withPriorityQueue ? new PriorityQueue() : null
 
     const promises: Promise<number>[] = []
 
@@ -213,43 +221,54 @@ describe('object-pool > ObjectPool', function () {
 
     const totalCount = maxSize * 5
     for (let i = 0; i < totalCount; i++) {
-      const func = createFunc(i)
+      const func = createFunc(i + 10000 * iteration)
       const abortController = abort && new AbortControllerFast()
-      if (abortController && !async) {
-        abortController.abort(i)
+      if (abortController && !(async || withPriorityQueue)) {
+        abortController.abort(i + 10000 * iteration)
       }
-      let promise = objectPool.use(countObjects, func, abortController.signal)
+      let promise = objectPool.use(countObjects, func, abortController.signal, priorityQueue)
       if (abort) {
         promise = promise.catch(o => o)
       }
       promises.push(promise)
-      if (abortController && async) {
-        abortController.abort(i)
+      if (abortController && (async || withPriorityQueue)) {
+        abortController.abort(i + 10000 * iteration)
       }
     }
 
     const results = await Promise.race([
       Promise.all(promises),
-      // awaitTime(timeController, 10000, 100)
-      awaitTime(timeController, totalCount + countObjects, 6)
+      // awaitTime(timeController, 1000, 100)
+      awaitTime(timeController, totalCount + countObjects, 7)
         .then(() => {
           throw new Error('Timeout')
         }),
     ])
 
+    // awaitTime(timeController, 1000, 100)
+
     assert.strictEqual(activeObjects.size, 0)
-    assert.strictEqual(objectPool.availableObjects.length, maxSize - maxSize % objectsCount)
     assert.strictEqual(objectPool.pool.maxSize, maxSize)
     assert.strictEqual(objectPool.pool.size, maxSize)
 
     for (let i = 0; i < totalCount; i++) {
-      assert.strictEqual(results[i], i)
+      assert.strictEqual(results[i], i + 10000 * iteration)
+    }
+
+    if (withPriorityQueue && abort && preAllocateSize !== null) {
+      assert.strictEqual(objectPool.availableObjects.length, Math.min(maxSize, preAllocateSize || 0))
+    }
+    else {
+      assert.strictEqual(objectPool.availableObjects.length, maxSize - (objectsCount && maxSize % objectsCount))
     }
   })
 
   it('variants', async function () {
     this.timeout(600000)
     await testVariants({
+      withPriorityQueue: typeof window !== 'undefined'
+        ? [true]
+        : [true, false],
       countObjects   : [1, 2, 3, 5],
       usePools       : [false, true],
       holdObjects    : [false, true],

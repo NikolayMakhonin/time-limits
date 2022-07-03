@@ -33,7 +33,7 @@ export class PoolWrapper implements IPool {
     return this._pool.release(count)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> {
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     return this._pool.tick(abortSignal)
   }
 

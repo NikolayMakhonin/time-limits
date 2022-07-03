@@ -16,7 +16,7 @@ export interface IObjectPool<TObject extends object> {
   release(objects: TObject[], start?: number, count?: number): Promise<number> | number
 
   /** it will resolve when size > 0 */
-  tick(abortSignal?: IAbortSignalFast): Promise<void>
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void
 
   /** wait available > 0 and get, use this for concurrency get */
   getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]>
@@ -115,7 +115,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     return releasedCount
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> {
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     return this._pool.tick()
   }
 
