@@ -1,6 +1,12 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
-import {Priority, IPriorityQueue, PriorityQueue, AwaitPriority} from '@flemist/priority-queue'
+import {
+  Priority,
+  IPriorityQueue,
+  PriorityQueue,
+  AwaitPriority,
+  awaitPriorityDefault,
+} from '@flemist/priority-queue'
 
 export interface IPool {
   readonly size: number
@@ -110,12 +116,14 @@ export class Pool implements IPool {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
     }
 
+    if (!awaitPriority) {
+      awaitPriority = awaitPriorityDefault
+    }
+
     await this._priorityQueue.run(async (abortSignal) => {
       while (count > this._size) {
         await this.tick(abortSignal)
-        if (awaitPriority) {
-          await awaitPriority(priority, abortSignal)
-        }
+        await awaitPriority(priority, abortSignal)
       }
       if (!this.hold(count)) {
         throw new Error('Unexpected behavior')

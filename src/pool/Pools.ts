@@ -1,5 +1,11 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, IPriorityQueue, PriorityQueue, AwaitPriority} from '@flemist/priority-queue'
+import {
+  Priority,
+  IPriorityQueue,
+  PriorityQueue,
+  AwaitPriority,
+  awaitPriorityDefault,
+} from '@flemist/priority-queue'
 import {isPromiseLike} from '@flemist/async-utils'
 import {IPool} from './Pool'
 
@@ -115,6 +121,10 @@ export class Pools implements IPool {
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
+    }
+
+    if (!awaitPriority) {
+      awaitPriority = awaitPriorityDefault
     }
 
     await this._priorityQueue.run(async (abortSignal) => {
