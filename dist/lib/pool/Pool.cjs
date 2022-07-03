@@ -71,12 +71,13 @@ class Pool {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
+            if (!awaitPriority) {
+                awaitPriority = priorityQueue.awaitPriorityDefault;
+            }
             yield this._priorityQueue.run((abortSignal) => tslib.__awaiter(this, void 0, void 0, function* () {
                 while (count > this._size) {
                     yield this.tick(abortSignal);
-                    if (awaitPriority) {
-                        yield awaitPriority(priority, abortSignal);
-                    }
+                    yield awaitPriority(priority, abortSignal);
                 }
                 if (!this.hold(count)) {
                     throw new Error('Unexpected behavior');

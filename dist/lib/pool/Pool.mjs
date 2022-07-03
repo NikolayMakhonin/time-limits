@@ -1,6 +1,6 @@
 import { __awaiter } from 'tslib';
 import { CustomPromise, promiseToAbortable } from '@flemist/async-utils';
-import { PriorityQueue } from '@flemist/priority-queue';
+import { PriorityQueue, awaitPriorityDefault } from '@flemist/priority-queue';
 
 // export interface IPoolSync extends IPool {
 //   release(count: number): number
@@ -67,12 +67,13 @@ class Pool {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
+            if (!awaitPriority) {
+                awaitPriority = awaitPriorityDefault;
+            }
             yield this._priorityQueue.run((abortSignal) => __awaiter(this, void 0, void 0, function* () {
                 while (count > this._size) {
                     yield this.tick(abortSignal);
-                    if (awaitPriority) {
-                        yield awaitPriority(priority, abortSignal);
-                    }
+                    yield awaitPriority(priority, abortSignal);
                 }
                 if (!this.hold(count)) {
                     throw new Error('Unexpected behavior');

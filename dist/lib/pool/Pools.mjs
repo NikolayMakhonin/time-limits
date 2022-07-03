@@ -1,5 +1,5 @@
 import { __awaiter } from 'tslib';
-import { PriorityQueue } from '@flemist/priority-queue';
+import { PriorityQueue, awaitPriorityDefault } from '@flemist/priority-queue';
 import { isPromiseLike } from '@flemist/async-utils';
 
 class Pools {
@@ -97,6 +97,9 @@ class Pools {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
+            }
+            if (!awaitPriority) {
+                awaitPriority = awaitPriorityDefault;
             }
             yield this._priorityQueue.run((abortSignal) => __awaiter(this, void 0, void 0, function* () {
                 while (count > this.size) {
