@@ -10,10 +10,10 @@ export interface IObjectPool<TObject extends object> {
     /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
     release(objects: TObject[], start?: number, count?: number): Promise<number> | number;
     /** it will resolve when size > 0 */
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     /** wait available > 0 and get, use this for concurrency get */
-    getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TResult>;
+    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }
 export declare type ObjectPoolArgs<TObject extends object> = {
@@ -37,8 +37,8 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     get holdObjects(): ReadonlySet<TObject>;
     get(count: number): TObject[];
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
-    getWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<TResult>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }

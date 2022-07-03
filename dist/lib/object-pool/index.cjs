@@ -8,6 +8,7 @@ var objectPool_ObjectPoolWrapper = require('./ObjectPoolWrapper.cjs');
 require('tslib');
 require('../pool/Pool.cjs');
 require('@flemist/async-utils');
+require('@flemist/priority-queue');
 require('../pool/Pools.cjs');
 
 

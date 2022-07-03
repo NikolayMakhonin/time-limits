@@ -12,6 +12,7 @@ var objectPool_ObjectPoolWrapper = require('./object-pool/ObjectPoolWrapper.cjs'
 var timeLimit_TimeLimitPool = require('./time-limit/TimeLimitPool.cjs');
 require('tslib');
 require('@flemist/async-utils');
+require('@flemist/priority-queue');
 require('@flemist/time-controller');
 
 

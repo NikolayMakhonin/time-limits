@@ -7,9 +7,9 @@ class PoolRunner {
     get pool() {
         return this._pool;
     }
-    run(count, func, abortSignal, priorityQueue, priority) {
+    run(count, func, priority, abortSignal, priorityQueue) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, abortSignal, priorityQueue, priority);
+            yield this._pool.holdWait(count, priority, abortSignal, priorityQueue);
             try {
                 const result = yield func(abortSignal);
                 return result;

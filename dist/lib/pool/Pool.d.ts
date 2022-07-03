@@ -9,11 +9,12 @@ export interface IPool {
     releaseAvailable: number;
     release(count: number): Promise<number> | number;
     /** it will resolve when size > 0 */
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     /** wait size > 0 and hold, use this for concurrency hold */
-    holdWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<void>;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
 }
 export declare class Pool implements IPool {
+    private readonly _priorityQueue;
     private readonly _maxSize;
     private _size;
     constructor(maxSize: number);
@@ -23,8 +24,7 @@ export declare class Pool implements IPool {
     hold(count: number): boolean;
     get releaseAvailable(): number;
     release(count: number): number;
-    private readonly _tickFunc;
     private _tickPromise;
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
-    holdWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<void>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
 }

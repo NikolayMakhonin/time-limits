@@ -2,7 +2,7 @@ import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
 import {IPool, Pool, Pools} from 'src/pool'
 import {isPromiseLike} from '@flemist/async-utils'
-import {IPriorityQueue, Priority} from '@flemist/priority-queue'
+import {Priority, AwaitPriority} from '@flemist/priority-queue'
 
 export interface IObjectPool<TObject extends object> {
   readonly pool: IPool
@@ -19,14 +19,19 @@ export interface IObjectPool<TObject extends object> {
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void
 
   /** wait available > 0 and get, use this for concurrency get */
-  getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]>
+  getWait(
+    count: number,
+    priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
+  ): Promise<TObject[]>
 
   use<TResult>(
     count: number,
     func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult,
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ): Promise<TResult>
 
   allocate(
@@ -121,22 +126,22 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
 
   async getWait(
     count: number,
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ): Promise<TObject[]> {
-    await this._pool.holdWait(count, abortSignal, priorityQueue, priority)
+    await this._pool.holdWait(count, priority, abortSignal, awaitPriority)
     return this.get(count)
   }
 
   async use<TResult>(
     count: number,
     func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult,
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ): Promise<TResult> {
-    let objects = await this.getWait(count, abortSignal, priorityQueue, priority)
+    let objects = await this.getWait(count, priority, abortSignal, awaitPriority)
     if (!this._create) {
       throw new Error('You should specify create function in the constructor')
     }
@@ -214,10 +219,10 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     for (let i = 0; i < holdCount; i++) {
       const objectOrPromise = this._create()
       if (isPromiseLike(objectOrPromise)) {
-        promises.push(releasePromiseObject(objectOrPromise as Promise<TObject>))
+        promises.push(releasePromiseObject(objectOrPromise))
       }
       else {
-        const promise = this.release([objectOrPromise as TObject])
+        const promise = this.release([objectOrPromise])
         if (isPromiseLike(promise)) {
           promises.push(releasePromise(promise))
         }

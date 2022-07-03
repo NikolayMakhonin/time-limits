@@ -42,7 +42,7 @@ describe('time-limits > TimeLimits perf', function () {
             () => __awaiter(this, void 0, void 0, function* () {
                 const promises = [];
                 for (let i = 0; i < count; i++) {
-                    promises.push(timeLimits.run(1, emptyFunc, null, priorityQueue));
+                    promises.push(timeLimits.run(1, emptyFunc, null, null, priorityQueue));
                 }
                 for (let i = 0; i < count; i++) {
                     timeController.addTime(1);

@@ -1,4 +1,5 @@
 import { __awaiter } from 'tslib';
+import { PriorityQueue } from '@flemist/priority-queue';
 import { isPromiseLike } from '@flemist/async-utils';
 
 class Pools {
@@ -7,7 +8,7 @@ class Pools {
             throw new Error('pools should not be empty');
         }
         this._pools = pools;
-        this._tickFunc = (abortSignal) => this.tick(abortSignal);
+        this._priorityQueue = new PriorityQueue();
     }
     get maxSize() {
         const pools = this._pools;
@@ -75,27 +76,39 @@ class Pools {
         return count;
     }
     tick(abortSignal) {
-        return Promise.race(this._pools.map(o => o.tick(abortSignal)));
+        let promises;
+        for (let i = 0, len = this._pools.length; i < len; i++) {
+            const promise = this._pools[i].tick(abortSignal);
+            if (promise) {
+                if (!promises) {
+                    promises = [promise];
+                }
+                else {
+                    promises.push(promise);
+                }
+            }
+        }
+        if (!promises) {
+            return null;
+        }
+        return Promise.race(promises);
     }
-    holdWait(count, abortSignal, priorityQueue, priority) {
+    holdWait(count, priority, abortSignal, priorityQueue) {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
-            if (priorityQueue) {
-                yield priorityQueue.run(null, priority, abortSignal);
-            }
-            while (count > this.size) {
-                if (priorityQueue) {
-                    yield priorityQueue.run(this._tickFunc, priority, abortSignal);
-                }
-                else {
+            yield this._priorityQueue.run((abortSignal) => __awaiter(this, void 0, void 0, function* () {
+                while (count > this.size) {
                     yield this.tick(abortSignal);
+                    if (priorityQueue) {
+                        yield priorityQueue.run(null, priority, abortSignal);
+                    }
                 }
-            }
-            if (!this.hold(count)) {
-                throw new Error('Unexpected behavior');
-            }
+                if (!this.hold(count)) {
+                    throw new Error('Unexpected behavior');
+                }
+            }), priority, abortSignal);
         });
     }
 }

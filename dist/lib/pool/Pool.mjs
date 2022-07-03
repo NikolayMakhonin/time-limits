@@ -1,5 +1,6 @@
 import { __awaiter } from 'tslib';
 import { CustomPromise, promiseToAbortable } from '@flemist/async-utils';
+import { PriorityQueue } from '@flemist/priority-queue';
 
 // export interface IPoolSync extends IPool {
 //   release(count: number): number
@@ -14,7 +15,7 @@ class Pool {
         }
         this._maxSize = maxSize;
         this._size = maxSize;
-        this._tickFunc = (abortSignal) => this.tick(abortSignal);
+        this._priorityQueue = new PriorityQueue();
     }
     get maxSize() {
         return this._maxSize;
@@ -53,30 +54,30 @@ class Pool {
         return count;
     }
     tick(abortSignal) {
+        if (this._size > 0) {
+            return;
+        }
         if (!this._tickPromise) {
             this._tickPromise = new CustomPromise();
         }
         return promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
-    holdWait(count, abortSignal, priorityQueue, priority) {
+    holdWait(count, priority, abortSignal, priorityQueue) {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
             }
-            if (priorityQueue) {
-                yield priorityQueue.run(null, priority, abortSignal);
-            }
-            while (count > this._size) {
-                if (priorityQueue) {
-                    yield priorityQueue.run(this._tickFunc, priority, abortSignal);
-                }
-                else {
+            yield this._priorityQueue.run((abortSignal) => __awaiter(this, void 0, void 0, function* () {
+                while (count > this._size) {
                     yield this.tick(abortSignal);
+                    if (priorityQueue) {
+                        yield priorityQueue.run(null, priority, abortSignal);
+                    }
                 }
-            }
-            if (!this.hold(count)) {
-                throw new Error('Unexpected behavior');
-            }
+                if (!this.hold(count)) {
+                    throw new Error('Unexpected behavior');
+                }
+            }), priority, abortSignal);
         });
     }
 }

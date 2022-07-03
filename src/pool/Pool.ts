@@ -1,6 +1,6 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
-import {Priority, IPriorityQueue, priorityQueueDefault} from '@flemist/priority-queue'
+import {Priority, IPriorityQueue, PriorityQueue, AwaitPriority} from '@flemist/priority-queue'
 
 export interface IPool {
   readonly size: number
@@ -21,9 +21,9 @@ export interface IPool {
   /** wait size > 0 and hold, use this for concurrency hold */
   holdWait(
     count: number,
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ): Promise<void>
 }
 
@@ -32,6 +32,7 @@ export interface IPool {
 // }
 
 export class Pool implements IPool {
+  private readonly _priorityQueue: IPriorityQueue
   private readonly _maxSize: number = 0
   private _size: number = 0
 
@@ -41,7 +42,7 @@ export class Pool implements IPool {
     }
     this._maxSize = maxSize
     this._size = maxSize
-    this._tickFunc = (abortSignal?: IAbortSignalFast) => this.tick(abortSignal)
+    this._priorityQueue = new PriorityQueue()
   }
 
   get maxSize() {
@@ -88,7 +89,6 @@ export class Pool implements IPool {
     return count
   }
 
-  private readonly _tickFunc: (abortSignal?: IAbortSignalFast) => Promise<void> | void
   private _tickPromise: CustomPromise<void> = new CustomPromise()
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     if (this._size > 0) {
@@ -102,27 +102,25 @@ export class Pool implements IPool {
 
   async holdWait(
     count: number,
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ) {
     if (count > this.maxSize) {
       throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
     }
 
-    if (!priorityQueue) {
-      priorityQueue = priorityQueueDefault
-    }
-
-    await priorityQueue.run(null, priority, abortSignal)
-
-    while (count > this._size) {
-      await priorityQueue.run(this._tickFunc, priority, abortSignal)
-    }
-
-    if (!this.hold(count)) {
-      throw new Error('Unexpected behavior')
-    }
+    await this._priorityQueue.run(async (abortSignal) => {
+      while (count > this._size) {
+        await this.tick(abortSignal)
+        if (awaitPriority) {
+          await awaitPriority(priority, abortSignal)
+        }
+      }
+      if (!this.hold(count)) {
+        throw new Error('Unexpected behavior')
+      }
+    }, priority, abortSignal)
   }
 }
 

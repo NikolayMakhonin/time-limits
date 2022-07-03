@@ -10,6 +10,6 @@ export declare class PoolWrapper implements IPool {
     get releaseAvailable(): number;
     hold(count: number): boolean;
     release(count: number): number | Promise<number>;
-    tick(abortSignal?: IAbortSignalFast): Promise<void>;
-    holdWait(count: number, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue, priority?: Priority): Promise<void>;
+    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
 }

@@ -8,4 +8,5 @@ export { ObjectPoolWrapper } from './object-pool/ObjectPoolWrapper.mjs';
 export { TimeLimitPool } from './time-limit/TimeLimitPool.mjs';
 import 'tslib';
 import '@flemist/async-utils';
+import '@flemist/priority-queue';
 import '@flemist/time-controller';

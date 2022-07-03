@@ -8,6 +8,7 @@ var pool_PoolRunner = require('./PoolRunner.cjs');
 var pool_PoolWrapper = require('./PoolWrapper.cjs');
 require('tslib');
 require('@flemist/async-utils');
+require('@flemist/priority-queue');
 
 
 

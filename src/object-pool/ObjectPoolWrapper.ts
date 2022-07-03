@@ -1,5 +1,5 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {IPriorityQueue, Priority} from '@flemist/priority-queue'
+import {Priority, AwaitPriority} from '@flemist/priority-queue'
 import {IPool} from 'src/pool/Pool'
 import {IObjectPool} from './ObjectPool'
 
@@ -26,8 +26,13 @@ export class ObjectPoolWrapper<TObject extends object> implements IObjectPool<TO
     return this._objectPool.get(count)
   }
 
-  getWait(count: number, abortSignal?: IAbortSignalFast): Promise<TObject[]> {
-    return this._objectPool.getWait(count, abortSignal)
+  getWait(
+    count: number,
+    priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
+  ): Promise<TObject[]> {
+    return this._objectPool.getWait(count, priority, abortSignal, awaitPriority)
   }
 
   release(objects: TObject[], start?: number, count?: number): Promise<number> | number {
@@ -41,10 +46,10 @@ export class ObjectPoolWrapper<TObject extends object> implements IObjectPool<TO
   use<TResult>(
     count: number,
     func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => (Promise<TResult> | TResult),
-    abortSignal?: IAbortSignalFast,
-    priorityQueue?: IPriorityQueue,
     priority?: Priority,
+    abortSignal?: IAbortSignalFast,
+    awaitPriority?: AwaitPriority,
   ): Promise<TResult> {
-    return this._objectPool.use(count, func, abortSignal, priorityQueue, priority)
+    return this._objectPool.use(count, func, priority, abortSignal, awaitPriority)
   }
 }

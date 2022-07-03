@@ -7,6 +7,7 @@ var objectPool_StackPool = require('./StackPool.cjs');
 var pool_Pool = require('../pool/Pool.cjs');
 var pool_Pools = require('../pool/Pools.cjs');
 var asyncUtils = require('@flemist/async-utils');
+require('@flemist/priority-queue');
 
 class ObjectPool {
     constructor({ pool, availableObjects, holdObjects, destroy, create, }) {
@@ -63,15 +64,15 @@ class ObjectPool {
     tick(abortSignal) {
         return this._pool.tick();
     }
-    getWait(count, abortSignal, priorityQueue, priority) {
+    getWait(count, priority, abortSignal, priorityQueue) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, abortSignal, priorityQueue, priority);
+            yield this._pool.holdWait(count, priority, abortSignal, priorityQueue);
             return this.get(count);
         });
     }
-    use(count, func, abortSignal, priorityQueue, priority) {
+    use(count, func, priority, abortSignal, priorityQueue) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            let objects = yield this.getWait(count, abortSignal, priorityQueue, priority);
+            let objects = yield this.getWait(count, priority, abortSignal, priorityQueue);
             if (!this._create) {
                 throw new Error('You should specify create function in the constructor');
             }

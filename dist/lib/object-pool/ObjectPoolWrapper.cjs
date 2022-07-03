@@ -18,8 +18,8 @@ class ObjectPoolWrapper {
     get(count) {
         return this._objectPool.get(count);
     }
-    getWait(count, abortSignal) {
-        return this._objectPool.getWait(count, abortSignal);
+    getWait(count, priority, abortSignal, priorityQueue) {
+        return this._objectPool.getWait(count, priority, abortSignal, priorityQueue);
     }
     release(objects, start, count) {
         return this._objectPool.release(objects, start, count);
@@ -27,8 +27,8 @@ class ObjectPoolWrapper {
     tick(abortSignal) {
         return this._objectPool.tick(abortSignal);
     }
-    use(count, func, abortSignal, priorityQueue, priority) {
-        return this._objectPool.use(count, func, abortSignal, priorityQueue, priority);
+    use(count, func, priority, abortSignal, priorityQueue) {
+        return this._objectPool.use(count, func, priority, abortSignal, priorityQueue);
     }
 }
 

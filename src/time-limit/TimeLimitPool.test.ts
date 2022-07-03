@@ -1,7 +1,7 @@
 /* eslint-disable no-loop-func,no-unmodified-loop-condition */
 
 import {delay} from '@flemist/async-utils'
-import {PriorityQueue, priorityCreate} from '@flemist/priority-queue'
+import {priorityCreate, createAwaitPriority} from '@flemist/priority-queue'
 import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
@@ -39,7 +39,7 @@ describe('time-limits > TimeLimits Old', function () {
   }) => {
     try {
       const timeController = new TimeControllerMock()
-      const priorityQueue = withPriorityQueue ? new PriorityQueue() : null
+      const awaitPriority = withPriorityQueue ? createAwaitPriority() : null
       const timeLimit = timeLimitsTree
         ? new PoolRunner(new Pools(
           new TimeLimitPool({
@@ -95,7 +95,7 @@ describe('time-limits > TimeLimits Old', function () {
         const async = mode === 'async' || mode === 'random' && Math.random() > 0.5
         const result = timeLimit.run(1, (abortSignal) => {
           return run(index, async ? asyncTime : 0, abortSignal)
-        }, null, priorityQueue, priorityCreate(order))
+        }, priorityCreate(order), null, awaitPriority)
         assert.ok(typeof result.then === 'function')
         promises.push(result.then(o => {
           assert.strictEqual(o, index)
@@ -138,7 +138,7 @@ describe('time-limits > TimeLimits Old', function () {
 
       await Promise.all(promises)
 
-      if (priorityQueue && (mode !== 'random' || maxCount > 5)) {
+      if (awaitPriority && (mode !== 'random' || maxCount > 5)) {
         assert.ok(results.every((o, i) => o === i) === (mode !== 'random'), results.join(', '))
       }
     }
@@ -293,7 +293,7 @@ describe('time-limits > TimeLimits', function () {
     maxCount2: number
     maxCount3: number
   }) => {
-    const priorityQueue = withPriorityQueue && new PriorityQueue()
+    const awaitPriority = withPriorityQueue && createAwaitPriority()
     const timeController = new TimeControllerMock()
     const abortSignal: IAbortSignalFast = null
 
@@ -415,18 +415,18 @@ describe('time-limits > TimeLimits', function () {
         if (startTime) {
           timeController.setTimeout(() => {
             checkPromiseResults.push(order)
-            promises.push(timeLimit.instance.run(1, func, abortSignal, priorityQueue, priorityCreate(order)))
+            promises.push(timeLimit.instance.run(1, func, priorityCreate(order), abortSignal, awaitPriority))
           }, startTime)
         }
         else {
           checkPromiseResults.push(order)
-          promises.push(timeLimit.instance.run(1, func, abortSignal, priorityQueue, priorityCreate(order)))
+          promises.push(timeLimit.instance.run(1, func, priorityCreate(order), abortSignal, awaitPriority))
         }
       }
     }
 
     async function run() {
-      await awaitTime(timeController, 95, 8)
+      await awaitTime(timeController, 95, 11)
 
       assert.strictEqual(values.length, count)
 
