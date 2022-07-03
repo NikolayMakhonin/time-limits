@@ -11,9 +11,9 @@ class PoolRunner {
     get pool() {
         return this._pool;
     }
-    run(count, func, priority, abortSignal, priorityQueue) {
+    run(count, func, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, priority, abortSignal, priorityQueue);
+            yield this._pool.holdWait(count, priority, abortSignal, awaitPriority);
             try {
                 const result = yield func(abortSignal);
                 return result;

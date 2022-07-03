@@ -1,7 +1,7 @@
 import { __awaiter } from 'tslib';
 import { calcPerformanceAsync } from 'rdtsc';
 import { TimeControllerMock } from '@flemist/time-controller';
-import { PriorityQueue } from '@flemist/priority-queue';
+import { createAwaitPriority } from '@flemist/priority-queue';
 import { TimeLimitPool } from './TimeLimitPool.mjs';
 import { Pool } from '../pool/Pool.mjs';
 import { Pools } from '../pool/Pools.mjs';
@@ -14,7 +14,7 @@ describe('time-limits > TimeLimits perf', function () {
     it('base', function () {
         return __awaiter(this, void 0, void 0, function* () {
             const emptyFunc = o => o;
-            const priorityQueue = new PriorityQueue();
+            const awaitPriority = createAwaitPriority();
             const timeController = new TimeControllerMock();
             const timeLimit = new PoolRunner(new TimeLimitPool({
                 pool: new Pool(1),
@@ -42,7 +42,7 @@ describe('time-limits > TimeLimits perf', function () {
             () => __awaiter(this, void 0, void 0, function* () {
                 const promises = [];
                 for (let i = 0; i < count; i++) {
-                    promises.push(timeLimits.run(1, emptyFunc, null, null, priorityQueue));
+                    promises.push(timeLimits.run(1, emptyFunc, null, null, awaitPriority));
                 }
                 for (let i = 0; i < count; i++) {
                     timeController.addTime(1);

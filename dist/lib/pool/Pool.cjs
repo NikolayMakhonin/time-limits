@@ -66,7 +66,7 @@ class Pool {
         }
         return asyncUtils.promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
-    holdWait(count, priority, abortSignal, priorityQueue) {
+    holdWait(count, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
@@ -74,8 +74,8 @@ class Pool {
             yield this._priorityQueue.run((abortSignal) => tslib.__awaiter(this, void 0, void 0, function* () {
                 while (count > this._size) {
                     yield this.tick(abortSignal);
-                    if (priorityQueue) {
-                        yield priorityQueue.run(null, priority, abortSignal);
+                    if (awaitPriority) {
+                        yield awaitPriority(priority, abortSignal);
                     }
                 }
                 if (!this.hold(count)) {

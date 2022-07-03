@@ -1,5 +1,5 @@
 import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { Priority, IPriorityQueue } from '@flemist/priority-queue';
+import { Priority, AwaitPriority } from '@flemist/priority-queue';
 import { IPool } from './Pool';
 export declare class Pools implements IPool {
     private readonly _priorityQueue;
@@ -12,5 +12,5 @@ export declare class Pools implements IPool {
     get releaseAvailable(): number;
     release(count: number): Promise<number> | number;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }

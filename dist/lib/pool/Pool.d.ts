@@ -1,5 +1,5 @@
 import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { Priority, IPriorityQueue } from '@flemist/priority-queue';
+import { Priority, AwaitPriority } from '@flemist/priority-queue';
 export interface IPool {
     readonly size: number;
     readonly maxSize: number;
@@ -11,7 +11,7 @@ export interface IPool {
     /** it will resolve when size > 0 */
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     /** wait size > 0 and hold, use this for concurrency hold */
-    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }
 export declare class Pool implements IPool {
     private readonly _priorityQueue;
@@ -26,5 +26,5 @@ export declare class Pool implements IPool {
     release(count: number): number;
     private _tickPromise;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<void>;
+    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }

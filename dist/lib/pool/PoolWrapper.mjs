@@ -23,8 +23,8 @@ class PoolWrapper {
     tick(abortSignal) {
         return this._pool.tick(abortSignal);
     }
-    holdWait(count, priority, abortSignal, priorityQueue) {
-        return this._pool.holdWait(count, priority, abortSignal, priorityQueue);
+    holdWait(count, priority, abortSignal, awaitPriority) {
+        return this._pool.holdWait(count, priority, abortSignal, awaitPriority);
     }
 }
 

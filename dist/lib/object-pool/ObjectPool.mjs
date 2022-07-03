@@ -60,15 +60,15 @@ class ObjectPool {
     tick(abortSignal) {
         return this._pool.tick();
     }
-    getWait(count, priority, abortSignal, priorityQueue) {
+    getWait(count, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, priority, abortSignal, priorityQueue);
+            yield this._pool.holdWait(count, priority, abortSignal, awaitPriority);
             return this.get(count);
         });
     }
-    use(count, func, priority, abortSignal, priorityQueue) {
+    use(count, func, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {
-            let objects = yield this.getWait(count, priority, abortSignal, priorityQueue);
+            let objects = yield this.getWait(count, priority, abortSignal, awaitPriority);
             if (!this._create) {
                 throw new Error('You should specify create function in the constructor');
             }

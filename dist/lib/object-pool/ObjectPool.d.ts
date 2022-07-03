@@ -1,7 +1,7 @@
 import { IAbortSignalFast } from '@flemist/abort-controller-fast';
 import { IStackPool } from "./StackPool";
 import { IPool } from "../pool";
-import { IPriorityQueue, Priority } from '@flemist/priority-queue';
+import { Priority, AwaitPriority } from '@flemist/priority-queue';
 export interface IObjectPool<TObject extends object> {
     readonly pool: IPool;
     readonly availableObjects: ReadonlyArray<TObject>;
@@ -12,8 +12,8 @@ export interface IObjectPool<TObject extends object> {
     /** it will resolve when size > 0 */
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     /** wait available > 0 and get, use this for concurrency get */
-    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TResult>;
+    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }
 export declare type ObjectPoolArgs<TObject extends object> = {
@@ -38,7 +38,7 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     get(count: number): TObject[];
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, priorityQueue?: IPriorityQueue): Promise<TResult>;
+    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TResult>;
     allocate(size?: number): Promise<number> | number;
 }

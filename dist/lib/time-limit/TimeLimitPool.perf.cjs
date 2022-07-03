@@ -16,7 +16,7 @@ describe('time-limits > TimeLimits perf', function () {
     it('base', function () {
         return tslib.__awaiter(this, void 0, void 0, function* () {
             const emptyFunc = o => o;
-            const priorityQueue$1 = new priorityQueue.PriorityQueue();
+            const awaitPriority = priorityQueue.createAwaitPriority();
             const timeController$1 = new timeController.TimeControllerMock();
             const timeLimit = new pool_PoolRunner.PoolRunner(new timeLimit_TimeLimitPool.TimeLimitPool({
                 pool: new pool_Pool.Pool(1),
@@ -44,7 +44,7 @@ describe('time-limits > TimeLimits perf', function () {
             () => tslib.__awaiter(this, void 0, void 0, function* () {
                 const promises = [];
                 for (let i = 0; i < count; i++) {
-                    promises.push(timeLimits.run(1, emptyFunc, null, null, priorityQueue$1));
+                    promises.push(timeLimits.run(1, emptyFunc, null, null, awaitPriority));
                 }
                 for (let i = 0; i < count; i++) {
                     timeController$1.addTime(1);

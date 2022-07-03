@@ -217,12 +217,11 @@ e=r.item,t.delete(r)}
 if(e.abortSignal&&e.abortSignal.aborted)e.reject(e.abortSignal.reason);else try{
 let t=e.func&&e.func(e.abortSignal)
 ;t&&"function"==typeof t.then&&(t=yield t),e.resolve(t)
-}catch(t){e.reject(t)}}}))}}new W
-;var R=function(){function t(t){
-if(this._maxSize=0,this._size=0,this._tickPromise=new b,
-!t)throw new Error("maxSize should be > 0")
-;this._maxSize=t,this._size=t,this._priorityQueue=new W
-}
+}catch(t){e.reject(t)}}}))}}var R=function(){
+function t(t){
+if(this._maxSize=0,this._size=0,this._tickPromise=new b,!t)throw new Error("maxSize should be > 0")
+;this._maxSize=t,
+this._size=t,this._priorityQueue=new W}
 return Object.defineProperty(t.prototype,"maxSize",{
 get:function(){return this._maxSize},
 enumerable:!1,configurable:!0
@@ -258,9 +257,8 @@ if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(
 return r(s,void 0,void 0,(function(){
 return n(this,(function(r){switch(r.label){case 0:
 return t>this._size?[4,this.tick(o)]:[3,4];case 1:
-return r.sent(),i?[4,i.run(null,e,o)]:[3,3]
-;case 2:r.sent(),r.label=3;case 3:return[3,0]
-;case 4:
+return r.sent(),i?[4,i(e,o)]:[3,3];case 2:
+r.sent(),r.label=3;case 3:return[3,0];case 4:
 if(!this.hold(t))throw new Error("Unexpected behavior")
 ;return[2]}}))}))}),e,o)];case 1:
 return l.sent(),[2]}}))}))},t}(),Q=function(){
@@ -308,9 +306,8 @@ if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(
 return r(s,void 0,void 0,(function(){
 return n(this,(function(r){switch(r.label){case 0:
 return t>this.size?[4,this.tick(o)]:[3,4];case 1:
-return r.sent(),i?[4,i.run(null,e,o)]:[3,3]
-;case 2:r.sent(),r.label=3;case 3:return[3,0]
-;case 4:
+return r.sent(),i?[4,i(e,o)]:[3,3];case 2:
+r.sent(),r.label=3;case 3:return[3,0];case 4:
 if(!this.hold(t))throw new Error("Unexpected behavior")
 ;return[2]}}))}))}),e,o)];case 1:
 return l.sent(),[2]}}))}))},t}(),q=function(){

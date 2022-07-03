@@ -93,7 +93,7 @@ class Pools {
         }
         return Promise.race(promises);
     }
-    holdWait(count, priority, abortSignal, priorityQueue) {
+    holdWait(count, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {
             if (count > this.maxSize) {
                 throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
@@ -101,8 +101,8 @@ class Pools {
             yield this._priorityQueue.run((abortSignal) => __awaiter(this, void 0, void 0, function* () {
                 while (count > this.size) {
                     yield this.tick(abortSignal);
-                    if (priorityQueue) {
-                        yield priorityQueue.run(null, priority, abortSignal);
+                    if (awaitPriority) {
+                        yield awaitPriority(priority, abortSignal);
                     }
                 }
                 if (!this.hold(count)) {
