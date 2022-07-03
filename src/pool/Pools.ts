@@ -118,20 +118,13 @@ export class Pools implements IPool {
     }
 
     if (!priorityQueue) {
-      // priorityQueue = priorityQueueDefault
+      priorityQueue = priorityQueueDefault
     }
 
-    if (priorityQueue) {
-      await priorityQueue.run(null, priority, abortSignal)
-    }
+    await priorityQueue.run(null, priority, abortSignal)
 
     while (count > this.size) {
-      if (priorityQueue) {
-        await priorityQueue.run(this._tickFunc, priority, abortSignal)
-      }
-      else {
-        await this.tick(abortSignal)
-      }
+      await priorityQueue.run(this._tickFunc, priority, abortSignal)
     }
 
     if (!this.hold(count)) {

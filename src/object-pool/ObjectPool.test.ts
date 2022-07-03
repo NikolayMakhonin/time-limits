@@ -25,7 +25,7 @@ describe('object-pool > ObjectPool', function () {
     usePools: boolean,
     holdObjects: boolean,
     preAllocateSize: number,
-    abort: boolean,
+    abort: null|'before'|'after',
     async: boolean,
     maxSize: number,
   }) => {
@@ -223,15 +223,15 @@ describe('object-pool > ObjectPool', function () {
     for (let i = 0; i < totalCount; i++) {
       const func = createFunc(i + 10000 * iteration)
       const abortController = abort && new AbortControllerFast()
-      if (abortController && !(async || withPriorityQueue)) {
+      if (abortController && abort === 'before') {
         abortController.abort(i + 10000 * iteration)
       }
-      let promise = objectPool.use(countObjects, func, abortController.signal, priorityQueue)
+      let promise = objectPool.use(countObjects, func, abortController?.signal, priorityQueue)
       if (abort) {
         promise = promise.catch(o => o)
       }
       promises.push(promise)
-      if (abortController && (async || withPriorityQueue)) {
+      if (abortController && abort === 'after') {
         abortController.abort(i + 10000 * iteration)
       }
     }
@@ -239,7 +239,7 @@ describe('object-pool > ObjectPool', function () {
     const results = await Promise.race([
       Promise.all(promises),
       // awaitTime(timeController, 1000, 100)
-      awaitTime(timeController, totalCount + countObjects, 7)
+      awaitTime(timeController, totalCount + countObjects, 13)
         .then(() => {
           throw new Error('Timeout')
         }),
@@ -255,7 +255,7 @@ describe('object-pool > ObjectPool', function () {
       assert.strictEqual(results[i], i + 10000 * iteration)
     }
 
-    if (withPriorityQueue && abort && preAllocateSize !== null) {
+    if (abort && preAllocateSize !== null) {
       assert.strictEqual(objectPool.availableObjects.length, Math.min(maxSize, preAllocateSize || 0))
     }
     else {
@@ -273,7 +273,7 @@ describe('object-pool > ObjectPool', function () {
       usePools       : [false, true],
       holdObjects    : [false, true],
       preAllocateSize: [void 0, null, 0, 1, 2, 5],
-      abort          : [false, true],
+      abort          : [null, 'before', 'after'],
       async          : [false, true],
       maxSize        : ({countObjects}) => [0, 1, 4].map(o => o + countObjects),
     })()
