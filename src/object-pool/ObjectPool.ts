@@ -40,7 +40,6 @@ export interface IObjectPool<TObject extends object> {
 }
 
 export type ObjectPoolArgs<TObject extends object> = {
-  maxSize?: number,
   pool?: IPool,
   availableObjects?: IStackPool<TObject>
   holdObjects?: boolean | Set<TObject>,
