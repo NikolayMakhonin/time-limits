@@ -4,7 +4,7 @@ import '@flemist/priority-queue';
 import { toFuncWithFinally } from '@flemist/async-utils';
 import '@flemist/time-controller';
 
-function runPoolWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
+function poolRunWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
     return __awaiter(this, void 0, void 0, function* () {
         return toFuncWithFinally(function funcWithPoolThrow() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -18,4 +18,4 @@ function runPoolWait({ pool, count, func, priority, abortSignal, awaitPriority, 
     });
 }
 
-export { runPoolWait };
+export { poolRunWait };

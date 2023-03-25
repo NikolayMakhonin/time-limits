@@ -547,12 +547,12 @@ return this._pool.release(t)},e}(V)
 ;t.ObjectPool=$,t.ObjectPoolWrapper=tt,t.Pool=N,
 t.PoolHoldError=X,t.PoolRunner=J,
 t.PoolWrapper=V,t.Pools=B,t.StackPool=Z,t.TimeLimitPool=et,
-t.runPoolThrow=function(t,e,r){
+t.poolRunThrow=function(t,e,r){
 return function(t,e,r){return T((function(){
 if(!t.hold(e))throw new X(e)
 ;return r.apply(this,arguments)}),(function(){
 t.release(e)}))}(t,e,r)()
-},t.runPoolWait=function(t){
+},t.poolRunWait=function(t){
 var e=t.pool,r=t.count,i=t.func,s=t.priority,l=t.abortSignal,c=t.awaitPriority
 ;return n(this,void 0,void 0,(function(){
 return o(this,(function(t){return[2,T((function(){

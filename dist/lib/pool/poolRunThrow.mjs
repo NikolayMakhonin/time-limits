@@ -12,8 +12,8 @@ function toFuncWithPoolThrow(pool, count, func) {
         void pool.release(count);
     });
 }
-function runPoolThrow(pool, count, func) {
+function poolRunThrow(pool, count, func) {
     return toFuncWithPoolThrow(pool, count, func)();
 }
 
-export { runPoolThrow, toFuncWithPoolThrow };
+export { poolRunThrow, toFuncWithPoolThrow };

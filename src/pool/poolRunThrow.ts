@@ -23,7 +23,7 @@ export function toFuncWithPoolThrow<TFunc extends FuncAny>(
   )
 }
 
-export function runPoolThrow<T>(
+export function poolRunThrow<T>(
   pool: IPool,
   count: number,
   func: () => T,

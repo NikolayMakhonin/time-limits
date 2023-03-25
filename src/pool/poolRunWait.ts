@@ -13,7 +13,7 @@ export type PoolRunWaitArgs<T> = {
   awaitPriority?: AwaitPriority
 }
 
-export async function runPoolWait<T>({
+export async function poolRunWait<T>({
   pool,
   count,
   func,

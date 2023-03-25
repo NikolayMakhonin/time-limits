@@ -8,7 +8,7 @@ require('@flemist/priority-queue');
 var asyncUtils = require('@flemist/async-utils');
 require('@flemist/time-controller');
 
-function runPoolWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
+function poolRunWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
     return tslib.__awaiter(this, void 0, void 0, function* () {
         return asyncUtils.toFuncWithFinally(function funcWithPoolThrow() {
             return tslib.__awaiter(this, void 0, void 0, function* () {
@@ -22,4 +22,4 @@ function runPoolWait({ pool, count, func, priority, abortSignal, awaitPriority, 
     });
 }
 
-exports.runPoolWait = runPoolWait;
+exports.poolRunWait = poolRunWait;
