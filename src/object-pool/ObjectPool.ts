@@ -40,11 +40,13 @@ export interface IObjectPool<TObject extends object> {
 }
 
 export type ObjectPoolArgs<TObject extends object> = {
-  pool?: IPool,
+  pool: IPool,
+  /** custom availableObjects */
   availableObjects?: IStackPool<TObject>
-  holdObjects?: boolean | Set<TObject>,
-  create?: () => Promise<TObject>|TObject,
-  destroy?: (obj: TObject) => Promise<void>|void,
+  /** use holdObjects so that you can know which objects are taken and not released to the pool */
+  holdObjects?: boolean | Set<TObject>
+  create: () => Promise<TObject>|TObject
+  destroy?: (obj: TObject) => Promise<void>|void
 }
 
 export class ObjectPool<TObject extends object> implements IObjectPool<TObject> {
@@ -65,7 +67,9 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     this._allocatePool = new Pool(pool.maxSize)
     this._pool = new Pools(pool, this._allocatePool)
     this._availableObjects = availableObjects || new StackPool()
-    this._holdObjects = holdObjects === true ? new Set<TObject>() : holdObjects || null
+    this._holdObjects = holdObjects === true
+      ? new Set<TObject>()
+      : holdObjects || null
     this._create = create
     this._destroy = destroy
   }
@@ -78,6 +82,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     return this._availableObjects.objects
   }
 
+  /** which objects are taken and not released to the pool */
   get holdObjects(): ReadonlySet<TObject> {
     return this._holdObjects
   }
