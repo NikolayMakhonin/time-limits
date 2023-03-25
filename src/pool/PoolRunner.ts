@@ -1,7 +1,8 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, AwaitPriority} from '@flemist/priority-queue'
+import {AwaitPriority, Priority} from '@flemist/priority-queue'
 import {IPool} from './Pool'
 
+/** @deprecated use poolRunWait */
 export interface IPoolRunner {
   pool: IPool
   run<T>(
@@ -13,6 +14,7 @@ export interface IPoolRunner {
   ): Promise<T>
 }
 
+/** @deprecated use poolRunWait */
 export class PoolRunner implements IPoolRunner {
   private readonly _pool: IPool
 
@@ -38,7 +40,7 @@ export class PoolRunner implements IPoolRunner {
       return result
     }
     finally {
-      void this._pool.release(1)
+      void this._pool.release(count)
     }
   }
 }
