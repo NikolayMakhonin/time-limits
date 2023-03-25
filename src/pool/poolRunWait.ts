@@ -1,6 +1,7 @@
 import {IPool, Pool} from '~/src'
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {AwaitPriority, Priority} from '@flemist/priority-queue'
+import {toFuncWithFinally} from '@flemist/async-utils'
 
 export type PoolRunWaitArgs<T> = {
   pool: IPool
@@ -12,7 +13,7 @@ export type PoolRunWaitArgs<T> = {
   awaitPriority?: AwaitPriority
 }
 
-export async function poolRunWait<T>({
+export async function runPoolWait<T>({
   pool,
   count,
   func,
@@ -20,14 +21,14 @@ export async function poolRunWait<T>({
   abortSignal,
   awaitPriority,
 }: PoolRunWaitArgs<T>): Promise<T> {
-  await pool.holdWait(count, priority, abortSignal, awaitPriority)
-
-  try {
-    const holdPool = new Pool(count)
-    const result = await func(holdPool, abortSignal)
-    return result
-  }
-  finally {
-    void this._pool.release(count)
-  }
+  return toFuncWithFinally(
+    async function funcWithPoolThrow() {
+      await pool.holdWait(count, priority, abortSignal, awaitPriority)
+      const holdPool = new Pool(count)
+      return func(holdPool, abortSignal)
+    },
+    () => {
+      void pool.release(count)
+    },
+  )()
 }
