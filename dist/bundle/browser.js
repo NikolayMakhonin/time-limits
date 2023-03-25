@@ -85,26 +85,29 @@ const e=t&&function(e){return t(),e
 const e=new p(f);return e._resolve(t),e}
 static reject(t){const e=new p(f)
 ;return e._reject(t),e}get[Symbol.toStringTag](){
-return"Promise"}}const b=function(){};class d{
+return"Promise"}}const _=function(){};class b{
 constructor(t){
-if(t&&t.aborted)this.promise=p.reject(t.reason),this.resolve=b,this.reject=b;else{
-let e,r;if(this.promise=new Promise((function(t){
+if(this._status="pending",t&&t.aborted)this.promise=p.reject(t.reason),
+this.resolve=_,this.reject=_;else{let e,r
+;if(this.promise=new Promise((function(t){
 e=t,r=function(e){c(t,e)}})),t){
 const n=t.subscribe((function(t){r(t)}))
 ;this.resolve=function(t){n(),e(t)
 },this.reject=function(t){n(),r(t)}
-}else this.resolve=e,this.reject=r}}}
-var _={},v={},y={}
+}else this.resolve=e,this.reject=r}
+this.promise.then((()=>{this._status="resolved"
+}),(()=>{this._status="rejected"}))}get state(){
+return this._status}}var d={},v={},y={}
 ;Object.defineProperty(y,"__esModule",{value:!0})
-;class g extends Error{constructor(t,e){
-super(t),Object.setPrototypeOf(this,g.prototype),
+;class j extends Error{constructor(t,e){
+super(t),Object.setPrototypeOf(this,j.prototype),
 this.reason=e,this.name="AbortError",
 this._internal=!1}}
-y.AbortError=g,Object.defineProperty(v,"__esModule",{
-value:!0});var j=y
+y.AbortError=j,Object.defineProperty(v,"__esModule",{
+value:!0});var g=y
 ;v.toAbortController=function(t,e){
 return t.signal.subscribe((t=>{
-t instanceof j.AbortError&&t._internal&&(t=t.reason),
+t instanceof g.AbortError&&t._internal&&(t=t.reason),
 e.abort(t)})),e
 },v.toAbortControllerFast=function(t,e){
 return t.signal.addEventListener("abort",(function(){
@@ -130,79 +133,131 @@ t.call(this,this.reason)})),this._callbacks=void 0
 }throwIfAborted(){
 if(this.aborted)throw this.reason}
 },Object.defineProperty(m,"__esModule",{value:!0})
-;var O=w,z=y;m.AbortControllerFast=class{
-constructor(){this.signal=new O.AbortSignalFast}
+;var A=w,O=y;m.AbortControllerFast=class{
+constructor(){this.signal=new A.AbortSignalFast}
 abort(t){
-this.signal.aborted||(void 0===t&&((t=new z.AbortError("Aborted with no reason",t))._internal=!0),
+this.signal.aborted||(void 0===t&&((t=new O.AbortError("Aborted with no reason",t))._internal=!0),
 this.signal.abort(t))}
-},Object.defineProperty(_,"__esModule",{value:!0})
-;var A=v,S=m,x=y
-;_.toAbortController=A.toAbortController,_.toAbortControllerFast=A.toAbortControllerFast,
-_.toAbortSignal=A.toAbortSignal,
-_.toAbortSignalFast=A.toAbortSignalFast,_.AbortControllerFast=S.AbortControllerFast,
-_.AbortError=x.AbortError;class k{
+},Object.defineProperty(d,"__esModule",{value:!0})
+;var S=v,z=m,x=y;function k(t,e){
+return e?t.then((t=>(e(),t)),(t=>{throw e(),t})):t
+}function T(t,e){return e?function(){try{
+const r=t.apply(this,arguments)
+;return u(r)?k(r,e):r}finally{e()}}:t}
+d.toAbortController=S.toAbortController,d.toAbortControllerFast=S.toAbortControllerFast,
+d.toAbortSignal=S.toAbortSignal,
+d.toAbortSignalFast=S.toAbortSignalFast,d.AbortControllerFast=z.AbortControllerFast,
+d.AbortError=x.AbortError;class E{
 constructor(t,e){
 this._branch=null,this.order=t,this.parent=e}
 get branch(){if(!this._branch){
 const t=[this.order];let e=this.parent
 ;for(;null!=e;)t.push(e.order),e=e.parent
 ;this._branch=t}return this._branch}}
-function T(t,e){return t<e}class E{
+function F(t,e){return t<e}class C{
 constructor({objectPool:t,lessThanFunc:e}={}){
-this._size=0,this._root=null,this.merge=F,
-this.collapse=C,this._objectPool=t,this._lessThanFunc=e||T
+this._size=0,this._root=null,this.merge=W,
+this.collapse=M,this._objectPool=t,this._lessThanFunc=e||F
 }clear(){this._root=null,this._size=0}get size(){
 return this._size}add(t){
 let e=null!=this._objectPool?this._objectPool.get():null
 ;return null==e?e={child:null,next:null,prev:null,
 item:t
-}:e.item=t,this._size++,this._root=F(this._root,e,this._lessThanFunc),e
+}:e.item=t,this._size++,this._root=W(this._root,e,this._lessThanFunc),e
 }getMin(){const{_root:t}=this
 ;return null==t?void 0:t.item}getMinNode(){
 return this._root}deleteMin(){const{_root:t}=this
 ;if(null==t)return;const e=t.item
 ;return this.delete(t),e}delete(t){var e
-;if(t===this._root)this._root=C(t.child,this._lessThanFunc);else{
+;if(t===this._root)this._root=M(t.child,this._lessThanFunc);else{
 if(null==t.prev){
 if(this._objectPool)throw new Error("The node is already deleted. Don't use the objectPool to prevent this error.")
 ;return}
 t.prev.child===t?t.prev.child=t.next:t.prev.next=t.next,null!=t.next&&(t.next.prev=t.prev),
-this._root=F(this._root,C(t.child,this._lessThanFunc),this._lessThanFunc)
+this._root=W(this._root,M(t.child,this._lessThanFunc),this._lessThanFunc)
 }
 t.child=null,t.prev=null,t.next=null,t.item=void 0,null===(e=this._objectPool)||void 0===e||e.release(t),
 this._size--}decreaseKey(t){
 t!==this._root&&(t.prev.child===t?t.prev.child=t.next:t.prev.next=t.next,
 null!=t.next&&(t.next.prev=t.prev),
-this._root=F(this._root,t,this._lessThanFunc))}
+this._root=W(this._root,t,this._lessThanFunc))}
 get isEmpty(){return null==this._root}
 [Symbol.iterator](){return this._iterate(!1)}
 nodes(){return{
 [Symbol.iterator]:()=>this._iterate(!0)}}
 _iterate(t){const e=this._lessThanFunc
 ;return function*r(n){
-n&&(t?yield n:yield n.item,n.child&&(null!=n.child.next&&(n.child=C(n.child,e),
+n&&(t?yield n:yield n.item,n.child&&(null!=n.child.next&&(n.child=M(n.child,e),
 n.child.prev=n),yield*r(n.child)))}(this._root)}}
-function F(t,e,r){let n,o
+function W(t,e,r){let n,o
 ;return null==t?e:null==e||t===e?t:(r(e.item,t.item)?(n=e,
 o=t):(n=t,o=e),o.next=n.child,
 null!=n.child&&(n.child.prev=o),o.prev=n,n.child=o,
-n.next=null,n.prev=null,n)}function C(t,e){
+n.next=null,n.prev=null,n)}function M(t,e){
 let r,n,o,i,s;if(null==t)return null
 ;for(i=t,r=null;null!=i;){
 if(n=i,o=n.next,null==o){n.prev=r,r=n;break}
-i=o.next,s=F(n,o,e),s.prev=r,r=s}
-for(s=null;null!=r;)i=r.prev,s=F(s,r,e),r=i
-;return s}function W(t,e){return function(t,e){
+i=o.next,s=W(n,o,e),s.prev=r,r=s}
+for(s=null;null!=r;)i=r.prev,s=W(s,r,e),r=i
+;return s}function R(t){
+return null!=t&&"object"==typeof t&&"function"==typeof t.then
+}function Q(t,e,r){try{const n=e?e(t):t
+;r._resolve(n)}catch(t){r._reject(t)}}
+function q(t,e,r){e||r._reject(t);try{const n=e(t)
+;r._resolve(n)}catch(t){r._reject(t)}}
+const L=function(){};class U{constructor(t){
+this.status="pending",this.value=void 0,
+this.reason=void 0,this._handlers=null
+;const e=this._resolve,r=this._reject,n=this._resolveAsync,o=this._rejectAsync,i=this
+;this._resolve=function(t){e.call(i,t)
+},this._reject=function(t){r.call(i,t)
+},this._resolveAsync=function(t){n.call(i,t)
+},this._rejectAsync=function(t){o.call(i,t)
+},t(this._resolve,this._reject)}_resolve(t){
+"pending"===this.status&&(this.status="fulfilled",
+this._resolveAsync(t))}_resolveAsync(t){
+R(t)?t.then(this._resolveAsync,this._rejectAsync):this._resolveSync(t)
+}_resolveSync(t){const e=this._handlers
+;if(this.value=t,null!=e){this._handlers=null
+;for(let r=0,n=e.length;r<n;r++){const[n,,o]=e[r]
+;Q(t,n,o)}}}_reject(t){
+"pending"===this.status&&this._rejectAsync(t)}
+_rejectAsync(t){
+this.status="rejected",R(t)?t.then(this._rejectAsync,this._rejectAsync):this._rejectSync(t)
+}_rejectSync(t){const e=this._handlers
+;if(this.reason=t,null!=e){this._handlers=null
+;for(let r=0,n=e.length;r<n;r++){const[,n,o]=e[r]
+;q(t,n,o)}}}then(t,e){const r=new U(L)
+;return"pending"===this.status?(null==this._handlers&&(this._handlers=[]),
+this._handlers.push([t,e,r])):"fulfilled"===this.status?Q(this.value,t,r):q(this.reason,e,r),
+r}catch(t){return this.then(void 0,t)}finally(t){
+const e=t&&function(e){return t(),e
+},r=t&&function(e){throw t(),e}
+;return this.then(e,r)}static resolve(t){
+const e=new U(L);return e._resolve(t),e}
+static reject(t){const e=new U(L)
+;return e._reject(t),e}get[Symbol.toStringTag](){
+return"Promise"}}const D=function(){};class H{
+constructor(t){
+if(t&&t.aborted)this.promise=U.reject(t.reason),this.resolve=D,this.reject=D;else{
+let e,r;if(this.promise=new Promise((function(t){
+e=t,r=function(e){!function(t,e){t(function(t){
+return{then(e,r){r(t)}}}(e))}(t,e)}})),t){
+const n=t.subscribe((function(t){r(t)}))
+;this.resolve=function(t){n(),e(t)
+},this.reject=function(t){n(),r(t)}
+}else this.resolve=e,this.reject=r}}}
+function Y(t,e){return function(t,e){
 const r=t&&t.branch,n=e&&e.branch,o=r?r.length:0,i=n?n.length:0,s=o>i?o:i
 ;for(let t=0;t<s;t++){
 const e=t>=o?0:r[o-1-t],s=t>=i?0:n[i-1-t]
 ;if(e!==s)return e>s?1:-1}return 0
-}(t.priority,e.priority)<0}let M=1;class R{
-constructor(){this._queue=new E({lessThanFunc:W})}
+}(t.priority,e.priority)<0}let G=1;class I{
+constructor(){this._queue=new C({lessThanFunc:Y})}
 run(t,e,r){return this._run(!1,t,e,r)}
 runTask(t,e,r){return this._run(!0,t,e,r)}
-_run(t,e,r,n){const o=new d(n),i={
-priority:(s=M++,l=r,null==s?null==l?null:l:new k(s,l)),
+_run(t,e,r,n){const o=new H(n),i={
+priority:(s=G++,l=r,null==s?null==l?null:l:new E(s,l)),
 func:e,abortSignal:n,resolve:o.resolve,
 reject:o.reject,readyToRun:!t};var s,l
 ;if(this._queue.add(i),t){const t=this;return{
@@ -221,13 +276,13 @@ e=r.item,t.delete(r)}
 if(e.abortSignal&&e.abortSignal.aborted)e.reject(e.abortSignal.reason);else try{
 let t=e.func&&e.func(e.abortSignal)
 ;t&&"function"==typeof t.then&&(t=yield t),e.resolve(t)
-}catch(t){e.reject(t)}}}))}}const Q=function(){
-const t=new R;return function(e,r){
-return t.run(void 0,e,r)}}();var q=function(){
+}catch(t){e.reject(t)}}}))}}const K=function(){
+const t=new I;return function(e,r){
+return t.run(void 0,e,r)}}();var N=function(){
 function t(t){
-if(this._maxSize=0,this._size=0,this._tickPromise=new d,!t)throw new Error("maxSize should be > 0")
+if(this._maxSize=0,this._size=0,this._tickPromise=new b,!t)throw new Error("maxSize should be > 0")
 ;this._maxSize=t,
-this._size=t,this._priorityQueue=new R}
+this._size=t,this._priorityQueue=new I}
 return Object.defineProperty(t.prototype,"maxSize",{
 get:function(){return this._maxSize},
 enumerable:!1,configurable:!0
@@ -247,7 +302,7 @@ var e=this._size,r=this.maxSize-e
 var n=this._tickPromise
 ;this._tickPromise=null,n.resolve()}return t
 },t.prototype.tick=function(t){
-if(!(this._size>0))return this._tickPromise||(this._tickPromise=new d),
+if(!(this._size>0))return this._tickPromise||(this._tickPromise=new b),
 function(t,e){return new Promise((function(r){
 if(t&&t.aborted)return void c(r,t.reason);let n,o
 ;function i(t){o||(o=!0,n&&n(),c(r,t))}
@@ -259,7 +314,7 @@ return n(this,void 0,void 0,(function(){var s=this
 ;return o(this,(function(l){switch(l.label){
 case 0:
 if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(this.maxSize,"))"))
-;return i||(i=Q),
+;return i||(i=K),
 [4,this._priorityQueue.run((function(r){
 return n(s,void 0,void 0,(function(){
 return o(this,(function(n){switch(n.label){case 0:
@@ -268,11 +323,11 @@ return n.sent(),[4,i(e,r)];case 2:
 return n.sent(),[3,0];case 3:
 if(!this.hold(t))throw new Error("Unexpected behavior")
 ;return[2]}}))}))}),e,r)];case 1:
-return l.sent(),[2]}}))}))},t}(),L=function(){
+return l.sent(),[2]}}))}))},t}(),B=function(){
 function t(){
 for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e]
 ;if(!(null==t?void 0:t.length))throw new Error("pools should not be empty")
-;this._pools=t,this._priorityQueue=new R}
+;this._pools=t,this._priorityQueue=new I}
 return Object.defineProperty(t.prototype,"maxSize",{
 get:function(){
 for(var t,e=this._pools,r=0,n=e.length;r<n;r++){
@@ -309,7 +364,7 @@ return n(this,void 0,void 0,(function(){var s=this
 ;return o(this,(function(l){switch(l.label){
 case 0:
 if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(this.maxSize,"))"))
-;return i||(i=Q),
+;return i||(i=K),
 [4,this._priorityQueue.run((function(r){
 return n(s,void 0,void 0,(function(){
 return o(this,(function(n){switch(n.label){case 0:
@@ -318,7 +373,7 @@ return n.sent(),i?[4,i(e,r)]:[3,3];case 2:
 n.sent(),n.label=3;case 3:return[3,0];case 4:
 if(!this.hold(t))throw new Error("Unexpected behavior")
 ;return[2]}}))}))}),e,r)];case 1:
-return l.sent(),[2]}}))}))},t}(),U=function(){
+return l.sent(),[2]}}))}))},t}(),J=function(){
 function t(t){this._pool=t}
 return Object.defineProperty(t.prototype,"pool",{
 get:function(){return this._pool},enumerable:!1,
@@ -331,7 +386,7 @@ n.sent(),n.label=2;case 2:
 return n.trys.push([2,,4,5]),[4,e(i)];case 3:
 return[2,n.sent()];case 4:
 return this._pool.release(t),[7];case 5:return[2]}
-}))}))},t}(),D=function(){function t(t){
+}))}))},t}(),V=function(){function t(t){
 this._pool=t}
 return Object.defineProperty(t.prototype,"size",{
 get:function(){return this._pool.size},
@@ -353,10 +408,10 @@ return this._pool.release(t)
 return this._pool.tick(t)
 },t.prototype.holdWait=function(t,e,r,n){
 return this._pool.holdWait(t,e,r,n)},t
-}(),H=function(t){function e(e){
+}(),X=function(t){function e(e){
 var r=t.call(this,"Pool hold(".concat(e,") failed"))||this
 ;return r.count=e,r}return r(e,t),e}(Error)
-;var Y=function(){function t(){this._objects=[]}
+;var Z=function(){function t(){this._objects=[]}
 return Object.defineProperty(t.prototype,"objects",{
 get:function(){return this._objects},
 enumerable:!1,configurable:!0
@@ -373,10 +428,10 @@ for(var n=r-e,o=new Array(n),i=0;i<n;i++)o[i]=t[e+i]
 null==e&&(e=0),null==r&&(r=t.length)
 ;for(var n=e;n<r;n++){var o=t[n]
 ;null!=o&&this._objects.push(o)}},t
-}(),G=function(){function t(t){
+}(),$=function(){function t(t){
 var e=t.pool,r=t.availableObjects,n=t.holdObjects,o=t.destroy,i=t.create
-;this._allocatePool=new q(e.maxSize),
-this._pool=new L(e,this._allocatePool),this._availableObjects=r||new Y,
+;this._allocatePool=new N(e.maxSize),
+this._pool=new B(e,this._allocatePool),this._availableObjects=r||new Z,
 this._holdObjects=!0===n?new Set:n||null,
 this._create=i,this._destroy=o}
 return Object.defineProperty(t.prototype,"pool",{
@@ -451,7 +506,7 @@ for(var h=0;h<i;h++){var f=this._create()
 ;if(u(f))e.push(c(f));else{var p=this.release([f])
 ;u(p)&&e.push(a(p))}}
 return e.length?Promise.all(e).then((function(t){
-return s})):s},t}(),I=function(){function t(t){
+return s})):s},t}(),tt=function(){function t(t){
 this._objectPool=t}
 return Object.defineProperty(t.prototype,"availableObjects",{
 get:function(){
@@ -472,7 +527,7 @@ return this._objectPool.release(t,e,r)
 return this._objectPool.tick(t)
 },t.prototype.use=function(t,e,r,n,o){
 return this._objectPool.use(t,e,r,n,o)},t
-}(),K=function(t){function e(e){
+}(),et=function(t){function e(e){
 var r=e.pool,n=e.time,o=e.timeController,i=t.call(this,r)||this
 ;return i._time=n,i._timeController=o||l,i}
 return r(e,t),Object.defineProperty(e.prototype,"time",{
@@ -488,25 +543,23 @@ e&&e(),t()}),r);n&&(e=n.subscribe((function(e){
 i.clearTimeout(s),c(t,e)})))})))];case 1:
 return e.sent(),[2,this._release(t)]}var r,n,o}))
 }))},e.prototype._release=function(t){
-return this._pool.release(t)},e}(D)
-;t.ObjectPool=G,t.ObjectPoolWrapper=I,t.Pool=q,
-t.PoolHoldError=H,t.PoolRunner=U,
-t.PoolWrapper=D,t.Pools=L,t.StackPool=Y,t.TimeLimitPool=K,
-t.poolRunThrow=function(t,e,r){var i=this
-;if(!t.hold(e))throw new H(e);try{var s=r()
-;return u(s)?n(i,void 0,void 0,(function(){
-return o(this,(function(r){switch(r.label){case 0:
-return r.trys.push([0,,2,3]),[4,s];case 1:
-return[2,r.sent()];case 2:return t.release(e),[7]
-;case 3:return[2]}}))})):s}finally{
-this._pool.release(e)}},t.poolRunWait=function(t){
+return this._pool.release(t)},e}(V)
+;t.ObjectPool=$,t.ObjectPoolWrapper=tt,t.Pool=N,
+t.PoolHoldError=X,t.PoolRunner=J,
+t.PoolWrapper=V,t.Pools=B,t.StackPool=Z,t.TimeLimitPool=et,
+t.runPoolThrow=function(t,e,r){
+return function(t,e,r){return T((function(){
+if(!t.hold(e))throw new X(e)
+;return r.apply(this,arguments)}),(function(){
+t.release(e)}))}(t,e,r)()
+},t.runPoolWait=function(t){
 var e=t.pool,r=t.count,i=t.func,s=t.priority,l=t.abortSignal,c=t.awaitPriority
-;return n(this,void 0,void 0,(function(){var t
+;return n(this,void 0,void 0,(function(){
+return o(this,(function(t){return[2,T((function(){
+return n(this,void 0,void 0,(function(){var t
 ;return o(this,(function(n){switch(n.label){
 case 0:return[4,e.holdWait(r,s,l,c)];case 1:
-n.sent(),n.label=2;case 2:
-return n.trys.push([2,,4,5]),t=new q(r),[4,i(t,l)]
-;case 3:return[2,n.sent()];case 4:
-return this._pool.release(r),[7];case 5:return[2]}
-}))}))},Object.defineProperty(t,"__esModule",{
-value:!0})}({});
+return n.sent(),t=new N(r),[2,i(t,l)]}}))}))
+}),(function(){e.release(r)}))()]}))}))
+},Object.defineProperty(t,"__esModule",{value:!0})
+}({});

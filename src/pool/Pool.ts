@@ -95,7 +95,7 @@ export class Pool implements IPool {
     return count
   }
 
-  private _tickPromise: CustomPromise<void> = new CustomPromise()
+  private _tickPromise: CustomPromise = new CustomPromise()
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     if (this._size > 0) {
       return
