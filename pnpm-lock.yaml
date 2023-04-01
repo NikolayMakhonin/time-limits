@@ -7,8 +7,8 @@ specifiers:
   '@babel/plugin-transform-runtime': 7.21.0
   '@babel/preset-env': 7.20.2
   '@babel/runtime-corejs3': 7.21.0
-  '@flemist/abort-controller-fast': ^0.0.5
-  '@flemist/async-utils': ^0.0.16
+  '@flemist/abort-controller-fast': ^0.0.6
+  '@flemist/async-utils': ^0.0.20
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
   '@flemist/priority-queue': ^0.0.9
@@ -55,8 +55,8 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
-  '@flemist/abort-controller-fast': 0.0.5
-  '@flemist/async-utils': 0.0.16
+  '@flemist/abort-controller-fast': 0.0.6
+  '@flemist/async-utils': 0.0.20
   '@flemist/priority-queue': 0.0.9
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
@@ -1372,6 +1372,12 @@ packages:
     dependencies:
       tslib: 2.4.0
 
+  /@flemist/abort-controller-fast/0.0.6:
+    resolution: {integrity: sha512-guk6p9Vvey+IM3xt4/YUi1n4iN6TV3xJdOx5nchDOGlvgNBZFfSAXS2LQIFjIeelQ3YjoXwxYxIbvUIzPwTf4Q==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
+
   /@flemist/async-utils/0.0.11:
     resolution: {integrity: sha512-XuHqpW9Z4teIM/aWWYZPZVLtS0DOOqhrTV/6DUcglSE2fZUfbyImdljRYq73ovwAwUy6ZmARFh25C+CoOf5UPw==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
@@ -1381,11 +1387,11 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@flemist/async-utils/0.0.16:
-    resolution: {integrity: sha512-3oqWfZz2BBEUJNmKgxK8y0LN5UEBqkqEXXfvdQADF1X2L8HFGBLTHnm0VTHtHH230O7bA9buyiEAWywKGf2tQQ==}
+  /@flemist/async-utils/0.0.20:
+    resolution: {integrity: sha512-MFFNRhuL89GWquKjEvV20bjQnuNJ7oHfpEUZ7vHcicZMXIfAgQ+5dMSmEJEO9KOtXiwF4BbGrUCWD0qA5xjDAw==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     dependencies:
-      '@flemist/abort-controller-fast': 0.0.5
+      '@flemist/abort-controller-fast': 0.0.6
       '@flemist/time-controller': 0.0.1
       tslib: 2.4.0
     dev: false
