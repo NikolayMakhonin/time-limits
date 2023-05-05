@@ -106,7 +106,7 @@ export class Pool implements IPool {
     return promiseToAbortable(abortSignal, this._tickPromise.promise)
   }
 
-  async holdWait(
+  holdWait(
     count: number,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
@@ -120,7 +120,7 @@ export class Pool implements IPool {
       awaitPriority = awaitPriorityDefault
     }
 
-    await this._priorityQueue.run(async (abortSignal) => {
+    return this._priorityQueue.run(async (abortSignal) => {
       while (count > this._size) {
         await this.tick(abortSignal)
         await awaitPriority(priority, abortSignal)

@@ -8,7 +8,7 @@ specifiers:
   '@babel/preset-env': 7.20.2
   '@babel/runtime-corejs3': 7.21.0
   '@flemist/abort-controller-fast': ^0.0.6
-  '@flemist/async-utils': ^0.0.20
+  '@flemist/async-utils': ^0.0.21
   '@flemist/copy-glob-flat': 0.0.5
   '@flemist/karma-custom-launcher': 0.0.0
   '@flemist/priority-queue': ^0.0.9
@@ -56,7 +56,7 @@ specifiers:
 
 dependencies:
   '@flemist/abort-controller-fast': 0.0.6
-  '@flemist/async-utils': 0.0.20
+  '@flemist/async-utils': 0.0.21
   '@flemist/priority-queue': 0.0.9
   '@flemist/time-controller': 0.0.1
   tslib: 2.4.0
@@ -1387,9 +1387,9 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@flemist/async-utils/0.0.20:
-    resolution: {integrity: sha512-MFFNRhuL89GWquKjEvV20bjQnuNJ7oHfpEUZ7vHcicZMXIfAgQ+5dMSmEJEO9KOtXiwF4BbGrUCWD0qA5xjDAw==}
-    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
+  /@flemist/async-utils/0.0.21:
+    resolution: {integrity: sha512-1bFhIaJjCw9zhO5U/+LyAqt7Cy/wet01UBlrvdnmddG6XGsaWvNVT/7q545un/2Be1I+Wf8TabLxKIkQon429w==}
+    engines: {node: '>=12.9.0', pnpm: ^7.1.6}
     dependencies:
       '@flemist/abort-controller-fast': 0.0.6
       '@flemist/time-controller': 0.0.1

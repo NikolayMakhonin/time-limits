@@ -1,7 +1,7 @@
 import {IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
 import {IPool, Pool, Pools} from 'src/pool'
-import {isPromiseLike} from '@flemist/async-utils'
+import {isPromiseLike, promiseAll} from '@flemist/async-utils'
 import {Priority, AwaitPriority} from '@flemist/priority-queue'
 
 export interface IObjectPool<TObject extends object> {
@@ -233,7 +233,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       }
     }
     if (promises.length) {
-      return Promise.all(promises).then(o => allocatedCount)
+      return promiseAll(promises).then(o => allocatedCount)
     }
 
     return allocatedCount

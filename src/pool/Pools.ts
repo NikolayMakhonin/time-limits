@@ -6,7 +6,7 @@ import {
   AwaitPriority,
   awaitPriorityDefault,
 } from '@flemist/priority-queue'
-import {isPromiseLike} from '@flemist/async-utils'
+import {isPromiseLike, promiseAll, promiseRace} from '@flemist/async-utils'
 import {IPool} from './Pool'
 
 export class Pools implements IPool {
@@ -86,7 +86,7 @@ export class Pools implements IPool {
         }
       }
       if (promises) {
-        return Promise.all(promises).then(() => count)
+        return promiseAll(promises).then(() => count)
       }
     }
     return count
@@ -110,7 +110,7 @@ export class Pools implements IPool {
       return null
     }
 
-    return Promise.race(promises)
+    return promiseRace(promises)
   }
 
   async holdWait(
