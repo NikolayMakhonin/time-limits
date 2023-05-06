@@ -67,23 +67,21 @@ class Pool {
         return asyncUtils.promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
-        return tslib.__awaiter(this, void 0, void 0, function* () {
-            if (count > this.maxSize) {
-                throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
+        if (count > this.maxSize) {
+            throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
+        }
+        if (!awaitPriority) {
+            awaitPriority = priorityQueue.awaitPriorityDefault;
+        }
+        return this._priorityQueue.run((abortSignal) => tslib.__awaiter(this, void 0, void 0, function* () {
+            while (count > this._size) {
+                yield this.tick(abortSignal);
+                yield awaitPriority(priority, abortSignal);
             }
-            if (!awaitPriority) {
-                awaitPriority = priorityQueue.awaitPriorityDefault;
+            if (!this.hold(count)) {
+                throw new Error('Unexpected behavior');
             }
-            yield this._priorityQueue.run((abortSignal) => tslib.__awaiter(this, void 0, void 0, function* () {
-                while (count > this._size) {
-                    yield this.tick(abortSignal);
-                    yield awaitPriority(priority, abortSignal);
-                }
-                if (!this.hold(count)) {
-                    throw new Error('Unexpected behavior');
-                }
-            }), priority, abortSignal);
-        });
+        }), priority, abortSignal);
     }
 }
 

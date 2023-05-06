@@ -3,7 +3,7 @@ import { StackPool } from './StackPool.mjs';
 import { Pool } from '../pool/Pool.mjs';
 import { Pools } from '../pool/Pools.mjs';
 import '@flemist/time-controller';
-import { isPromiseLike } from '@flemist/async-utils';
+import { isPromiseLike, promiseAll } from '@flemist/async-utils';
 import '@flemist/priority-queue';
 
 class ObjectPool {
@@ -157,7 +157,7 @@ class ObjectPool {
             }
         }
         if (promises.length) {
-            return Promise.all(promises).then(o => allocatedCount);
+            return promiseAll(promises).then(o => allocatedCount);
         }
         return allocatedCount;
     }

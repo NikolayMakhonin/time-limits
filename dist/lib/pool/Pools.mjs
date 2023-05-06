@@ -1,6 +1,6 @@
 import { __awaiter } from 'tslib';
 import { PriorityQueue, awaitPriorityDefault } from '@flemist/priority-queue';
-import { isPromiseLike } from '@flemist/async-utils';
+import { isPromiseLike, promiseAll, promiseRace } from '@flemist/async-utils';
 
 class Pools {
     constructor(...pools) {
@@ -70,7 +70,7 @@ class Pools {
                 }
             }
             if (promises) {
-                return Promise.all(promises).then(() => count);
+                return promiseAll(promises).then(() => count);
             }
         }
         return count;
@@ -91,7 +91,7 @@ class Pools {
         if (!promises) {
             return null;
         }
-        return Promise.race(promises);
+        return promiseRace(promises);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {

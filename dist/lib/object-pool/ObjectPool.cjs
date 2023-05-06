@@ -161,7 +161,7 @@ class ObjectPool {
             }
         }
         if (promises.length) {
-            return Promise.all(promises).then(o => allocatedCount);
+            return asyncUtils.promiseAll(promises).then(o => allocatedCount);
         }
         return allocatedCount;
     }

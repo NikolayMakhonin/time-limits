@@ -74,7 +74,7 @@ class Pools {
                 }
             }
             if (promises) {
-                return Promise.all(promises).then(() => count);
+                return asyncUtils.promiseAll(promises).then(() => count);
             }
         }
         return count;
@@ -95,7 +95,7 @@ class Pools {
         if (!promises) {
             return null;
         }
-        return Promise.race(promises);
+        return asyncUtils.promiseRace(promises);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
