@@ -1,13 +1,12 @@
 {
   "name": "@flemist/time-limits",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "TODO",
   "main": "dist/lib/index.cjs",
   "module": "dist/lib/index.mjs",
   "types": "dist/lib/index.d.ts",
   "engines": {
-    "node": ">=10.4.0",
-    "pnpm": "^7.1.6"
+    "node": ">=10.4.0"
   },
   "repository": {
     "type": "git",
@@ -32,7 +31,7 @@
     "access": "public"
   },
   "scripts": {
-    "prepublishOnly": "pnpm run audit && pnpm run lint && pnpm run build && pnpm run test:mocha:ci && pnpm run test:karma",
+    "_prepublishOnly": "pnpm run audit && pnpm run lint && pnpm run build && pnpm run test:mocha:ci && pnpm run test:karma",
     "audit": "pnpm audit --prod",
     "lint": "eslint ./**/*.{js,cjs,mjs,ts,tsx}",
     "lint:fix": "eslint --fix ./**/*.{js,cjs,mjs,ts,tsx}",
@@ -99,9 +98,9 @@
   },
   "dependencies": {
     "@flemist/abort-controller-fast": "^0.0.6",
-    "@flemist/async-utils": "^0.0.21",
-    "@flemist/priority-queue": "^0.0.9",
-    "@flemist/time-controller": "^0.0.1",
+    "@flemist/async-utils": "^0.0.23",
+    "@flemist/priority-queue": "^0.0.10",
+    "@flemist/time-controller": "^0.0.3",
     "tslib": "^2.4.0"
   }
 }
