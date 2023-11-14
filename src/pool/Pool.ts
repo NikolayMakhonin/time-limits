@@ -19,7 +19,7 @@ export interface IPool {
   /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
   releaseAvailable: number
 
-  release(count: number): Promise<number> | number
+  release(count: number, dontThrow?: boolean): Promise<number> | number
 
   /** it will resolve when size > 0 */
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void
@@ -76,11 +76,16 @@ export class Pool implements IPool {
     return this.maxSize - this._size
   }
 
-  release(count: number): number {
+  release(count: number, dontThrow?: boolean): number {
     const size = this._size
     const maxReleaseCount = this.maxSize - size
     if (count > maxReleaseCount) {
-      count = maxReleaseCount
+      if (dontThrow) {
+        count = maxReleaseCount
+      }
+      else {
+        throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`)
+      }
     }
     if (count > 0) {
       this._size = size + count
@@ -91,13 +96,12 @@ export class Pool implements IPool {
         tickPromise.resolve()
       }
     }
-
     return count
   }
 
   private _tickPromise: CustomPromise = new CustomPromise()
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
-    if (this._size > 0) {
+    if (this._size >= this._maxSize) {
       return
     }
     if (!this._tickPromise) {

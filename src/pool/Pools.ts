@@ -35,14 +35,14 @@ export class Pools implements IPool {
 
   get size() {
     const pools = this._pools
-    let min: number
+    let max: number
     for (let i = 0, len = pools.length; i < len; i++) {
       const value = pools[i].size
-      if (i === 0 || value < min) {
-        min = value
+      if (i === 0 || value < max) {
+        max = value
       }
     }
-    return min
+    return max
   }
 
   get holdAvailable() {
@@ -65,17 +65,22 @@ export class Pools implements IPool {
     return this.maxSize - this.size
   }
 
-  release(count: number): Promise<number> | number {
+  release(count: number, dontThrow?: boolean): Promise<number> | number {
     const size = this.size
     const maxReleaseCount = this.maxSize - size
     if (count > maxReleaseCount) {
-      count = maxReleaseCount
+      if (dontThrow) {
+        count = maxReleaseCount
+      }
+      else {
+        throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`)
+      }
     }
     if (count > 0) {
       const pools = this._pools
       let promises: Promise<number>[] = null
       for (let i = 0, len = pools.length; i < len; i++) {
-        const promise = pools[i].release(count)
+        const promise = pools[i].release(count, dontThrow)
         if (isPromiseLike(promise)) {
           if (!promises) {
             promises = [promise]

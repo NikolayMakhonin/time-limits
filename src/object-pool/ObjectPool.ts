@@ -105,7 +105,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       end = objects.length
     }
     const tryReleaseCount = end - start
-    const releasedCount = await this._pool.release(tryReleaseCount)
+    const releasedCount = await this._pool.release(tryReleaseCount, true)
 
     end = Math.min(objects.length, releasedCount)
     this._availableObjects.release(objects, start, end)
@@ -125,7 +125,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
   }
 
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
-    return this._pool.tick()
+    return this._pool.tick(abortSignal)
   }
 
   async getWait(
