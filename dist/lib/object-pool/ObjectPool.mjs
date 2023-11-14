@@ -38,6 +38,11 @@ class ObjectPool {
     }
     release(objects, start, end) {
         return __awaiter(this, void 0, void 0, function* () {
+            return this._release(objects, this._pool, start, end);
+        });
+    }
+    _release(objects, pool, start, end) {
+        return __awaiter(this, void 0, void 0, function* () {
             if (start == null) {
                 start = 0;
             }
@@ -45,7 +50,7 @@ class ObjectPool {
                 end = objects.length;
             }
             const tryReleaseCount = end - start;
-            const releasedCount = yield this._pool.release(tryReleaseCount);
+            const releasedCount = yield pool.release(tryReleaseCount, true);
             end = Math.min(objects.length, releasedCount);
             this._availableObjects.release(objects, start, end);
             if (this._holdObjects) {
@@ -62,7 +67,7 @@ class ObjectPool {
         });
     }
     tick(abortSignal) {
-        return this._pool.tick();
+        return this._pool.tick(abortSignal);
     }
     getWait(count, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -134,7 +139,7 @@ class ObjectPool {
                     yield _this._allocatePool.release(1);
                     throw err;
                 }
-                const count = yield _this.release([obj]);
+                const count = yield _this._release([obj], _this._allocatePool);
                 allocatedCount += count;
             });
         }
@@ -150,7 +155,7 @@ class ObjectPool {
                 promises.push(releasePromiseObject(objectOrPromise));
             }
             else {
-                const promise = this.release([objectOrPromise]);
+                const promise = this._release([objectOrPromise], this._allocatePool);
                 if (isPromiseLike(promise)) {
                     promises.push(releasePromise(promise));
                 }

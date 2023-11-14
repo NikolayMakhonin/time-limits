@@ -7,7 +7,7 @@ export interface IPool {
     hold(count: number): boolean;
     /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
     releaseAvailable: number;
-    release(count: number): Promise<number> | number;
+    release(count: number, dontThrow?: boolean): Promise<number> | number;
     /** it will resolve when size > 0 */
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     /** wait size > 0 and hold, use this for concurrency hold */
@@ -23,7 +23,7 @@ export declare class Pool implements IPool {
     get holdAvailable(): number;
     hold(count: number): boolean;
     get releaseAvailable(): number;
-    release(count: number): number;
+    release(count: number, dontThrow?: boolean): number;
     private _tickPromise;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;

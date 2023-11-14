@@ -14,6 +14,5 @@ export declare class TimeLimitPool extends PoolWrapper implements ITimeLimitPool
     private readonly _timeController;
     constructor({ pool, time, timeController, }: TimeLimitPoolParams);
     get time(): number;
-    release(count: number): Promise<number>;
-    private _release;
+    release(count: number, dontThrow?: boolean): Promise<number>;
 }

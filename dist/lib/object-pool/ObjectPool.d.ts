@@ -39,6 +39,7 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     get holdObjects(): ReadonlySet<TObject>;
     get(count: number): TObject[];
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
+    private _release;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TObject[]>;
     use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TResult>;

@@ -49,17 +49,22 @@ class Pools {
     get releaseAvailable() {
         return this.maxSize - this.size;
     }
-    release(count) {
+    release(count, dontThrow) {
         const size = this.size;
         const maxReleaseCount = this.maxSize - size;
         if (count > maxReleaseCount) {
-            count = maxReleaseCount;
+            if (dontThrow) {
+                count = maxReleaseCount;
+            }
+            else {
+                throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`);
+            }
         }
         if (count > 0) {
             const pools = this._pools;
             let promises = null;
             for (let i = 0, len = pools.length; i < len; i++) {
-                const promise = pools[i].release(count);
+                const promise = pools[i].release(count, dontThrow);
                 if (isPromiseLike(promise)) {
                     if (!promises) {
                         promises = [promise];

@@ -37,11 +37,16 @@ class Pool {
     get releaseAvailable() {
         return this.maxSize - this._size;
     }
-    release(count) {
+    release(count, dontThrow) {
         const size = this._size;
         const maxReleaseCount = this.maxSize - size;
         if (count > maxReleaseCount) {
-            count = maxReleaseCount;
+            if (dontThrow) {
+                count = maxReleaseCount;
+            }
+            else {
+                throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`);
+            }
         }
         if (count > 0) {
             this._size = size + count;
@@ -54,7 +59,7 @@ class Pool {
         return count;
     }
     tick(abortSignal) {
-        if (this._size > 0) {
+        if (this._size >= this._maxSize) {
             return;
         }
         if (!this._tickPromise) {

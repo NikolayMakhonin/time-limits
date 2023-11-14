@@ -12,14 +12,11 @@ class TimeLimitPool extends PoolWrapper {
     get time() {
         return this._time;
     }
-    release(count) {
+    release(count, dontThrow) {
         return __awaiter(this, void 0, void 0, function* () {
             yield delay(this._time, null, this._timeController);
-            return this._release(count);
+            return this._pool.release(count, dontThrow);
         });
-    }
-    _release(count) {
-        return this._pool.release(count);
     }
 }
 

@@ -17,8 +17,8 @@ class PoolWrapper {
     hold(count) {
         return this._pool.hold(count);
     }
-    release(count) {
-        return this._pool.release(count);
+    release(count, dontThrow) {
+        return this._pool.release(count, dontThrow);
     }
     tick(abortSignal) {
         return this._pool.tick(abortSignal);

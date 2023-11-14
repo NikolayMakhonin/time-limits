@@ -16,14 +16,11 @@ class TimeLimitPool extends pool_PoolWrapper.PoolWrapper {
     get time() {
         return this._time;
     }
-    release(count) {
+    release(count, dontThrow) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
             yield asyncUtils.delay(this._time, null, this._timeController);
-            return this._release(count);
+            return this._pool.release(count, dontThrow);
         });
-    }
-    _release(count) {
-        return this._pool.release(count);
     }
 }
 

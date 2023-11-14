@@ -10,7 +10,7 @@ export declare class Pools implements IPool {
     get holdAvailable(): number;
     hold(count: number): boolean;
     get releaseAvailable(): number;
-    release(count: number): Promise<number> | number;
+    release(count: number, dontThrow?: boolean): Promise<number> | number;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
     holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }
