@@ -35,14 +35,14 @@ export class Pools implements IPool {
 
   get size() {
     const pools = this._pools
-    let max: number
+    let min: number
     for (let i = 0, len = pools.length; i < len; i++) {
       const value = pools[i].size
-      if (i === 0 || value < max) {
-        max = value
+      if (i === 0 || value < min) {
+        min = value
       }
     }
-    return max
+    return min
   }
 
   get holdAvailable() {

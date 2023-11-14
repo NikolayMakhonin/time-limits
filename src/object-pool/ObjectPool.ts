@@ -98,6 +98,10 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
   }
 
   async release(objects: TObject[], start?: number, end?: number): Promise<number> {
+    return this._release(objects, this._pool, start, end)
+  }
+
+  private async _release(objects: TObject[], pool: IPool, start?: number, end?: number): Promise<number> {
     if (start == null) {
       start = 0
     }
@@ -105,7 +109,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       end = objects.length
     }
     const tryReleaseCount = end - start
-    const releasedCount = await this._pool.release(tryReleaseCount, true)
+    const releasedCount = await pool.release(tryReleaseCount, true)
 
     end = Math.min(objects.length, releasedCount)
     this._availableObjects.release(objects, start, end)
@@ -211,7 +215,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
         await _this._allocatePool.release(1)
         throw err
       }
-      const count = await _this.release([obj])
+      const count = await _this._release([obj], _this._allocatePool)
       allocatedCount += count
     }
 
@@ -226,7 +230,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
         promises.push(releasePromiseObject(objectOrPromise))
       }
       else {
-        const promise = this.release([objectOrPromise])
+        const promise = this._release([objectOrPromise], this._allocatePool)
         if (isPromiseLike(promise)) {
           promises.push(releasePromise(promise))
         }
