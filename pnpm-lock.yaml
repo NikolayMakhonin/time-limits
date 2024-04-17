@@ -12,7 +12,7 @@ dependencies:
     specifier: ^1.0.4
     version: 1.0.4
   '@flemist/priority-queue':
-    specifier: ^1.0.0
+    specifier: 1.0.0
     version: 1.0.0
   '@flemist/time-controller':
     specifier: ^1.0.0

@@ -1,4 +1,4 @@
 import { IPool } from "./..";
-import { FuncAny } from "../contracts";
-export declare function toFuncWithPoolThrow<TFunc extends FuncAny>(pool: IPool, count: number, func: TFunc): TFunc;
-export declare function poolRunThrow<T>(pool: IPool, count: number, func: () => T): T;
+import { PromiseLikeOrValue } from '@flemist/async-utils';
+export declare function poolRunThrow<Result>(pool: IPool, count: number, func: (() => Result) | null | undefined): Result;
+export declare function poolRunThrow<Result>(pool: IPool, count: number, func: (() => PromiseLikeOrValue<Result>) | null | undefined): PromiseLikeOrValue<Result>;

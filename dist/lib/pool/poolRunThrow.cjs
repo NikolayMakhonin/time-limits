@@ -5,20 +5,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var asyncUtils = require('@flemist/async-utils');
 var pool_PoolHoldError = require('./PoolHoldError.cjs');
 
-function toFuncWithPoolThrow(pool, count, func) {
-    return asyncUtils.toFuncWithFinally(function funcWithPoolThrow() {
+function poolRunThrow(pool, count, func) {
+    return asyncUtils.runWithFinally(() => {
         const hold = pool.hold(count);
         if (!hold) {
             throw new pool_PoolHoldError.PoolHoldError(count);
         }
-        return func.apply(this, arguments);
-    }, () => {
+    }, func, () => {
         void pool.release(count);
     });
 }
-function poolRunThrow(pool, count, func) {
-    return toFuncWithPoolThrow(pool, count, func)();
-}
 
 exports.poolRunThrow = poolRunThrow;
-exports.toFuncWithPoolThrow = toFuncWithPoolThrow;

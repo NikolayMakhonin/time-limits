@@ -99,7 +99,7 @@
   "dependencies": {
     "@flemist/abort-controller-fast": "^1.0.0",
     "@flemist/async-utils": "^1.0.4",
-    "@flemist/priority-queue": "^1.0.0",
+    "@flemist/priority-queue": "1.0.0",
     "@flemist/time-controller": "^1.0.0",
     "tslib": "^2.4.0"
   }

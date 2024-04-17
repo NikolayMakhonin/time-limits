@@ -174,28 +174,33 @@ const r=t.subscribe((function(t){n(t)}))
 }else this.resolve=e,this.reject=n}
 this.promise.then((()=>{this._status="resolved"
 }),(()=>{this._status="rejected"}))}get state(){
-return this._status}}function x(t,e){
-return e?t.then((t=>(e(),t)),(t=>{throw e(),t})):t
-}function O(t,e){return e?function(){try{
-const n=t.apply(this,arguments)
-;return p(n)?x(n,e):(e(),n)}catch(t){throw e(),t}
-}:t}class S{constructor(t,e){
+return this._status}}function x(t,e,n){
+function r(t){if(!n)return e(t);try{const r=e(t)
+;if(!p(r)){const t=n()
+;return p(t)?t.then((()=>r)):r}
+return function(t,e){return e?t.then((t=>{
+const n=e();return p(n)?n.then((()=>t)):t}),(t=>{
+const n=e();if(!p(n))throw t;return n.then((()=>{
+throw t}))})):t}(r,n)}catch(t){const e=n()
+;if(!p(e))throw t;return e.then((()=>{throw t}))}}
+const o=t?t():void 0;return p(o)?o.then(r):r(o)}
+class O{constructor(t,e){
 this._branch=null,this.order=t,this.parent=e}
 get branch(){if(!this._branch){
 const t=[this.order];let e=this.parent
 ;for(;null!=e;)t.push(e.order),e=e.parent
 ;this._branch=t}return this._branch}}
-function T(t,e){return function(t,e){
+function S(t,e){return function(t,e){
 const n=t&&t.branch,r=e&&e.branch,o=n?n.length:0,i=r?r.length:0,s=o>i?o:i
 ;for(let t=0;t<s;t++){
 const e=t>=o?0:n[o-1-t],s=t>=i?0:r[i-1-t]
 ;if(e!==s)return e>s?1:-1}return 0
-}(t.priority,e.priority)<0}let k=1;class E{
-constructor(){this._queue=new u({lessThanFunc:T})}
+}(t.priority,e.priority)<0}let T=1;class k{
+constructor(){this._queue=new u({lessThanFunc:S})}
 run(t,e,n){return this._run(!1,t,e,n)}
 runTask(t,e,n){return this._run(!0,t,e,n)}
 _run(t,e,n,r){const o=new z(r),i={
-priority:(s=k++,l=n,null==s?null==l?null:l:new S(s,l)),
+priority:(s=T++,l=n,null==s?null==l?null:l:new O(s,l)),
 func:e,abortSignal:r,resolve:o.resolve,
 reject:o.reject,readyToRun:!t};var s,l
 ;if(this._queue.add(i),t){const t=this;return{
@@ -214,13 +219,13 @@ e=n.item,t.delete(n)}
 if(e.abortSignal&&e.abortSignal.aborted)e.reject(e.abortSignal.reason);else try{
 let t=e.func&&e.func(e.abortSignal)
 ;t&&"function"==typeof t.then&&(t=yield t),e.resolve(t)
-}catch(t){e.reject(t)}}}))}}const A=function(){
-const t=new E;return function(e,n){
-return t.run(void 0,e,n)}}();var W=function(){
+}catch(t){e.reject(t)}}}))}}const E=function(){
+const t=new k;return function(e,n){
+return t.run(void 0,e,n)}}();var A=function(){
 function t(t){
 if(this._maxSize=0,this._size=0,this._tickPromise=new z,!t)throw new Error("maxSize should be > 0")
 ;this._maxSize=t,
-this._size=t,this._priorityQueue=new E}
+this._size=t,this._priorityQueue=new k}
 return Object.defineProperty(t.prototype,"maxSize",{
 get:function(){return this._maxSize},
 enumerable:!1,configurable:!0
@@ -251,7 +256,7 @@ e.then((function(t){r&&r(),n(t)
 },t.prototype.holdWait=function(t,e,n,i){
 var s=this
 ;if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(this.maxSize,"))"))
-;return i||(i=A),
+;return i||(i=E),
 this._priorityQueue.run((function(n){
 return r(s,void 0,void 0,(function(){
 return o(this,(function(r){switch(r.label){case 0:
@@ -259,11 +264,11 @@ return t>this._size?[4,this.tick(n)]:[3,3];case 1:
 return r.sent(),[4,i(e,n)];case 2:
 return r.sent(),[3,0];case 3:
 if(!this.hold(t))throw new Error("Unexpected behavior")
-;return[2]}}))}))}),e,n)},t}(),R=function(){
+;return[2]}}))}))}),e,n)},t}(),W=function(){
 function t(){
 for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e]
 ;if(!(null==t?void 0:t.length))throw new Error("pools should not be empty")
-;this._pools=t,this._priorityQueue=new E}
+;this._pools=t,this._priorityQueue=new k}
 return Object.defineProperty(t.prototype,"maxSize",{
 get:function(){
 for(var t,e=this._pools,n=0,r=e.length;n<r;n++){
@@ -299,7 +304,7 @@ return r(this,void 0,void 0,(function(){var s=this
 ;return o(this,(function(l){switch(l.label){
 case 0:
 if(t>this.maxSize)throw new Error("holdCount (".concat(t," > maxSize (").concat(this.maxSize,"))"))
-;return i||(i=A),
+;return i||(i=E),
 [4,this._priorityQueue.run((function(n){
 return r(s,void 0,void 0,(function(){
 return o(this,(function(r){switch(r.label){case 0:
@@ -308,7 +313,7 @@ return r.sent(),i?[4,i(e,n)]:[3,3];case 2:
 r.sent(),r.label=3;case 3:return[3,0];case 4:
 if(!this.hold(t))throw new Error("Unexpected behavior")
 ;return[2]}}))}))}),e,n)];case 1:
-return l.sent(),[2]}}))}))},t}(),C=function(){
+return l.sent(),[2]}}))}))},t}(),R=function(){
 function t(t){this._pool=t}
 return Object.defineProperty(t.prototype,"pool",{
 get:function(){return this._pool},enumerable:!1,
@@ -321,7 +326,7 @@ r.sent(),r.label=2;case 2:
 return r.trys.push([2,,4,5]),[4,e(i)];case 3:
 return[2,r.sent()];case 4:
 return this._pool.release(t),[7];case 5:return[2]}
-}))}))},t}(),F=function(){function t(t){
+}))}))},t}(),C=function(){function t(t){
 this._pool=t}
 return Object.defineProperty(t.prototype,"size",{
 get:function(){return this._pool.size},
@@ -343,10 +348,10 @@ return this._pool.release(t,e)
 return this._pool.tick(t)
 },t.prototype.holdWait=function(t,e,n,r){
 return this._pool.holdWait(t,e,n,r)},t
-}(),M=function(t){function e(e){
+}(),F=function(t){function e(e){
 var n=t.call(this,"Pool hold(".concat(e,") failed"))||this
 ;return n.count=e,n}return n(e,t),e}(Error)
-;var Q=function(){function t(){this._objects=[]}
+;var M=function(){function t(){this._objects=[]}
 return Object.defineProperty(t.prototype,"objects",{
 get:function(){return this._objects},
 enumerable:!1,configurable:!0
@@ -363,10 +368,10 @@ for(var r=n-e,o=new Array(r),i=0;i<r;i++)o[i]=t[e+i]
 null==e&&(e=0),null==n&&(n=t.length)
 ;for(var r=e;r<n;r++){var o=t[r]
 ;null!=o&&this._objects.push(o)}},t
-}(),U=function(){function t(t){
+}(),Q=function(){function t(t){
 var e=t.pool,n=t.availableObjects,r=t.holdObjects,o=t.destroy,i=t.create
-;this._allocatePool=new W(e.maxSize),
-this._pool=new R(e,this._allocatePool),this._availableObjects=n||new Q,
+;this._allocatePool=new A(e.maxSize),
+this._pool=new W(e,this._allocatePool),this._availableObjects=n||new M,
 this._holdObjects=!0===r?new Set:r||null,
 this._create=i,this._destroy=o}
 return Object.defineProperty(t.prototype,"pool",{
@@ -446,7 +451,7 @@ for(var a=0;a<i;a++){var h=this._create()
 var f=this._release([h],this._allocatePool)
 ;p(f)&&e.push(u(f))}}
 return e.length?y(e).then((function(t){return s
-})):s},t}(),q=function(){function t(t){
+})):s},t}(),U=function(){function t(t){
 this._objectPool=t}
 return Object.defineProperty(t.prototype,"availableObjects",{
 get:function(){
@@ -467,7 +472,7 @@ return this._objectPool.release(t,e,n)
 return this._objectPool.tick(t)
 },t.prototype.use=function(t,e,n,r,o){
 return this._objectPool.use(t,e,n,r,o)},t
-}(),D=function(t){function e(e){
+}(),q=function(t){function e(e){
 var n=e.pool,r=e.time,o=e.timeController,i=t.call(this,n)||this
 ;return i._time=r,i._timeController=o||l,i}
 return n(e,t),Object.defineProperty(e.prototype,"time",{
@@ -483,22 +488,16 @@ if(o&&o.aborted)return void f(t,o.reason);let e
 e&&e(),t()}),r);o&&(e=o.subscribe((function(e){
 n.clearTimeout(s),f(t,e)})))})))];case 1:
 return n.sent(),[2,this._pool.release(t,e)]}
-var r,o,i}))}))},e}(F)
-;t.ObjectPool=U,t.ObjectPoolWrapper=q,t.Pool=W,t.PoolHoldError=M,
-t.PoolRunner=C,
-t.PoolWrapper=F,t.Pools=R,t.StackPool=Q,t.TimeLimitPool=D,t.poolRunThrow=function(t,e,n){
-return function(t,e,n){return O((function(){
-if(!t.hold(e))throw new M(e)
-;return n.apply(this,arguments)}),(function(){
-t.release(e)}))}(t,e,n)()
+var r,o,i}))}))},e}(C)
+;t.ObjectPool=Q,t.ObjectPoolWrapper=U,t.Pool=A,t.PoolHoldError=F,
+t.PoolRunner=R,
+t.PoolWrapper=C,t.Pools=W,t.StackPool=M,t.TimeLimitPool=q,t.poolRunThrow=function(t,e,n){
+return x((function(){if(!t.hold(e))throw new F(e)
+}),n,(function(){t.release(e)}))
 },t.poolRunWait=function(t){
-var e=t.pool,n=t.count,i=t.func,s=t.priority,l=t.abortSignal,c=t.awaitPriority
-;return r(this,void 0,void 0,(function(){
-return o(this,(function(t){return[2,O((function(){
-return r(this,void 0,void 0,(function(){var t
-;return o(this,(function(r){switch(r.label){
-case 0:return[4,e.holdWait(n,s,l,c)];case 1:
-return r.sent(),t=new W(n),[2,i(t,l)]}}))}))
-}),(function(){e.release(n)}))()]}))}))
+var e=t.pool,n=t.count,r=t.func,o=t.priority,i=t.abortSignal,s=t.awaitPriority
+;return x((function(){return e.holdWait(n,o,i,s)
+}),(function(){var t=new A(n);return r(t,i)
+}),(function(){return e.release(n)}))
 },Object.defineProperty(t,"__esModule",{value:!0})
 }({});
