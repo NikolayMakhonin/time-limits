@@ -1,32 +1,33 @@
 import {IPool} from '~/src'
-import {toFuncWithFinally} from '@flemist/async-utils'
+import {PromiseLikeOrValue, runWithFinally} from '@flemist/async-utils'
 import {PoolHoldError} from 'src/pool/PoolHoldError'
-import {FuncAny} from 'src/contracts'
 
-export function toFuncWithPoolThrow<TFunc extends FuncAny>(
+export function poolRunThrow<Result>(
   pool: IPool,
   count: number,
-  func: TFunc,
-): TFunc {
-  return toFuncWithFinally(
-    function funcWithPoolThrow() {
+  func: (() => Result) | null | undefined,
+): Result
+export function poolRunThrow<Result>(
+  pool: IPool,
+  count: number,
+  func: (() => PromiseLikeOrValue<Result>) | null | undefined,
+): PromiseLikeOrValue<Result>
+export function poolRunThrow<Result>(
+  pool: IPool,
+  count: number,
+  func: (() => PromiseLikeOrValue<Result>) | null | undefined,
+): PromiseLikeOrValue<Result> {
+  return runWithFinally(
+    () => {
       const hold = pool.hold(count)
       if (!hold) {
         throw new PoolHoldError(count)
       }
-
-      return func.apply(this, arguments)
-    } as TFunc,
+    },
+    func,
     () => {
       void pool.release(count)
     },
   )
 }
 
-export function poolRunThrow<T>(
-  pool: IPool,
-  count: number,
-  func: () => T,
-): T {
-  return toFuncWithPoolThrow(pool, count, func)()
-}
