@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.0.4
     version: 1.0.4
   '@flemist/priority-queue':
-    specifier: 1.0.0
-    version: 1.0.0
+    specifier: ^1.0.1
+    version: 1.0.1
   '@flemist/time-controller':
     specifier: ^1.0.0
     version: 1.0.0
@@ -1511,8 +1511,8 @@ packages:
     dependencies:
       tslib: 2.4.0
 
-  /@flemist/priority-queue@1.0.0:
-    resolution: {integrity: sha512-B9gzh3Tcjlz8C/e5bMFLKVVGPa9MX/TC2OTWmMVRMOoIUHXIkOsp6m8zFTt77iCDoL0/d15LpA7SieqwHB/WTw==}
+  /@flemist/priority-queue@1.0.1:
+    resolution: {integrity: sha512-5rc1BdJOBpLzXoyKGWjXQSSEr5S8NtPG5c4oH/mG1Dsm3/7H1QlyaHfznXbquy2B6lQ7j1sHMlFvsDO3+ULdSQ==}
     engines: {node: '>=12.9.0'}
     dependencies:
       '@flemist/abort-controller-fast': 1.0.0
