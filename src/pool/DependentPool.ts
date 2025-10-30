@@ -6,7 +6,7 @@ import {
   AwaitPriority,
   awaitPriorityDefault,
 } from '@flemist/priority-queue'
-import {isPromiseLike, promiseAll, promiseRace} from '@flemist/async-utils'
+import {promiseRace} from '@flemist/async-utils'
 import {IPool} from './Pool'
 
 /**
