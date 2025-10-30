@@ -30,22 +30,16 @@ export class DependentPool implements IPool {
   }
 
   get size() {
-    let size: number = this._pool.size
-    if (size === 0) {
-      return 0
-    }
+    return Math.min(0, this.maxSize - this.holdCount)
+  }
 
+  get holdCount() {
+    let holdCount: number = this._pool.holdCount
     const pools = this._pools
     for (let i = 0, len = pools.length; i < len; i++) {
-      const pool = pools[i]
-      const holdCount = pool.maxSize - pool.size
-      if (holdCount >= size) {
-        return 0
-      }
-      size -= holdCount
+      holdCount += pools[i].holdCount
     }
-
-    return size
+    return holdCount
   }
 
   get holdAvailable() {
@@ -53,7 +47,7 @@ export class DependentPool implements IPool {
   }
 
   get releaseAvailable() {
-    return this.maxSize - this.size
+    return this._pool.releaseAvailable
   }
 
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {

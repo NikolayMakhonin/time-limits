@@ -11,6 +11,7 @@ import {
 export interface IPool {
   readonly size: number
   readonly maxSize: number
+  readonly holdCount: number
 
   holdAvailable: number
 
@@ -59,6 +60,10 @@ export class Pool implements IPool {
     return this._size
   }
 
+  get holdCount() {
+    return this._maxSize - this._size
+  }
+
   get holdAvailable() {
     return this._size
   }
@@ -73,12 +78,12 @@ export class Pool implements IPool {
   }
 
   get releaseAvailable() {
-    return this.maxSize - this._size
+    return this._maxSize - this._size
   }
 
   release(count: number, dontThrow?: boolean): number {
     const size = this._size
-    const maxReleaseCount = this.maxSize - size
+    const maxReleaseCount = this._maxSize - size
     if (count > maxReleaseCount) {
       if (dontThrow) {
         count = maxReleaseCount
@@ -116,8 +121,8 @@ export class Pool implements IPool {
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ) {
-    if (count > this.maxSize) {
-      throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
+    if (count > this._maxSize) {
+      throw new Error(`holdCount (${count} > maxSize (${this._maxSize}))`)
     }
 
     if (!awaitPriority) {

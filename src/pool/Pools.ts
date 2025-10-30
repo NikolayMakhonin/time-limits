@@ -45,6 +45,10 @@ export class Pools implements IPool {
     return min
   }
 
+  get holdCount() {
+    return this.maxSize - this.size
+  }
+
   get holdAvailable() {
     return this.size
   }

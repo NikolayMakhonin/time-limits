@@ -17,6 +17,10 @@ export class PoolWrapper implements IPool {
     return this._pool.maxSize
   }
 
+  get holdCount(): number {
+    return this._pool.holdCount
+  }
+
   get holdAvailable(): number {
     return this._pool.holdAvailable
   }
