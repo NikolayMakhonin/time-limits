@@ -56,7 +56,7 @@
     "@babel/runtime-corejs3": "7.28.4",
     "@flemist/copy-glob-flat": "0.0.5",
     "@flemist/karma-custom-launcher": "0.0.0",
-    "@flemist/test-utils": "1.0.3",
+    "@flemist/test-utils": "1.0.4",
     "@flemist/test-variants": "1.0.0",
     "@rollup/plugin-alias": "3.1.9",
     "@rollup/plugin-babel": "6.0.3",

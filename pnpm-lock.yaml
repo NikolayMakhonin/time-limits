@@ -49,8 +49,8 @@ importers:
         specifier: 0.0.0
         version: 0.0.0
       '@flemist/test-utils':
-        specifier: 1.0.3
-        version: 1.0.3(expect@30.2.0)
+        specifier: 1.0.4
+        version: 1.0.4(expect@30.2.0)
       '@flemist/test-variants':
         specifier: 1.0.0
         version: 1.0.0
@@ -718,8 +718,8 @@ packages:
     resolution: {integrity: sha512-5rc1BdJOBpLzXoyKGWjXQSSEr5S8NtPG5c4oH/mG1Dsm3/7H1QlyaHfznXbquy2B6lQ7j1sHMlFvsDO3+ULdSQ==}
     engines: {node: '>=12.9.0'}
 
-  '@flemist/test-utils@1.0.3':
-    resolution: {integrity: sha512-C+x2EyYQx3aqgRVMHqpavKvI286Ngoj+wtRa2XjteUXkOw4JdFKatH8X106pok3ZXCjZe05vi0Jjv+OQntCweA==}
+  '@flemist/test-utils@1.0.4':
+    resolution: {integrity: sha512-kdHXVCXaL4kpMkTU/zxJ4MQU0WetOhUZvObq45KI7dYDofaeOmiV2Wu0Nj8p7Kyr7Rr0NvOf2qzTj59sAz/I3Q==}
     engines: {node: '>=10.4.0', pnpm: '>=7.1.6'}
     peerDependencies:
       expect: '>=24'
@@ -4333,7 +4333,7 @@ snapshots:
       '@flemist/time-controller': 1.0.4
       tslib: 2.8.1
 
-  '@flemist/test-utils@1.0.3(expect@30.2.0)':
+  '@flemist/test-utils@1.0.4(expect@30.2.0)':
     dependencies:
       '@flemist/async-utils': 1.2.2
       '@flemist/time-controller': 1.0.4
