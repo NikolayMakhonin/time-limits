@@ -1,9 +1,9 @@
-import {IAbortSignalFast} from '@flemist/abort-controller-fast'
+import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {
   Priority,
-  IPriorityQueue,
+  type IPriorityQueue,
   PriorityQueue,
-  AwaitPriority,
+  type AwaitPriority,
   awaitPriorityDefault,
 } from '@flemist/priority-queue'
 import {isPromiseLike, promiseAll, promiseRace} from '@flemist/async-utils'

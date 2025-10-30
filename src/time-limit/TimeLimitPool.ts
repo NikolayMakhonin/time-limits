@@ -1,4 +1,4 @@
-import {ITimeController, timeControllerDefault} from '@flemist/time-controller'
+import {type ITimeController, timeControllerDefault} from '@flemist/time-controller'
 import {delay} from '@flemist/async-utils'
 import {PoolWrapper} from 'src/pool/PoolWrapper'
 import {IPool} from 'src/pool'

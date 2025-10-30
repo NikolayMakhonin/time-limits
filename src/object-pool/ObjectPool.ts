@@ -1,8 +1,8 @@
-import {IAbortSignalFast} from '@flemist/abort-controller-fast'
+import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
 import {IPool, Pool, Pools} from 'src/pool'
 import {isPromiseLike, promiseAll} from '@flemist/async-utils'
-import {Priority, AwaitPriority} from '@flemist/priority-queue'
+import {Priority, type AwaitPriority} from '@flemist/priority-queue'
 
 export interface IObjectPool<TObject extends object> {
   readonly pool: IPool

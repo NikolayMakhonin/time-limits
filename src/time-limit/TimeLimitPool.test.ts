@@ -2,8 +2,8 @@
 
 import {delay} from '@flemist/async-utils'
 import {priorityCreate, createAwaitPriority} from '@flemist/priority-queue'
-import {ITimeController, TimeControllerMock} from '@flemist/time-controller'
-import {IAbortSignalFast} from '@flemist/abort-controller-fast'
+import {type ITimeController, TimeControllerMock} from '@flemist/time-controller'
+import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {createTestVariants} from '@flemist/test-variants'
 import {IPoolRunner, Pool, PoolRunner, Pools} from 'src/pool'
 import {TimeLimitPool} from 'src/time-limit/TimeLimitPool'

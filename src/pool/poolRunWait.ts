@@ -1,8 +1,8 @@
 import {IPool, Pool} from '~/src'
-import {IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {AwaitPriority, Priority} from '@flemist/priority-queue'
+import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
+import {type AwaitPriority, Priority} from '@flemist/priority-queue'
 import {
-  PromiseLikeOrValue,
+  type PromiseLikeOrValue,
   runWithFinally,
 } from '@flemist/async-utils'
 

@@ -1,5 +1,5 @@
 import {IPool} from '~/src'
-import {PromiseLikeOrValue, runWithFinally} from '@flemist/async-utils'
+import {type PromiseLikeOrValue, runWithFinally} from '@flemist/async-utils'
 import {PoolHoldError} from 'src/pool/PoolHoldError'
 
 export function poolRunThrow<Result>(

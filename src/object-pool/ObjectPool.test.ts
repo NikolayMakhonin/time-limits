@@ -1,6 +1,6 @@
 import {createTestVariants} from '@flemist/test-variants'
 import {delay} from '@flemist/async-utils'
-import {AbortControllerFast, IAbortSignalFast} from '@flemist/abort-controller-fast'
+import {AbortControllerFast, type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IObjectPool, ObjectPool} from './ObjectPool'
 import {Pool, Pools} from 'src/pool'
 import {TimeControllerMock} from '@flemist/time-controller'
