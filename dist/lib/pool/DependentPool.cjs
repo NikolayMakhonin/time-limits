@@ -6,47 +6,43 @@ var tslib = require('tslib');
 var priorityQueue = require('@flemist/priority-queue');
 var asyncUtils = require('@flemist/async-utils');
 
-class Pools {
-    constructor(...pools) {
-        if (!(pools === null || pools === void 0 ? void 0 : pools.length)) {
-            throw new Error('pools should not be empty');
-        }
-        this._pools = pools;
+/**
+ * К текущему size прибавляется size всех зависимостей.
+ * Таким образом, этому пулу нужно будет ждать все зависимые пулы, но при этом не блокировать их.
+ * Пример использования: есть 2 пула на загрузку данных, один загружает данные фоново, а второй для срочной загрузки по требованию. Чтобы добавить новую фоновую задачу, нужно убедиться что общее количество задач во всех пулах не превышает лимит. Но если нужно добавить срочную задачу, то нужно убедиться что только в срочном пуле есть место. В худшем случае будут заняты оба пула, но ненадолго, т.к. фоновые задачи будут завершаться, а новые фоновые задачи не будут добавляться, пока не освободится место.
+ */
+class DependentPool {
+    constructor(pool, ...dependencies) {
+        this._pool = pool;
+        this._pools = dependencies;
         this._priorityQueue = new priorityQueue.PriorityQueue();
     }
     get maxSize() {
-        const pools = this._pools;
-        let min;
-        for (let i = 0, len = pools.length; i < len; i++) {
-            const value = pools[i].maxSize;
-            if (i === 0 || value < min) {
-                min = value;
-            }
-        }
-        return min;
+        return this._pool.maxSize;
     }
     get size() {
-        const pools = this._pools;
-        let min;
-        for (let i = 0, len = pools.length; i < len; i++) {
-            const value = pools[i].size;
-            if (i === 0 || value < min) {
-                min = value;
-            }
-        }
-        return min;
+        return Math.min(0, this.maxSize - this.holdCount);
     }
     get holdCount() {
-        return this.maxSize - this.size;
+        let holdCount = this._pool.holdCount;
+        const pools = this._pools;
+        for (let i = 0, len = pools.length; i < len; i++) {
+            holdCount += pools[i].holdCount;
+        }
+        return holdCount;
     }
     get holdAvailable() {
         return this.size;
     }
     get releaseAvailable() {
-        return this.maxSize - this.size;
+        return this._pool.releaseAvailable;
     }
     tick(abortSignal) {
         let promises;
+        const promise = this._pool.tick(abortSignal);
+        if (promise) {
+            promises = [promise];
+        }
         for (let i = 0, len = this._pools.length; i < len; i++) {
             const promise = this._pools[i].tick(abortSignal);
             if (promise) {
@@ -68,42 +64,10 @@ class Pools {
         if (count > size) {
             return false;
         }
-        const pools = this._pools;
-        for (let i = 0, len = pools.length; i < len; i++) {
-            pools[i].hold(count);
-        }
-        return true;
+        return this._pool.hold(count);
     }
     release(count, dontThrow) {
-        const size = this.size;
-        const maxReleaseCount = this.maxSize - size;
-        if (count > maxReleaseCount) {
-            if (dontThrow) {
-                count = maxReleaseCount;
-            }
-            else {
-                throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`);
-            }
-        }
-        if (count > 0) {
-            const pools = this._pools;
-            let promises = null;
-            for (let i = 0, len = pools.length; i < len; i++) {
-                const promise = pools[i].release(count, dontThrow);
-                if (asyncUtils.isPromiseLike(promise)) {
-                    if (!promises) {
-                        promises = [promise];
-                    }
-                    else {
-                        promises.push(promise);
-                    }
-                }
-            }
-            if (promises) {
-                return asyncUtils.promiseAll(promises).then(() => count);
-            }
-        }
-        return count;
+        return this._pool.release(count, dontThrow);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
@@ -128,4 +92,4 @@ class Pools {
     }
 }
 
-exports.Pools = Pools;
+exports.DependentPool = DependentPool;

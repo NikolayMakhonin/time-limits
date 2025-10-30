@@ -1,5 +1,5 @@
-import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { AwaitPriority, Priority } from '@flemist/priority-queue';
+import { type IAbortSignalFast } from '@flemist/abort-controller-fast';
+import { type AwaitPriority, Priority } from '@flemist/priority-queue';
 import { IPool } from './Pool';
 /** @deprecated use poolRunWait */
 export interface IPoolRunner {

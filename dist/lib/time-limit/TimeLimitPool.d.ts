@@ -1,4 +1,4 @@
-import { ITimeController } from '@flemist/time-controller';
+import { type ITimeController } from '@flemist/time-controller';
 import { PoolWrapper } from "../pool/PoolWrapper";
 import { IPool } from "../pool";
 export interface ITimeLimitPool extends IPool {

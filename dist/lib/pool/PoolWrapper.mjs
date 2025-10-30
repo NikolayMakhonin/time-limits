@@ -8,6 +8,9 @@ class PoolWrapper {
     get maxSize() {
         return this._pool.maxSize;
     }
+    get holdCount() {
+        return this._pool.holdCount;
+    }
     get holdAvailable() {
         return this._pool.holdAvailable;
     }

@@ -4,6 +4,7 @@ export { PoolRunner } from './pool/PoolRunner.mjs';
 export { PoolWrapper } from './pool/PoolWrapper.mjs';
 export { PoolHoldError } from './pool/PoolHoldError.mjs';
 export { poolRunWait } from './pool/poolRunWait.mjs';
+export { DependentPool } from './pool/DependentPool.mjs';
 export { poolRunThrow } from './pool/poolRunThrow.mjs';
 export { StackPool } from './object-pool/StackPool.mjs';
 export { ObjectPool } from './object-pool/ObjectPool.mjs';

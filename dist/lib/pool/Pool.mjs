@@ -23,6 +23,9 @@ class Pool {
     get size() {
         return this._size;
     }
+    get holdCount() {
+        return this._maxSize - this._size;
+    }
     get holdAvailable() {
         return this._size;
     }
@@ -35,11 +38,11 @@ class Pool {
         return true;
     }
     get releaseAvailable() {
-        return this.maxSize - this._size;
+        return this._maxSize - this._size;
     }
     release(count, dontThrow) {
         const size = this._size;
-        const maxReleaseCount = this.maxSize - size;
+        const maxReleaseCount = this._maxSize - size;
         if (count > maxReleaseCount) {
             if (dontThrow) {
                 count = maxReleaseCount;
@@ -68,8 +71,8 @@ class Pool {
         return promiseToAbortable(abortSignal, this._tickPromise.promise);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
-        if (count > this.maxSize) {
-            throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`);
+        if (count > this._maxSize) {
+            throw new Error(`holdCount (${count} > maxSize (${this._maxSize}))`);
         }
         if (!awaitPriority) {
             awaitPriority = awaitPriorityDefault;

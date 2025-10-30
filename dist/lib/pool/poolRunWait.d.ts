@@ -1,7 +1,7 @@
 import { IPool } from "./..";
-import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { AwaitPriority, Priority } from '@flemist/priority-queue';
-import { PromiseLikeOrValue } from '@flemist/async-utils';
+import { type IAbortSignalFast } from '@flemist/abort-controller-fast';
+import { type AwaitPriority, Priority } from '@flemist/priority-queue';
+import { type PromiseLikeOrValue } from '@flemist/async-utils';
 export declare type PoolRunWaitArgs<T> = {
     pool: IPool;
     count: number;

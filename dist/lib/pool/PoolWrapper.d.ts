@@ -1,11 +1,12 @@
-import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { Priority, AwaitPriority } from '@flemist/priority-queue';
+import { type IAbortSignalFast } from '@flemist/abort-controller-fast';
+import { Priority, type AwaitPriority } from '@flemist/priority-queue';
 import { IPool } from "./Pool";
 export declare class PoolWrapper implements IPool {
     protected readonly _pool: IPool;
     constructor(pool: IPool);
     get size(): number;
     get maxSize(): number;
+    get holdCount(): number;
     get holdAvailable(): number;
     get releaseAvailable(): number;
     hold(count: number): boolean;

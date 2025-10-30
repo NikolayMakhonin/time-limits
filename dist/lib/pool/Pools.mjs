@@ -1,6 +1,6 @@
 import { __awaiter } from 'tslib';
 import { PriorityQueue, awaitPriorityDefault } from '@flemist/priority-queue';
-import { isPromiseLike, promiseAll, promiseRace } from '@flemist/async-utils';
+import { promiseRace, isPromiseLike, promiseAll } from '@flemist/async-utils';
 
 class Pools {
     constructor(...pools) {
@@ -32,8 +32,32 @@ class Pools {
         }
         return min;
     }
+    get holdCount() {
+        return this.maxSize - this.size;
+    }
     get holdAvailable() {
         return this.size;
+    }
+    get releaseAvailable() {
+        return this.maxSize - this.size;
+    }
+    tick(abortSignal) {
+        let promises;
+        for (let i = 0, len = this._pools.length; i < len; i++) {
+            const promise = this._pools[i].tick(abortSignal);
+            if (promise) {
+                if (!promises) {
+                    promises = [promise];
+                }
+                else {
+                    promises.push(promise);
+                }
+            }
+        }
+        if (!promises) {
+            return null;
+        }
+        return promiseRace(promises);
     }
     hold(count) {
         const size = this.size;
@@ -45,9 +69,6 @@ class Pools {
             pools[i].hold(count);
         }
         return true;
-    }
-    get releaseAvailable() {
-        return this.maxSize - this.size;
     }
     release(count, dontThrow) {
         const size = this.size;
@@ -79,24 +100,6 @@ class Pools {
             }
         }
         return count;
-    }
-    tick(abortSignal) {
-        let promises;
-        for (let i = 0, len = this._pools.length; i < len; i++) {
-            const promise = this._pools[i].tick(abortSignal);
-            if (promise) {
-                if (!promises) {
-                    promises = [promise];
-                }
-                else {
-                    promises.push(promise);
-                }
-            }
-        }
-        if (!promises) {
-            return null;
-        }
-        return promiseRace(promises);
     }
     holdWait(count, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {

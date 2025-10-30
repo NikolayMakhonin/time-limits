@@ -1,8 +1,9 @@
-import { IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { Priority, AwaitPriority } from '@flemist/priority-queue';
+import { type IAbortSignalFast } from '@flemist/abort-controller-fast';
+import { Priority, type AwaitPriority } from '@flemist/priority-queue';
 export interface IPool {
     readonly size: number;
     readonly maxSize: number;
+    readonly holdCount: number;
     holdAvailable: number;
     hold(count: number): boolean;
     /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
@@ -20,6 +21,7 @@ export declare class Pool implements IPool {
     constructor(maxSize: number);
     get maxSize(): number;
     get size(): number;
+    get holdCount(): number;
     get holdAvailable(): number;
     hold(count: number): boolean;
     get releaseAvailable(): number;
