@@ -25,29 +25,41 @@ export class DependentPool implements IPool {
     this._priorityQueue = new PriorityQueue()
   }
 
-  get maxSize() {
-    return this._pool.maxSize
-  }
-
   get size() {
-    return Math.min(0, this.maxSize - this.holdCount)
+    return this.holdAvailable
   }
 
-  get holdCount() {
-    let holdCount: number = this._pool.holdCount
+  get heldCountMax() {
+    return this._pool.heldCountMax
+  }
+
+  get heldCount() {
+    let holdCount: number = this._pool.heldCount
     const pools = this._pools
     for (let i = 0, len = pools.length; i < len; i++) {
-      holdCount += pools[i].holdCount
+      holdCount += pools[i].heldCount
     }
     return holdCount
   }
 
   get holdAvailable() {
-    return this.size
+    return Math.min(0, this.heldCountMax - this.heldCount)
   }
 
   get releaseAvailable() {
     return this._pool.releaseAvailable
+  }
+
+  hold(count: number): boolean {
+    const size = this.size
+    if (count > size) {
+      return false
+    }
+    return this._pool.hold(count)
+  }
+
+  release(count: number, dontThrow?: boolean): Promise<number> | number {
+    return this._pool.release(count, dontThrow)
   }
 
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
@@ -75,26 +87,14 @@ export class DependentPool implements IPool {
     return promiseRace(promises)
   }
 
-  hold(count: number): boolean {
-    const size = this.size
-    if (count > size) {
-      return false
-    }
-    return this._pool.hold(count)
-  }
-
-  release(count: number, dontThrow?: boolean): Promise<number> | number {
-    return this._pool.release(count, dontThrow)
-  }
-
   async holdWait(
     count: number,
     priority?: Priority,
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ) {
-    if (count > this.maxSize) {
-      throw new Error(`holdCount (${count} > maxSize (${this.maxSize}))`)
+    if (count > this.heldCountMax) {
+      throw new Error(`holdCount (${count} > maxSize (${this.heldCountMax}))`)
     }
 
     if (!awaitPriority) {

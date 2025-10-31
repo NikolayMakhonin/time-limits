@@ -87,7 +87,7 @@ describe('object-pool > ObjectPool', function () {
         destroy: null,
       })
 
-    assert.strictEqual(objectPool.pool.maxSize, maxSize)
+    assert.strictEqual(objectPool.pool.heldCountMax, maxSize)
     assert.strictEqual(objectPool.pool.size, maxSize)
     if (holdObjects) {
       assert.strictEqual(objectPool.holdObjects.size, 0)
@@ -104,7 +104,7 @@ describe('object-pool > ObjectPool', function () {
             throw new Error('Timeout')
           }),
       ])
-      assert.strictEqual(objectPool.pool.maxSize, maxSize)
+      assert.strictEqual(objectPool.pool.heldCountMax, maxSize)
       assert.strictEqual(objectPool.pool.size, maxSize)
       if (holdObjects) {
         assert.strictEqual(objectPool.holdObjects.size, 0)
@@ -131,7 +131,7 @@ describe('object-pool > ObjectPool', function () {
             activeObjects.add(o)
           })
           assert.ok(activeObjects.size <= maxSize)
-          assert.ok(objectPool.pool.size < objectPool.pool.maxSize)
+          assert.ok(objectPool.pool.size < objectPool.pool.heldCountMax)
           assert.ok(objectPool.availableObjects.length < maxSize)
           activeObjects.forEach(o => {
             assert.ok(!objectPool.availableObjects.includes(o))
@@ -155,7 +155,7 @@ describe('object-pool > ObjectPool', function () {
             assert.ok(abortSignal.aborted)
           }
 
-          assert.ok(objectPool.pool.size < objectPool.pool.maxSize)
+          assert.ok(objectPool.pool.size < objectPool.pool.heldCountMax)
           assert.ok(objectPool.availableObjects.length < maxSize)
           activeObjects.forEach(o => {
             assert.ok(!objectPool.availableObjects.includes(o))
@@ -248,7 +248,7 @@ describe('object-pool > ObjectPool', function () {
     // awaitTime(timeController, 1000, 100)
 
     assert.strictEqual(activeObjects.size, 0)
-    assert.strictEqual(objectPool.pool.maxSize, maxSize)
+    assert.strictEqual(objectPool.pool.heldCountMax, maxSize)
     assert.strictEqual(objectPool.pool.size, maxSize)
 
     for (let i = 0; i < totalCount; i++) {

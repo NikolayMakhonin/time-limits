@@ -9,17 +9,15 @@ import {
 } from '@flemist/priority-queue'
 
 export interface IPool {
+  /** @deprecated use holdAvailable */
   readonly size: number
-  readonly maxSize: number
-  readonly holdCount: number
 
-  holdAvailable: number
+  readonly heldCountMax: number
+  readonly heldCount: number
+  readonly holdAvailable: number
+  readonly releaseAvailable: number
 
   hold(count: number): boolean
-
-  /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
-  releaseAvailable: number
-
   release(count: number, dontThrow?: boolean): Promise<number> | number
 
   /** it will resolve when size > 0 */
@@ -40,60 +38,59 @@ export interface IPool {
 
 export class Pool implements IPool {
   private readonly _priorityQueue: IPriorityQueue
-  private readonly _maxSize: number = 0
-  private _size: number = 0
+  private readonly _heldCountMax: number = 0
+  private _heldCount: number = 0
 
-  constructor(maxSize: number) {
-    if (!maxSize) {
-      throw new Error('maxSize should be > 0')
+  constructor(heldCountMax: number) {
+    if (!heldCountMax) {
+      throw new Error('heldCountMax should be > 0')
     }
-    this._maxSize = maxSize
-    this._size = maxSize
+    this._heldCountMax = heldCountMax
     this._priorityQueue = new PriorityQueue()
   }
 
-  get maxSize() {
-    return this._maxSize
-  }
-
+  /** @deprecated use holdAvailable */
   get size() {
-    return this._size
+    return this.holdAvailable
   }
 
-  get holdCount() {
-    return this._maxSize - this._size
+  get heldCountMax() {
+    return this._heldCountMax
+  }
+
+  get heldCount() {
+    return this._heldCount
   }
 
   get holdAvailable() {
-    return this._size
-  }
-
-  hold(count: number): boolean {
-    const size = this._size
-    if (count > size) {
-      return false
-    }
-    this._size = size - count
-    return true
+    return Math.max(0, this._heldCountMax - this._heldCount)
   }
 
   get releaseAvailable() {
-    return this._maxSize - this._size
+    return this._heldCount
+  }
+
+  hold(count: number): boolean {
+    const heldCount = this._heldCount
+    if (heldCount !== 0 && count > this.holdAvailable) {
+      return false
+    }
+    this._heldCount = heldCount + count
+    return true
   }
 
   release(count: number, dontThrow?: boolean): number {
-    const size = this._size
-    const maxReleaseCount = this._maxSize - size
-    if (count > maxReleaseCount) {
+    const holdCount = this._heldCount
+    if (count > holdCount) {
       if (dontThrow) {
-        count = maxReleaseCount
+        count = holdCount
       }
       else {
-        throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`)
+        throw new Error(`count (${count} > holdCount (${holdCount}))`)
       }
     }
     if (count > 0) {
-      this._size = size + count
+      this._heldCount = holdCount - count
 
       if (this._tickPromise) {
         const tickPromise = this._tickPromise
@@ -106,7 +103,7 @@ export class Pool implements IPool {
 
   private _tickPromise: CustomPromise = new CustomPromise()
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
-    if (this._size >= this._maxSize) {
+    if (this._heldCount === 0) {
       return
     }
     if (!this._tickPromise) {
@@ -121,8 +118,8 @@ export class Pool implements IPool {
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ) {
-    if (count > this._maxSize) {
-      throw new Error(`holdCount (${count} > maxSize (${this._maxSize}))`)
+    if (count > this._heldCountMax) {
+      throw new Error(`holdCount (${count} > maxSize (${this._heldCountMax}))`)
     }
 
     if (!awaitPriority) {
@@ -130,7 +127,7 @@ export class Pool implements IPool {
     }
 
     return this._priorityQueue.run(async (abortSignal) => {
-      while (count > this._size) {
+      while (count > this.holdAvailable) {
         await this.tick(abortSignal)
         await awaitPriority(priority, abortSignal)
       }

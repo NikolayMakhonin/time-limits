@@ -64,7 +64,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     destroy,
     create,
   }: ObjectPoolArgs<TObject>) {
-    this._allocatePool = new Pool(pool.maxSize)
+    this._allocatePool = new Pool(pool.heldCountMax)
     this._pool = new Pools(pool, this._allocatePool)
     this._availableObjects = availableObjects || new StackPool()
     this._holdObjects = holdObjects === true
