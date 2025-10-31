@@ -1,5 +1,4 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
-import {Priority, type AwaitPriority} from '@flemist/priority-queue'
 import {IPool} from 'src/pool/Pool'
 
 export class PoolWrapper implements IPool {
