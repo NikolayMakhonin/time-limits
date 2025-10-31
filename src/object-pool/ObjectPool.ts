@@ -1,6 +1,6 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
-import {IPool, Pool, Pools} from 'src/pool'
+import {IPool, Pool, poolHoldWait, Pools} from 'src/pool'
 import {isPromiseLike, promiseAll} from '@flemist/async-utils'
 import {Priority, type AwaitPriority} from '@flemist/priority-queue'
 
@@ -138,7 +138,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ): Promise<TObject[]> {
-    await this._pool.holdWait(count, priority, abortSignal, awaitPriority)
+    await poolHoldWait({ pool: this._pool, count, priority, abortSignal, awaitPriority })
     return this.get(count)
   }
 
@@ -151,7 +151,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
   ): Promise<TResult> {
     let objects = await this.getWait(count, priority, abortSignal, awaitPriority)
     if (!this._create) {
-      throw new Error('You should specify create function in the constructor')
+      throw new Error('[ObjectPool][use] You should specify create function in the constructor')
     }
 
     let start
@@ -166,7 +166,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     for (let i = start; i < count; i++) {
       const obj = await this._create()
       if (obj == null) {
-        throw new Error('create function should return not null object')
+        throw new Error('[ObjectPool][use] create function should return not null object')
       }
       if (this._heldObjects) {
         this._heldObjects.add(obj)
@@ -192,7 +192,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     size?: number,
   ): Promise<number> | number {
     if (!this._create) {
-      throw new Error('You should specify create function in the constructor')
+      throw new Error('[ObjectPool][allocate] You should specify create function in the constructor')
     }
     const promises: Promise<void>[] = []
     let tryHoldCount = this._allocatePool.holdAvailable - this._availableObjects.size
@@ -200,7 +200,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       tryHoldCount = size
     }
     if (tryHoldCount < 0) {
-      throw new Error('Unexpected behavior: tryHoldCount < 0')
+      throw new Error('[ObjectPool][allocate] Unexpected behavior: tryHoldCount < 0')
     }
     const heldCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0
 

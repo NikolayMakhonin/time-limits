@@ -25,6 +25,10 @@ export class PoolWrapper implements IPool {
     return this._pool.releaseAvailable
   }
 
+  canHold(count: number): boolean {
+    return this._pool.canHold(count)
+  }
+
   hold(count: number) {
     return this._pool.hold(count)
   }
@@ -35,14 +39,5 @@ export class PoolWrapper implements IPool {
 
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
     return this._pool.tick(abortSignal)
-  }
-
-  holdWait(
-    count: number,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
-  ): Promise<void> {
-    return this._pool.holdWait(count, priority, abortSignal, awaitPriority)
   }
 }

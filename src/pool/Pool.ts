@@ -2,7 +2,6 @@ import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
 import {
   Priority,
-  type IPriorityQueue,
   PriorityQueue,
   type AwaitPriority,
   awaitPriorityDefault,
@@ -14,19 +13,11 @@ export interface IPool {
   readonly holdAvailable: number
   readonly releaseAvailable: number
 
+  canHold(count: number): boolean
   hold(count: number): boolean
   release(count: number, dontThrow?: boolean): Promise<number> | number
 
-  /** it will resolve when size > 0 */
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void
-
-  /** wait size > 0 and hold, use this for concurrency hold */
-  holdWait(
-    count: number,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
-  ): Promise<void>
 }
 
 // export interface IPoolSync extends IPool {
@@ -34,16 +25,14 @@ export interface IPool {
 // }
 
 export class Pool implements IPool {
-  private readonly _priorityQueue: IPriorityQueue
   private readonly _heldCountMax: number = 0
   private _heldCount: number = 0
 
   constructor(heldCountMax: number) {
     if (!heldCountMax) {
-      throw new Error('heldCountMax should be > 0')
+      throw new Error('[Pool][constructor] heldCountMax should be > 0')
     }
     this._heldCountMax = heldCountMax
-    this._priorityQueue = new PriorityQueue()
   }
 
   get heldCountMax() {
@@ -62,6 +51,10 @@ export class Pool implements IPool {
     return this._heldCount
   }
 
+  canHold(count: number): boolean {
+    return this.heldCount === 0 || count <= this.holdAvailable
+  }
+
   hold(count: number): boolean {
     const heldCount = this._heldCount
     if (heldCount !== 0 && count > this.holdAvailable) {
@@ -78,7 +71,7 @@ export class Pool implements IPool {
         count = heldCount
       }
       else {
-        throw new Error(`count (${count} > heldCount (${heldCount}))`)
+        throw new Error(`[Pool][release] count (${count} > heldCount (${heldCount}))`)
       }
     }
     if (count > 0) {
@@ -103,30 +96,34 @@ export class Pool implements IPool {
     }
     return promiseToAbortable(abortSignal, this._tickPromise.promise)
   }
-
-  holdWait(
-    count: number,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
-  ) {
-    if (count > this._heldCountMax) {
-      throw new Error(`holdCount (${count} > maxSize (${this._heldCountMax}))`)
-    }
-
-    if (!awaitPriority) {
-      awaitPriority = awaitPriorityDefault
-    }
-
-    return this._priorityQueue.run(async (abortSignal) => {
-      while (this._heldCount !== 0 && count > this.holdAvailable) {
-        await this.tick(abortSignal)
-        await awaitPriority(priority, abortSignal)
-      }
-      if (!this.hold(count)) {
-        throw new Error('Unexpected behavior')
-      }
-    }, priority, abortSignal)
-  }
 }
 
+export const poolPriorityQueue = new PriorityQueue()
+
+export function poolHoldWait({
+  pool,
+  count,
+  priority,
+  abortSignal,
+  awaitPriority,
+}: {
+  pool: IPool
+  count: number
+  priority?: Priority
+  abortSignal?: IAbortSignalFast
+  awaitPriority?: AwaitPriority
+}): Promise<void> {
+  if (!awaitPriority) {
+    awaitPriority = awaitPriorityDefault
+  }
+
+  return poolPriorityQueue.run(async (abortSignal) => {
+    while (!pool.canHold(count)) {
+      await pool.tick(abortSignal)
+      await awaitPriority(priority, abortSignal)
+    }
+    if (!pool.hold(count)) {
+      throw new Error('[poolHoldWait] Unexpected behavior')
+    }
+  }, priority, abortSignal)
+}

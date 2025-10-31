@@ -1,163 +1,266 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {
   Priority,
-  type IPriorityQueue,
-  PriorityQueue,
   type AwaitPriority,
   awaitPriorityDefault,
 } from '@flemist/priority-queue'
 import {isPromiseLike, promiseAll, promiseRace} from '@flemist/async-utils'
-import {IPool} from './Pool'
+import {IPool, poolPriorityQueue} from './Pool'
+
+// export interface IPools {
+//   canHold(count: number | number[]): boolean
+//   hold(count: number | number[]): boolean
+//   release(count: number, dontThrow?: boolean): Promise<number> | number
+//   release(count: number[], dontThrow?: boolean): Promise<number[]> | number[]
+//   release(count: number | number[], dontThrow?: boolean): Promise<number | number[]> | number | number[]
+// }
 
 export class Pools implements IPool {
-  private readonly _priorityQueue: IPriorityQueue
   private readonly _pools: IPool[]
 
   constructor(...pools: IPool[]) {
     if (!pools?.length) {
-      throw new Error('pools should not be empty')
+      throw new Error('[Pools][constructor] pools should not be empty')
     }
     this._pools = pools
-    this._priorityQueue = new PriorityQueue()
   }
 
   get heldCountMax() {
-    const pools = this._pools
-    let min: number
-    for (let i = 0, len = pools.length; i < len; i++) {
-      const value = pools[i].heldCountMax
-      if (i === 0 || value < min) {
-        min = value
-      }
-    }
-    return min
+    return poolsHeldCountMax(this._pools)
   }
 
   get heldCount() {
-    const pools = this._pools
-    let max: number
-    for (let i = 0, len = pools.length; i < len; i++) {
-      const value = pools[i].heldCount
-      if (i === 0 || value > max) {
-        max = value
-      }
-    }
-    return max
+    return poolsHeldCount(this._pools)
   }
 
   get holdAvailable() {
-    const pools = this._pools
-    let min: number
-    for (let i = 0, len = pools.length; i < len; i++) {
-      const value = pools[i].holdAvailable
-      if (i === 0 || value < min) {
-        min = value
-      }
-    }
-    return min
+    return poolsHoldAvailable(this._pools)
   }
 
   get releaseAvailable() {
-    const pools = this._pools
-    let min: number
-    for (let i = 0, len = pools.length; i < len; i++) {
-      const value = pools[i].heldCount
-      if (i === 0 || value < min) {
-        min = value
-      }
-    }
-    return min
+    return poolsReleaseAvailable(this._pools)
   }
 
-  hold(count: number): boolean {
-    if (this.heldCount !== 0 && count > this.holdAvailable) {
+  canHold(count: number | number[]): boolean {
+    return poolsCanHold(this._pools, count)
+  }
+
+  hold(count: number | number[]): boolean {
+    return poolsHold(this._pools, count)
+  }
+
+  release(count: number, dontThrow?: boolean): Promise<number> | number
+  release(count: number[], dontThrow?: boolean): Promise<number[]> | number[]
+  release(count: number | number[], dontThrow?: boolean): Promise<number | number[]> | number | number[] {
+    return poolsRelease(this._pools, count, dontThrow)
+  }
+
+  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+    return poolsTick(this._pools, abortSignal)
+  }
+}
+
+function poolsHeldCountMax(pools: IPool[]) {
+  let min: number
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const value = pools[i].heldCountMax
+    if (i === 0 || value < min) {
+      min = value
+    }
+  }
+  return min
+}
+
+function poolsHeldCount(pools: IPool[]) {
+  let max: number
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const value = pools[i].heldCount
+    if (i === 0 || value > max) {
+      max = value
+    }
+  }
+  return max
+}
+
+function poolsHoldAvailable(pools: IPool[]) {
+  let min: number
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const value = pools[i].holdAvailable
+    if (i === 0 || value < min) {
+      min = value
+    }
+  }
+  return min
+}
+
+function poolsReleaseAvailable(pools: IPool[]): number {
+  let min: number
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const value = pools[i].heldCount
+    if (i === 0 || value < min) {
+      min = value
+    }
+  }
+  return min
+}
+
+export function poolsCanHold(pools: IPool[], count: number | number[]): boolean {
+  const len = pools.length
+  if (typeof count !== 'number' && count.length !== len) {
+    throw new Error(`[poolsCanHold] count.length (${count.length}) !== pools.length (${len})`)
+  }
+  for (let i = 0; i < len; i++) {
+    const pool = pools[i]
+    if (
+      pool.heldCount !== 0
+      && (typeof count === 'number' ? count : count[i]) > pool.holdAvailable
+    ) {
       return false
     }
-    const pools = this._pools
-    for (let i = 0, len = pools.length; i < len; i++) {
-      if (!pools[i].hold(count)) {
-        throw new Error('Unexpected behavior')
-      }
-    }
-    return true
   }
+  return true
+}
 
-  release(count: number, dontThrow?: boolean): Promise<number> | number {
-    const releaseAvailable = this.releaseAvailable
+export function poolsHold(
+  pools: IPool[],
+  count: number | number[],
+): boolean {
+  if (!poolsCanHold(pools, count)) {
+    return false
+  }
+  for (let i = 0, len = pools.length; i < len; i++) {
+    if (!pools[i].hold(typeof count === 'number' ? count : count[i])) {
+      throw new Error('[poolsHold] Unexpected behavior')
+    }
+  }
+  return true
+}
+
+export function poolsRelease(
+  pools: IPool[],
+  count: number,
+  dontThrow?: boolean,
+): Promise<number> | number
+export function poolsRelease(
+  pools: IPool[],
+  count: number[],
+  dontThrow?: boolean,
+): Promise<number[]> | number[]
+export function poolsRelease(
+  pools: IPool[],
+  count: number | number[],
+  dontThrow?: boolean,
+): Promise<number | number[]> | number | number[]
+export function poolsRelease(
+  pools: IPool[],
+  count: number | number[],
+  dontThrow?: boolean,
+): Promise<number | number[]> | number | number[] {
+  if (typeof count === 'number') {
+    const releaseAvailable = poolsReleaseAvailable(pools)
     if (count > releaseAvailable) {
       if (dontThrow) {
         count = releaseAvailable
       }
       else {
-        throw new Error(`count (${count} > releaseAvailable (${releaseAvailable}))`)
+        throw new Error(`[poolsRelease] count (${count} > releaseAvailable (${releaseAvailable}))`)
       }
     }
-    if (count > 0) {
-      const pools = this._pools
-      let promises: Promise<number>[] = null
-      for (let i = 0, len = pools.length; i < len; i++) {
-        const promise = pools[i].release(count, dontThrow)
-        if (isPromiseLike(promise)) {
-          if (!promises) {
-            promises = [promise]
-          }
-          else {
-            promises.push(promise)
-          }
+    if (count === 0) {
+      return 0
+    }
+  }
+  else {
+    const len = pools.length
+    if (count.length !== len) {
+      throw new Error(`[poolsRelease] count.length (${count.length}) !== pools.length (${len})`)
+    }
+
+    if (!dontThrow) {
+      for (let i = 0; i < len; i++) {
+        const releaseAvailable = pools[i].releaseAvailable
+        if (count[i] > releaseAvailable) {
+          throw new Error(`[poolsRelease] count[${i}] (${count[i]} > releaseAvailable (${releaseAvailable}))`)
         }
       }
-      if (promises) {
-        return promiseAll(promises).then(() => count)
-      }
     }
-    return count
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
-    let promises: Promise<void>[]
-    for (let i = 0, len = this._pools.length; i < len; i++) {
-      const promise = this._pools[i].tick(abortSignal)
-      if (promise) {
-        if (!promises) {
-          promises = [promise]
-        }
-        else {
-          promises.push(promise)
-        }
+  let promises: Promise<number>[] = null
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const promise = pools[i].release(typeof count === 'number' ? count : count[i], dontThrow)
+    if (isPromiseLike(promise)) {
+      if (!promises) {
+        promises = [promise]
+      }
+      else {
+        promises.push(promise)
       }
     }
-
-    if (!promises) {
-      return null
-    }
-
-    return promiseRace(promises)
+  }
+  if (promises) {
+    const result = promiseAll(promises)
+    return typeof count === 'number' ? result.then(() => count) : result
   }
 
-  async holdWait(
-    count: number,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
-  ) {
-    if (count > this.heldCountMax) {
-      throw new Error(`holdCount (${count} > maxSize (${this.heldCountMax}))`)
-    }
+  return count
+}
 
-    if (!awaitPriority) {
-      awaitPriority = awaitPriorityDefault
+export async function poolsTick(
+  pools: IPool[],
+  abortSignal?: IAbortSignalFast,
+): Promise<void> {
+  let promises: Promise<void>[]
+  for (let i = 0, len = pools.length; i < len; i++) {
+    const promise = pools[i].tick(abortSignal)
+    if (promise) {
+      if (!promises) {
+        promises = [promise]
+      }
+      else {
+        promises.push(promise)
+      }
     }
-
-    await this._priorityQueue.run(async (abortSignal) => {
-      while (this.heldCount !== 0 && count > this.holdAvailable) {
-        await this.tick(abortSignal)
-        if (awaitPriority) {
-          await awaitPriority(priority, abortSignal)
-        }
-      }
-      if (!this.hold(count)) {
-        throw new Error('Unexpected behavior')
-      }
-    }, priority, abortSignal)
   }
+
+  if (!promises) {
+    return null
+  }
+
+  return promiseRace(promises)
+}
+
+export async function poolsHoldWait({
+  pools,
+  count,
+  priority,
+  abortSignal,
+  awaitPriority,
+}: {
+  pools: IPool[]
+  count: number | number[]
+  priority?: Priority
+  abortSignal?: IAbortSignalFast
+  awaitPriority?: AwaitPriority
+}) {
+  const len = pools.length
+  if (typeof count !== 'number' && count.length !== len) {
+    throw new Error(`[poolsHoldWait] count.length (${count.length}) !== pools.length (${len})`)
+  }
+
+  if (!awaitPriority) {
+    awaitPriority = awaitPriorityDefault
+  }
+
+  await poolPriorityQueue.run(async (abortSignal) => {
+    while (!poolsCanHold(pools, count)) {
+      await poolsTick(pools, abortSignal)
+      if (awaitPriority) {
+        await awaitPriority(priority, abortSignal)
+      }
+    }
+    if (!poolsHold(pools, count)) {
+      throw new Error('[poolsHoldWait] Unexpected behavior')
+    }
+  }, priority, abortSignal)
 }
