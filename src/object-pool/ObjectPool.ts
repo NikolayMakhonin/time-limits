@@ -8,7 +8,7 @@ export interface IObjectPool<TObject extends object> {
   readonly pool: IPool
 
   readonly availableObjects: ReadonlyArray<TObject>
-  readonly holdObjects?: ReadonlySet<TObject>
+  readonly heldObjects?: ReadonlySet<TObject>
 
   get(count: number): TObject[]
 
@@ -43,8 +43,8 @@ export type ObjectPoolArgs<TObject extends object> = {
   pool: IPool,
   /** custom availableObjects */
   availableObjects?: IStackPool<TObject>
-  /** use holdObjects so that you can know which objects are taken and not released to the pool */
-  holdObjects?: boolean | Set<TObject>
+  /** use heldObjects so that you can know which objects are taken and not released to the pool */
+  heldObjects?: boolean | Set<TObject>
   create: () => Promise<TObject>|TObject
   destroy?: (obj: TObject) => Promise<void>|void
 }
@@ -53,23 +53,23 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
   private readonly _pool: IPool
   private readonly _allocatePool: IPool
   private readonly _availableObjects: IStackPool<TObject>
-  private readonly _holdObjects: Set<TObject>
+  private readonly _heldObjects: Set<TObject>
   private readonly _create?: () => Promise<TObject> | TObject
   private readonly _destroy?: (obj: TObject) => Promise<void>|void
 
   constructor({
     pool,
     availableObjects,
-    holdObjects,
+    heldObjects,
     destroy,
     create,
   }: ObjectPoolArgs<TObject>) {
     this._allocatePool = new Pool(pool.heldCountMax)
     this._pool = new Pools(pool, this._allocatePool)
     this._availableObjects = availableObjects || new StackPool()
-    this._holdObjects = holdObjects === true
+    this._heldObjects = heldObjects === true
       ? new Set<TObject>()
-      : holdObjects || null
+      : heldObjects || null
     this._create = create
     this._destroy = destroy
   }
@@ -83,15 +83,15 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
   }
 
   /** which objects are taken and not released to the pool */
-  get holdObjects(): ReadonlySet<TObject> {
-    return this._holdObjects
+  get heldObjects(): ReadonlySet<TObject> {
+    return this._heldObjects
   }
 
   get(count: number): TObject[] {
     const objects = this._availableObjects.get(count)
-    if (this._holdObjects && objects) {
+    if (this._heldObjects && objects) {
       for (let i = 0, len = objects.length; i < len; i++) {
-        this._holdObjects.add(objects[i])
+        this._heldObjects.add(objects[i])
       }
     }
     return objects
@@ -114,12 +114,12 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     end = Math.min(objects.length, releasedCount)
     this._availableObjects.release(objects, start, end)
 
-    if (this._holdObjects) {
+    if (this._heldObjects) {
       for (let i = start; i < end; i++) {
         const obj = objects[i]
         if (obj != null) {
-          if (this._holdObjects) {
-            this._holdObjects.delete(obj)
+          if (this._heldObjects) {
+            this._heldObjects.delete(obj)
           }
         }
       }
@@ -168,8 +168,8 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       if (obj == null) {
         throw new Error('create function should return not null object')
       }
-      if (this._holdObjects) {
-        this._holdObjects.add(obj)
+      if (this._heldObjects) {
+        this._heldObjects.add(obj)
       }
       objects[i] = obj
     }
@@ -195,14 +195,14 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       throw new Error('You should specify create function in the constructor')
     }
     const promises: Promise<void>[] = []
-    let tryHoldCount = this._allocatePool.size - this._availableObjects.size
+    let tryHoldCount = this._allocatePool.holdAvailable - this._availableObjects.size
     if (size != null && size < tryHoldCount) {
       tryHoldCount = size
     }
     if (tryHoldCount < 0) {
       throw new Error('Unexpected behavior: tryHoldCount < 0')
     }
-    const holdCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0
+    const heldCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0
 
     let allocatedCount = 0
     const _this = this
@@ -224,7 +224,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
       allocatedCount += count
     }
 
-    for (let i = 0; i < holdCount; i++) {
+    for (let i = 0; i < heldCount; i++) {
       const objectOrPromise = this._create()
       if (isPromiseLike(objectOrPromise)) {
         promises.push(releasePromiseObject(objectOrPromise))

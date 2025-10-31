@@ -80,17 +80,17 @@ export class Pool implements IPool {
   }
 
   release(count: number, dontThrow?: boolean): number {
-    const holdCount = this._heldCount
-    if (count > holdCount) {
+    const heldCount = this._heldCount
+    if (count > heldCount) {
       if (dontThrow) {
-        count = holdCount
+        count = heldCount
       }
       else {
-        throw new Error(`count (${count} > holdCount (${holdCount}))`)
+        throw new Error(`count (${count} > heldCount (${heldCount}))`)
       }
     }
     if (count > 0) {
-      this._heldCount = holdCount - count
+      this._heldCount = heldCount - count
 
       if (this._tickPromise) {
         const tickPromise = this._tickPromise
@@ -127,7 +127,7 @@ export class Pool implements IPool {
     }
 
     return this._priorityQueue.run(async (abortSignal) => {
-      while (count > this.holdAvailable) {
+      while (this._heldCount !== 0 && count > this.holdAvailable) {
         await this.tick(abortSignal)
         await awaitPriority(priority, abortSignal)
       }

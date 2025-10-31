@@ -21,16 +21,9 @@ export class Pools implements IPool {
     this._priorityQueue = new PriorityQueue()
   }
 
+  /** @deprecated use holdAvailable */
   get size() {
-    const pools = this._pools
-    let min: number
-    for (let i = 0, len = pools.length; i < len; i++) {
-      const value = pools[i].size
-      if (i === 0 || value < min) {
-        min = value
-      }
-    }
-    return min
+    return this.holdAvailable
   }
 
   get heldCountMax() {
@@ -46,38 +39,62 @@ export class Pools implements IPool {
   }
 
   get heldCount() {
-    return this.heldCountMax - this.size
+    const pools = this._pools
+    let max: number
+    for (let i = 0, len = pools.length; i < len; i++) {
+      const value = pools[i].heldCount
+      if (i === 0 || value > max) {
+        max = value
+      }
+    }
+    return max
   }
 
   get holdAvailable() {
-    return this.size
+    const pools = this._pools
+    let min: number
+    for (let i = 0, len = pools.length; i < len; i++) {
+      const value = pools[i].holdAvailable
+      if (i === 0 || value < min) {
+        min = value
+      }
+    }
+    return min
   }
 
   get releaseAvailable() {
-    return this.heldCountMax - this.size
+    const pools = this._pools
+    let min: number
+    for (let i = 0, len = pools.length; i < len; i++) {
+      const value = pools[i].heldCount
+      if (i === 0 || value < min) {
+        min = value
+      }
+    }
+    return min
   }
 
   hold(count: number): boolean {
-    const size = this.size
-    if (count > size) {
+    if (this.heldCount !== 0 && count > this.holdAvailable) {
       return false
     }
     const pools = this._pools
     for (let i = 0, len = pools.length; i < len; i++) {
-      pools[i].hold(count)
+      if (!pools[i].hold(count)) {
+        throw new Error('Unexpected behavior')
+      }
     }
     return true
   }
 
   release(count: number, dontThrow?: boolean): Promise<number> | number {
-    const size = this.size
-    const maxReleaseCount = this.heldCountMax - size
-    if (count > maxReleaseCount) {
+    const releaseAvailable = this.releaseAvailable
+    if (count > releaseAvailable) {
       if (dontThrow) {
-        count = maxReleaseCount
+        count = releaseAvailable
       }
       else {
-        throw new Error(`count (${count} > maxReleaseCount (${maxReleaseCount}))`)
+        throw new Error(`count (${count} > releaseAvailable (${releaseAvailable}))`)
       }
     }
     if (count > 0) {
@@ -137,7 +154,7 @@ export class Pools implements IPool {
     }
 
     await this._priorityQueue.run(async (abortSignal) => {
-      while (count > this.size) {
+      while (this.heldCount !== 0 && count > this.holdAvailable) {
         await this.tick(abortSignal)
         if (awaitPriority) {
           await awaitPriority(priority, abortSignal)

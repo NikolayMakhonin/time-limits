@@ -25,6 +25,7 @@ export class DependentPool implements IPool {
     this._priorityQueue = new PriorityQueue()
   }
 
+  /** @deprecated use holdAvailable */
   get size() {
     return this.holdAvailable
   }
@@ -34,12 +35,12 @@ export class DependentPool implements IPool {
   }
 
   get heldCount() {
-    let holdCount: number = this._pool.heldCount
+    let heldCount: number = this._pool.heldCount
     const pools = this._pools
     for (let i = 0, len = pools.length; i < len; i++) {
-      holdCount += pools[i].heldCount
+      heldCount += pools[i].heldCount
     }
-    return holdCount
+    return heldCount
   }
 
   get holdAvailable() {
@@ -51,8 +52,8 @@ export class DependentPool implements IPool {
   }
 
   hold(count: number): boolean {
-    const size = this.size
-    if (count > size) {
+    const heldCount = this.heldCount
+    if (heldCount !== 0 && count > this.holdAvailable) {
       return false
     }
     return this._pool.hold(count)
@@ -102,7 +103,7 @@ export class DependentPool implements IPool {
     }
 
     await this._priorityQueue.run(async (abortSignal) => {
-      while (count > this.size) {
+      while (this.heldCount !== 0 && count > this.holdAvailable) {
         await this.tick(abortSignal)
         if (awaitPriority) {
           await awaitPriority(priority, abortSignal)
