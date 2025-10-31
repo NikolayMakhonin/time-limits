@@ -97,7 +97,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     return objects
   }
 
-  async release(objects: TObject[], start?: number, end?: number): Promise<number> {
+  release(objects: TObject[], start?: number, end?: number): Promise<number> {
     return this._release(objects, this._pool, start, end)
   }
 

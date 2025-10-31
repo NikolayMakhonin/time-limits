@@ -206,7 +206,7 @@ export function poolsRelease(
   return count
 }
 
-export async function poolsTick(
+export function poolsTick(
   pools: IPool[],
   abortSignal?: IAbortSignalFast,
 ): Promise<void> {
@@ -230,7 +230,7 @@ export async function poolsTick(
   return promiseRace(promises)
 }
 
-export async function poolsHoldWait({
+export function poolsHoldWait({
   pools,
   count,
   priority,
@@ -252,7 +252,7 @@ export async function poolsHoldWait({
     awaitPriority = awaitPriorityDefault
   }
 
-  await poolPriorityQueue.run(async (abortSignal) => {
+  return poolPriorityQueue.run(async (abortSignal) => {
     while (!poolsCanHold(pools, count)) {
       await poolsTick(pools, abortSignal)
       if (awaitPriority) {

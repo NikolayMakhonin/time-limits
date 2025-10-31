@@ -426,7 +426,7 @@ describe('time-limits > TimeLimits', function () {
     }
 
     async function run() {
-      await awaitTime(timeController, 95, 13)
+      await awaitTime(timeController, 95, 11)
 
       assert.strictEqual(values.length, count)
 
