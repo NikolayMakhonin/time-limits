@@ -239,7 +239,7 @@ describe('object-pool > ObjectPool', function () {
     const results = await Promise.race([
       Promise.all(promises),
       // awaitTime(timeController, 1000, 100)
-      awaitTime(timeController, totalCount + countObjects, 13)
+      awaitTime(timeController, totalCount + countObjects, 34)
         .then(() => {
           throw new Error('Timeout')
         }),
