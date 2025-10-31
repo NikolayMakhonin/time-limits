@@ -1,6 +1,6 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {IStackPool, StackPool} from 'src/object-pool/StackPool'
-import {IPool, Pool, poolHoldWait, Pools} from 'src/pool'
+import {IPool, Pool, poolWaitHold, Pools} from 'src/pool'
 import {isPromiseLike, promiseAll} from '@flemist/async-utils'
 import {Priority, type AwaitPriority} from '@flemist/priority-queue'
 
@@ -138,7 +138,7 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ): Promise<TObject[]> {
-    await poolHoldWait({ pool: this._pool, count, priority, abortSignal, awaitPriority })
+    await poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority })
     return this.get(count)
   }
 

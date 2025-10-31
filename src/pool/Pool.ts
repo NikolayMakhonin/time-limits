@@ -100,7 +100,7 @@ export class Pool implements IPool {
 
 export const poolPriorityQueue = new PriorityQueue()
 
-export function poolHoldWait({
+export function poolWait({
   pool,
   count,
   priority,
@@ -122,8 +122,24 @@ export function poolHoldWait({
       await pool.tick(abortSignal)
       await awaitPriority(priority, abortSignal)
     }
-    if (!pool.hold(count)) {
-      throw new Error('[poolHoldWait] Unexpected behavior')
-    }
   }, priority, abortSignal)
+}
+
+export async function poolWaitHold({
+  pool,
+  count,
+  priority,
+  abortSignal,
+  awaitPriority,
+}: {
+  pool: IPool
+  count: number
+  priority?: Priority
+  abortSignal?: IAbortSignalFast
+  awaitPriority?: AwaitPriority
+}): Promise<void> {
+  await poolWait({ pool, count, priority, abortSignal, awaitPriority })
+  if (!pool.hold(count)) {
+    throw new Error('[poolHoldWait] Unexpected behavior')
+  }
 }

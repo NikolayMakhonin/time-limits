@@ -1,6 +1,6 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {type AwaitPriority, Priority} from '@flemist/priority-queue'
-import {IPool, poolHoldWait} from './Pool'
+import {IPool, poolWaitHold} from './Pool'
 
 /** @deprecated use poolRunWait */
 export interface IPoolRunner {
@@ -33,7 +33,7 @@ export class PoolRunner implements IPoolRunner {
     abortSignal?: IAbortSignalFast,
     awaitPriority?: AwaitPriority,
   ): Promise<T> {
-    await poolHoldWait({ pool: this._pool, count, priority, abortSignal, awaitPriority})
+    await poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority})
 
     try {
       const result = await func(abortSignal)

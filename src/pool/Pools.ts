@@ -230,7 +230,7 @@ export function poolsTick(
   return promiseRace(promises)
 }
 
-export function poolsHoldWait({
+export function poolsWait({
   pools,
   count,
   priority,
@@ -259,8 +259,24 @@ export function poolsHoldWait({
         await awaitPriority(priority, abortSignal)
       }
     }
-    if (!poolsHold(pools, count)) {
-      throw new Error('[poolsHoldWait] Unexpected behavior')
-    }
   }, priority, abortSignal)
+}
+
+export async function poolsWaitHold({
+  pools,
+  count,
+  priority,
+  abortSignal,
+  awaitPriority,
+}: {
+  pools: IPool[]
+  count: number | number[]
+  priority?: Priority
+  abortSignal?: IAbortSignalFast
+  awaitPriority?: AwaitPriority
+}) {
+  await poolsWait({ pools, count, priority, abortSignal, awaitPriority })
+  if (!poolsHold(pools, count)) {
+    throw new Error('[poolsHoldWait] Unexpected behavior')
+  }
 }
