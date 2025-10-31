@@ -21,11 +21,6 @@ export class Pools implements IPool {
     this._priorityQueue = new PriorityQueue()
   }
 
-  /** @deprecated use holdAvailable */
-  get size() {
-    return this.holdAvailable
-  }
-
   get heldCountMax() {
     const pools = this._pools
     let min: number

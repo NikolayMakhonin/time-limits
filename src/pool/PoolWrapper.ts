@@ -9,11 +9,6 @@ export class PoolWrapper implements IPool {
     this._pool = pool
   }
 
-  /** @deprecated use holdAvailable */
-  get size(): number {
-    return this._pool.size
-  }
-
   get heldCountMax(): number {
     return this._pool.heldCountMax
   }

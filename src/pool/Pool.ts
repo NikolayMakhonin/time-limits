@@ -9,9 +9,6 @@ import {
 } from '@flemist/priority-queue'
 
 export interface IPool {
-  /** @deprecated use holdAvailable */
-  readonly size: number
-
   readonly heldCountMax: number
   readonly heldCount: number
   readonly holdAvailable: number
@@ -47,11 +44,6 @@ export class Pool implements IPool {
     }
     this._heldCountMax = heldCountMax
     this._priorityQueue = new PriorityQueue()
-  }
-
-  /** @deprecated use holdAvailable */
-  get size() {
-    return this.holdAvailable
   }
 
   get heldCountMax() {

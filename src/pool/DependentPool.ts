@@ -25,11 +25,6 @@ export class DependentPool implements IPool {
     this._priorityQueue = new PriorityQueue()
   }
 
-  /** @deprecated use holdAvailable */
-  get size() {
-    return this.holdAvailable
-  }
-
   get heldCountMax() {
     return this._pool.heldCountMax
   }
