@@ -5,7 +5,7 @@ import { Priority, type AwaitPriority } from '@flemist/priority-queue';
 export interface IObjectPool<TObject extends object> {
     readonly pool: IPool;
     readonly availableObjects: ReadonlyArray<TObject>;
-    readonly holdObjects?: ReadonlySet<TObject>;
+    readonly heldObjects?: ReadonlySet<TObject>;
     get(count: number): TObject[];
     /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
     release(objects: TObject[], start?: number, count?: number): Promise<number> | number;
@@ -20,8 +20,8 @@ export declare type ObjectPoolArgs<TObject extends object> = {
     pool: IPool;
     /** custom availableObjects */
     availableObjects?: IStackPool<TObject>;
-    /** use holdObjects so that you can know which objects are taken and not released to the pool */
-    holdObjects?: boolean | Set<TObject>;
+    /** use heldObjects so that you can know which objects are taken and not released to the pool */
+    heldObjects?: boolean | Set<TObject>;
     create: () => Promise<TObject> | TObject;
     destroy?: (obj: TObject) => Promise<void> | void;
 };
@@ -29,14 +29,14 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     private readonly _pool;
     private readonly _allocatePool;
     private readonly _availableObjects;
-    private readonly _holdObjects;
+    private readonly _heldObjects;
     private readonly _create?;
     private readonly _destroy?;
-    constructor({ pool, availableObjects, holdObjects, destroy, create, }: ObjectPoolArgs<TObject>);
+    constructor({ pool, availableObjects, heldObjects, destroy, create, }: ObjectPoolArgs<TObject>);
     get pool(): IPool;
     get availableObjects(): ReadonlyArray<TObject>;
     /** which objects are taken and not released to the pool */
-    get holdObjects(): ReadonlySet<TObject>;
+    get heldObjects(): ReadonlySet<TObject>;
     get(count: number): TObject[];
     release(objects: TObject[], start?: number, end?: number): Promise<number>;
     private _release;

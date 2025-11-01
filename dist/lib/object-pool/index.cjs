@@ -10,7 +10,6 @@ require('../pool/Pool.cjs');
 require('@flemist/async-utils');
 require('@flemist/priority-queue');
 require('../pool/Pools.cjs');
-require('@flemist/time-controller');
 
 
 

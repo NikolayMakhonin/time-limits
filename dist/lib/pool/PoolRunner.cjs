@@ -3,6 +3,9 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var tslib = require('tslib');
+var pool_Pool = require('./Pool.cjs');
+require('@flemist/async-utils');
+require('@flemist/priority-queue');
 
 /** @deprecated use poolRunWait */
 class PoolRunner {
@@ -14,7 +17,7 @@ class PoolRunner {
     }
     run(count, func, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, priority, abortSignal, awaitPriority);
+            yield pool_Pool.poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority });
             try {
                 const result = yield func(abortSignal);
                 return result;

@@ -1,32 +1,41 @@
 import { type IAbortSignalFast } from '@flemist/abort-controller-fast';
-import { Priority, type AwaitPriority } from '@flemist/priority-queue';
+import { type AwaitPriority, Priority, PriorityQueue } from '@flemist/priority-queue';
 export interface IPool {
-    readonly size: number;
-    readonly maxSize: number;
-    readonly holdCount: number;
-    holdAvailable: number;
+    readonly heldCountMax: number;
+    readonly heldCount: number;
+    readonly holdAvailable: number;
+    readonly releaseAvailable: number;
+    canHold(count: number): boolean;
     hold(count: number): boolean;
-    /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
-    releaseAvailable: number;
     release(count: number, dontThrow?: boolean): Promise<number> | number;
-    /** it will resolve when size > 0 */
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    /** wait size > 0 and hold, use this for concurrency hold */
-    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }
 export declare class Pool implements IPool {
-    private readonly _priorityQueue;
-    private readonly _maxSize;
-    private _size;
-    constructor(maxSize: number);
-    get maxSize(): number;
-    get size(): number;
-    get holdCount(): number;
+    private readonly _heldCountMax;
+    private _heldCount;
+    constructor(heldCountMax: number);
+    get heldCountMax(): number;
+    get heldCount(): number;
     get holdAvailable(): number;
-    hold(count: number): boolean;
     get releaseAvailable(): number;
+    canHold(count: number): boolean;
+    hold(count: number): boolean;
     release(count: number, dontThrow?: boolean): number;
     private _tickPromise;
     tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    holdWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<void>;
 }
+export declare const poolPriorityQueue: PriorityQueue;
+export declare function poolWait({ pool, count, priority, abortSignal, awaitPriority, }: {
+    pool: IPool;
+    count: number;
+    priority?: Priority;
+    abortSignal?: IAbortSignalFast;
+    awaitPriority?: AwaitPriority;
+}): Promise<void>;
+export declare function poolWaitHold({ pool, count, priority, abortSignal, awaitPriority, }: {
+    pool: IPool;
+    count: number;
+    priority?: Priority;
+    abortSignal?: IAbortSignalFast;
+    awaitPriority?: AwaitPriority;
+}): Promise<void>;

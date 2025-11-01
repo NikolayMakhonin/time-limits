@@ -1,5 +1,5 @@
-export { Pool } from './Pool.mjs';
-export { Pools } from './Pools.mjs';
+export { Pool, poolPriorityQueue, poolWait, poolWaitHold } from './Pool.mjs';
+export { Pools, poolsCanHold, poolsHold, poolsRelease, poolsTick, poolsWait, poolsWaitHold } from './Pools.mjs';
 export { PoolRunner } from './PoolRunner.mjs';
 export { PoolWrapper } from './PoolWrapper.mjs';
 export { PoolHoldError } from './PoolHoldError.mjs';
@@ -9,4 +9,3 @@ export { poolRunThrow } from './poolRunThrow.mjs';
 import 'tslib';
 import '@flemist/async-utils';
 import '@flemist/priority-queue';
-import '@flemist/time-controller';

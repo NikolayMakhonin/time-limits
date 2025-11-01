@@ -22,7 +22,16 @@ require('@flemist/time-controller');
 
 
 exports.Pool = pool_Pool.Pool;
+exports.poolPriorityQueue = pool_Pool.poolPriorityQueue;
+exports.poolWait = pool_Pool.poolWait;
+exports.poolWaitHold = pool_Pool.poolWaitHold;
 exports.Pools = pool_Pools.Pools;
+exports.poolsCanHold = pool_Pools.poolsCanHold;
+exports.poolsHold = pool_Pools.poolsHold;
+exports.poolsRelease = pool_Pools.poolsRelease;
+exports.poolsTick = pool_Pools.poolsTick;
+exports.poolsWait = pool_Pools.poolsWait;
+exports.poolsWaitHold = pool_Pools.poolsWaitHold;
 exports.PoolRunner = pool_PoolRunner.PoolRunner;
 exports.PoolWrapper = pool_PoolWrapper.PoolWrapper;
 exports.PoolHoldError = pool_PoolHoldError.PoolHoldError;

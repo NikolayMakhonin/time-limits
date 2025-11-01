@@ -3,14 +3,13 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var pool_Pool = require('./Pool.cjs');
+var asyncUtils = require('@flemist/async-utils');
 require('tslib');
 require('@flemist/priority-queue');
-var asyncUtils = require('@flemist/async-utils');
-require('@flemist/time-controller');
 
 function poolRunWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
     return asyncUtils.runWithFinally(() => {
-        return pool.holdWait(count, priority, abortSignal, awaitPriority);
+        return pool_Pool.poolWaitHold({ pool, count, priority, abortSignal, awaitPriority });
     }, () => {
         const holdPool = new pool_Pool.Pool(count);
         return func(holdPool, abortSignal);

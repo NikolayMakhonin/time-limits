@@ -1,5 +1,5 @@
-export { Pool } from './pool/Pool.mjs';
-export { Pools } from './pool/Pools.mjs';
+export { Pool, poolPriorityQueue, poolWait, poolWaitHold } from './pool/Pool.mjs';
+export { Pools, poolsCanHold, poolsHold, poolsRelease, poolsTick, poolsWait, poolsWaitHold } from './pool/Pools.mjs';
 export { PoolRunner } from './pool/PoolRunner.mjs';
 export { PoolWrapper } from './pool/PoolWrapper.mjs';
 export { PoolHoldError } from './pool/PoolHoldError.mjs';

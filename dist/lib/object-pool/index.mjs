@@ -6,4 +6,3 @@ import '../pool/Pool.mjs';
 import '@flemist/async-utils';
 import '@flemist/priority-queue';
 import '../pool/Pools.mjs';
-import '@flemist/time-controller';

@@ -1,12 +1,11 @@
-import { Pool } from './Pool.mjs';
+import { poolWaitHold, Pool } from './Pool.mjs';
+import { runWithFinally } from '@flemist/async-utils';
 import 'tslib';
 import '@flemist/priority-queue';
-import { runWithFinally } from '@flemist/async-utils';
-import '@flemist/time-controller';
 
 function poolRunWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
     return runWithFinally(() => {
-        return pool.holdWait(count, priority, abortSignal, awaitPriority);
+        return poolWaitHold({ pool, count, priority, abortSignal, awaitPriority });
     }, () => {
         const holdPool = new Pool(count);
         return func(holdPool, abortSignal);

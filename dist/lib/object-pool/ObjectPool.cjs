@@ -6,18 +6,17 @@ var tslib = require('tslib');
 var objectPool_StackPool = require('./StackPool.cjs');
 var pool_Pool = require('../pool/Pool.cjs');
 var pool_Pools = require('../pool/Pools.cjs');
-require('@flemist/time-controller');
 var asyncUtils = require('@flemist/async-utils');
 require('@flemist/priority-queue');
 
 class ObjectPool {
-    constructor({ pool, availableObjects, holdObjects, destroy, create, }) {
-        this._allocatePool = new pool_Pool.Pool(pool.maxSize);
+    constructor({ pool, availableObjects, heldObjects, destroy, create, }) {
+        this._allocatePool = new pool_Pool.Pool(pool.heldCountMax);
         this._pool = new pool_Pools.Pools(pool, this._allocatePool);
         this._availableObjects = availableObjects || new objectPool_StackPool.StackPool();
-        this._holdObjects = holdObjects === true
+        this._heldObjects = heldObjects === true
             ? new Set()
-            : holdObjects || null;
+            : heldObjects || null;
         this._create = create;
         this._destroy = destroy;
     }
@@ -28,22 +27,20 @@ class ObjectPool {
         return this._availableObjects.objects;
     }
     /** which objects are taken and not released to the pool */
-    get holdObjects() {
-        return this._holdObjects;
+    get heldObjects() {
+        return this._heldObjects;
     }
     get(count) {
         const objects = this._availableObjects.get(count);
-        if (this._holdObjects && objects) {
+        if (this._heldObjects && objects) {
             for (let i = 0, len = objects.length; i < len; i++) {
-                this._holdObjects.add(objects[i]);
+                this._heldObjects.add(objects[i]);
             }
         }
         return objects;
     }
     release(objects, start, end) {
-        return tslib.__awaiter(this, void 0, void 0, function* () {
-            return this._release(objects, this._pool, start, end);
-        });
+        return this._release(objects, this._pool, start, end);
     }
     _release(objects, pool, start, end) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
@@ -57,12 +54,12 @@ class ObjectPool {
             const releasedCount = yield pool.release(tryReleaseCount, true);
             end = Math.min(objects.length, releasedCount);
             this._availableObjects.release(objects, start, end);
-            if (this._holdObjects) {
+            if (this._heldObjects) {
                 for (let i = start; i < end; i++) {
                     const obj = objects[i];
                     if (obj != null) {
-                        if (this._holdObjects) {
-                            this._holdObjects.delete(obj);
+                        if (this._heldObjects) {
+                            this._heldObjects.delete(obj);
                         }
                     }
                 }
@@ -75,7 +72,7 @@ class ObjectPool {
     }
     getWait(count, priority, abortSignal, awaitPriority) {
         return tslib.__awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, priority, abortSignal, awaitPriority);
+            yield pool_Pool.poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority });
             return this.get(count);
         });
     }
@@ -83,7 +80,7 @@ class ObjectPool {
         return tslib.__awaiter(this, void 0, void 0, function* () {
             let objects = yield this.getWait(count, priority, abortSignal, awaitPriority);
             if (!this._create) {
-                throw new Error('You should specify create function in the constructor');
+                throw new Error('[ObjectPool][use] You should specify create function in the constructor');
             }
             let start;
             if (!objects) {
@@ -96,10 +93,10 @@ class ObjectPool {
             for (let i = start; i < count; i++) {
                 const obj = yield this._create();
                 if (obj == null) {
-                    throw new Error('create function should return not null object');
+                    throw new Error('[ObjectPool][use] create function should return not null object');
                 }
-                if (this._holdObjects) {
-                    this._holdObjects.add(obj);
+                if (this._heldObjects) {
+                    this._heldObjects.add(obj);
                 }
                 objects[i] = obj;
             }
@@ -120,17 +117,17 @@ class ObjectPool {
     }
     allocate(size) {
         if (!this._create) {
-            throw new Error('You should specify create function in the constructor');
+            throw new Error('[ObjectPool][allocate] You should specify create function in the constructor');
         }
         const promises = [];
-        let tryHoldCount = this._allocatePool.size - this._availableObjects.size;
+        let tryHoldCount = this._allocatePool.holdAvailable - this._availableObjects.size;
         if (size != null && size < tryHoldCount) {
             tryHoldCount = size;
         }
         if (tryHoldCount < 0) {
-            throw new Error('Unexpected behavior: tryHoldCount < 0');
+            throw new Error('[ObjectPool][allocate] Unexpected behavior: tryHoldCount < 0');
         }
-        const holdCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0;
+        const heldCount = this._allocatePool.hold(tryHoldCount) ? tryHoldCount : 0;
         let allocatedCount = 0;
         const _this = this;
         function releasePromiseObject(objectPromise) {
@@ -153,7 +150,7 @@ class ObjectPool {
                 allocatedCount += count;
             });
         }
-        for (let i = 0; i < holdCount; i++) {
+        for (let i = 0; i < heldCount; i++) {
             const objectOrPromise = this._create();
             if (asyncUtils.isPromiseLike(objectOrPromise)) {
                 promises.push(releasePromiseObject(objectOrPromise));

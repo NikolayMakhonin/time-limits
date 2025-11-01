@@ -1,4 +1,7 @@
 import { __awaiter } from 'tslib';
+import { poolWaitHold } from './Pool.mjs';
+import '@flemist/async-utils';
+import '@flemist/priority-queue';
 
 /** @deprecated use poolRunWait */
 class PoolRunner {
@@ -10,7 +13,7 @@ class PoolRunner {
     }
     run(count, func, priority, abortSignal, awaitPriority) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this._pool.holdWait(count, priority, abortSignal, awaitPriority);
+            yield poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority });
             try {
                 const result = yield func(abortSignal);
                 return result;

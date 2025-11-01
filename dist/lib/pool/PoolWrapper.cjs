@@ -6,20 +6,20 @@ class PoolWrapper {
     constructor(pool) {
         this._pool = pool;
     }
-    get size() {
-        return this._pool.size;
+    get heldCountMax() {
+        return this._pool.heldCountMax;
     }
-    get maxSize() {
-        return this._pool.maxSize;
-    }
-    get holdCount() {
-        return this._pool.holdCount;
+    get heldCount() {
+        return this._pool.heldCount;
     }
     get holdAvailable() {
         return this._pool.holdAvailable;
     }
     get releaseAvailable() {
         return this._pool.releaseAvailable;
+    }
+    canHold(count) {
+        return this._pool.canHold(count);
     }
     hold(count) {
         return this._pool.hold(count);
@@ -29,9 +29,6 @@ class PoolWrapper {
     }
     tick(abortSignal) {
         return this._pool.tick(abortSignal);
-    }
-    holdWait(count, priority, abortSignal, awaitPriority) {
-        return this._pool.holdWait(count, priority, abortSignal, awaitPriority);
     }
 }
 
