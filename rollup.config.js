@@ -58,10 +58,6 @@ const aliasOptions = {
       find       : 'src',
       replacement: path.resolve(__dirname, 'src'),
     },
-    {
-      find       : '~',
-      replacement: path.resolve(__dirname),
-    },
   ],
 }
 

@@ -1,11 +1,6 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
-import {
-  Priority,
-  PriorityQueue,
-  type AwaitPriority,
-  awaitPriorityDefault,
-} from '@flemist/priority-queue'
+import {type AwaitPriority, awaitPriorityDefault, Priority, PriorityQueue} from '@flemist/priority-queue'
 
 export interface IPool {
   readonly heldCountMax: number

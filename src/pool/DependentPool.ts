@@ -1,23 +1,19 @@
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {promiseRace} from '@flemist/async-utils'
 import {IPool} from './Pool'
+import {PoolWrapper} from './PoolWrapper'
 
 /**
  * К текущему size прибавляется size всех зависимостей.
  * Таким образом, этому пулу нужно будет ждать все зависимые пулы, но при этом не блокировать их.
  * Пример использования: есть 2 пула на загрузку данных, один загружает данные фоново, а второй для срочной загрузки по требованию. Чтобы добавить новую фоновую задачу, нужно убедиться что общее количество задач во всех пулах не превышает лимит. Но если нужно добавить срочную задачу, то нужно убедиться что только в срочном пуле есть место. В худшем случае будут заняты оба пула, но ненадолго, т.к. фоновые задачи будут завершаться, а новые фоновые задачи не будут добавляться, пока не освободится место.
  */
-export class DependentPool implements IPool {
-  private readonly _pool: IPool
+export class DependentPool extends PoolWrapper {
   private readonly _pools: IPool[]
 
   constructor(pool: IPool, ...dependencies: IPool[]) {
-    this._pool = pool
+    super(pool)
     this._pools = dependencies
-  }
-
-  get heldCountMax() {
-    return this._pool.heldCountMax
   }
 
   get heldCount() {
@@ -33,10 +29,6 @@ export class DependentPool implements IPool {
     return Math.min(0, this.heldCountMax - this.heldCount)
   }
 
-  get releaseAvailable() {
-    return this._pool.releaseAvailable
-  }
-
   canHold(count: number): boolean {
     return this.heldCount === 0 || count <= this.holdAvailable
   }
@@ -46,10 +38,6 @@ export class DependentPool implements IPool {
       return false
     }
     return this._pool.hold(count)
-  }
-
-  release(count: number, dontThrow?: boolean): Promise<number> | number {
-    return this._pool.release(count, dontThrow)
   }
 
   tick(abortSignal?: IAbortSignalFast): Promise<void> | void {

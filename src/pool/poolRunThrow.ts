@@ -1,4 +1,4 @@
-import {IPool} from '~/src'
+import {IPool} from './Pool'
 import {type PromiseLikeOrValue, runWithFinally} from '@flemist/async-utils'
 import {PoolHoldError} from 'src/pool/PoolHoldError'
 
