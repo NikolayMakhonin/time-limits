@@ -6,9 +6,9 @@ import { poolPriorityQueue } from './Pool.mjs';
 // export interface IPools {
 //   canHold(count: number | number[]): boolean
 //   hold(count: number | number[]): boolean
-//   release(count: number, dontThrow?: boolean): Promise<number> | number
-//   release(count: number[], dontThrow?: boolean): Promise<number[]> | number[]
-//   release(count: number | number[], dontThrow?: boolean): Promise<number | number[]> | number | number[]
+//   release(count: number, dontThrow?: null | boolean): Promise<number> | number
+//   release(count: number[], dontThrow?: null | boolean): Promise<number[]> | number[]
+//   release(count: number | number[], dontThrow?: null | boolean): Promise<number | number[]> | number | number[]
 // }
 class Pools {
     constructor(...pools) {

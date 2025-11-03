@@ -7,12 +7,12 @@ export interface ITimeLimitPool extends IPool {
 export declare type TimeLimitPoolParams = {
     pool: IPool;
     time: number;
-    timeController?: ITimeController;
+    timeController?: null | ITimeController;
 };
 export declare class TimeLimitPool extends PoolWrapper implements ITimeLimitPool {
     private readonly _time;
     private readonly _timeController;
     constructor({ pool, time, timeController, }: TimeLimitPoolParams);
     get time(): number;
-    release(count: number, dontThrow?: boolean): Promise<number>;
+    release(count: number, dontThrow?: null | boolean): Promise<number>;
 }

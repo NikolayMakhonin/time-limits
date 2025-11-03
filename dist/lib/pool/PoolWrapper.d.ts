@@ -9,6 +9,6 @@ export declare class PoolWrapper implements IPool {
     get releaseAvailable(): number;
     canHold(count: number): boolean;
     hold(count: number): boolean;
-    release(count: number, dontThrow?: boolean): number | Promise<number>;
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    release(count: number, dontThrow?: null | boolean): number | Promise<number>;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
 }

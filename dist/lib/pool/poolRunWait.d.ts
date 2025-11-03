@@ -6,9 +6,9 @@ export declare type PoolRunWaitArgs<T> = {
     pool: IPool;
     count: number;
     /** @param holdPool - pool with `count` size, you can use it for nested checks using poolRunThrow */
-    func: (holdPool: IPool, abortSignal?: IAbortSignalFast) => T;
-    priority?: Priority;
-    abortSignal?: IAbortSignalFast;
-    awaitPriority?: AwaitPriority;
+    func: (holdPool: IPool, abortSignal?: null | IAbortSignalFast) => T;
+    priority?: null | Priority;
+    abortSignal?: null | IAbortSignalFast;
+    awaitPriority?: null | AwaitPriority;
 };
 export declare function poolRunWait<T>({ pool, count, func, priority, abortSignal, awaitPriority, }: PoolRunWaitArgs<PromiseLikeOrValue<T>>): PromiseLike<T>;

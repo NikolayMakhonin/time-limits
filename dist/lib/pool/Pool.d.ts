@@ -7,8 +7,8 @@ export interface IPool {
     readonly releaseAvailable: number;
     canHold(count: number): boolean;
     hold(count: number): boolean;
-    release(count: number, dontThrow?: boolean): Promise<number> | number;
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    release(count: number, dontThrow?: null | boolean): Promise<number> | number;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
 }
 export declare class Pool implements IPool {
     private readonly _heldCountMax;
@@ -20,22 +20,22 @@ export declare class Pool implements IPool {
     get releaseAvailable(): number;
     canHold(count: number): boolean;
     hold(count: number): boolean;
-    release(count: number, dontThrow?: boolean): number;
+    release(count: number, dontThrow?: null | boolean): number;
     private _tickPromise;
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
 }
 export declare const poolPriorityQueue: PriorityQueue;
 export declare function poolWait({ pool, count, priority, abortSignal, awaitPriority, }: {
     pool: IPool;
     count: number;
-    priority?: Priority;
-    abortSignal?: IAbortSignalFast;
-    awaitPriority?: AwaitPriority;
+    priority?: null | Priority;
+    abortSignal?: null | IAbortSignalFast;
+    awaitPriority?: null | AwaitPriority;
 }): Promise<void>;
 export declare function poolWaitHold({ pool, count, priority, abortSignal, awaitPriority, }: {
     pool: IPool;
     count: number;
-    priority?: Priority;
-    abortSignal?: IAbortSignalFast;
-    awaitPriority?: AwaitPriority;
+    priority?: null | Priority;
+    abortSignal?: null | IAbortSignalFast;
+    awaitPriority?: null | AwaitPriority;
 }): Promise<void>;

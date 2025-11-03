@@ -5,25 +5,25 @@ import { Priority, type AwaitPriority } from '@flemist/priority-queue';
 export interface IObjectPool<TObject extends object> {
     readonly pool: IPool;
     readonly availableObjects: ReadonlyArray<TObject>;
-    readonly heldObjects?: ReadonlySet<TObject>;
+    readonly heldObjects?: null | ReadonlySet<TObject>;
     get(count: number): TObject[];
     /** it returns false if the obj cannot be pushed into the object pool (if size >= maxSize) */
-    release(objects: TObject[], start?: number, count?: number): Promise<number> | number;
+    release(objects: TObject[], start?: null | number, count?: null | number): Promise<number> | number;
     /** it will resolve when size > 0 */
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
     /** wait available > 0 and get, use this for concurrency get */
-    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TResult>;
-    allocate(size?: number): Promise<number> | number;
+    getWait(count: number, priority?: null | Priority, abortSignal?: null | IAbortSignalFast, awaitPriority?: null | AwaitPriority): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: null | IAbortSignalFast) => Promise<TResult> | TResult, priority?: null | Priority, abortSignal?: null | IAbortSignalFast, awaitPriority?: null | AwaitPriority): Promise<TResult>;
+    allocate(size?: null | number): Promise<number> | number;
 }
 export declare type ObjectPoolArgs<TObject extends object> = {
     pool: IPool;
     /** custom availableObjects */
-    availableObjects?: IStackPool<TObject>;
+    availableObjects?: null | IStackPool<TObject>;
     /** use heldObjects so that you can know which objects are taken and not released to the pool */
-    heldObjects?: boolean | Set<TObject>;
+    heldObjects?: null | boolean | Set<TObject>;
     create: () => Promise<TObject> | TObject;
-    destroy?: (obj: TObject) => Promise<void> | void;
+    destroy?: null | ((obj: TObject) => Promise<void> | void);
 };
 export declare class ObjectPool<TObject extends object> implements IObjectPool<TObject> {
     private readonly _pool;
@@ -38,10 +38,10 @@ export declare class ObjectPool<TObject extends object> implements IObjectPool<T
     /** which objects are taken and not released to the pool */
     get heldObjects(): ReadonlySet<TObject>;
     get(count: number): TObject[];
-    release(objects: TObject[], start?: number, end?: number): Promise<number>;
+    release(objects: TObject[], start?: null | number, end?: null | number): Promise<number>;
     private _release;
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
-    getWait(count: number, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TObject[]>;
-    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => Promise<TResult> | TResult, priority?: Priority, abortSignal?: IAbortSignalFast, awaitPriority?: AwaitPriority): Promise<TResult>;
-    allocate(size?: number): Promise<number> | number;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
+    getWait(count: number, priority?: null | Priority, abortSignal?: null | IAbortSignalFast, awaitPriority?: null | AwaitPriority): Promise<TObject[]>;
+    use<TResult>(count: number, func: (objects: ReadonlyArray<TObject>, abortSignal?: null | IAbortSignalFast) => Promise<TResult> | TResult, priority?: null | Priority, abortSignal?: null | IAbortSignalFast, awaitPriority?: null | AwaitPriority): Promise<TResult>;
+    allocate(size?: null | number): Promise<number> | number;
 }

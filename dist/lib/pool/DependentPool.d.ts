@@ -13,5 +13,5 @@ export declare class DependentPool extends PoolWrapper {
     get holdAvailable(): number;
     canHold(count: number): boolean;
     hold(count: number): boolean;
-    tick(abortSignal?: IAbortSignalFast): Promise<void> | void;
+    tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void;
 }
