@@ -18,7 +18,7 @@ export class ObjectPoolWrapper<TObject extends object> implements IObjectPool<TO
     return this._objectPool.pool
   }
 
-  allocate(size?: number): Promise<number> | number {
+  allocate(size?: null | number): Promise<number> | number {
     return this._objectPool.allocate(size)
   }
 
@@ -28,27 +28,27 @@ export class ObjectPoolWrapper<TObject extends object> implements IObjectPool<TO
 
   getWait(
     count: number,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
+    priority?: null | Priority,
+    abortSignal?: null | IAbortSignalFast,
+    awaitPriority?: null | AwaitPriority,
   ): Promise<TObject[]> {
     return this._objectPool.getWait(count, priority, abortSignal, awaitPriority)
   }
 
-  release(objects: TObject[], start?: number, count?: number): Promise<number> | number {
+  release(objects: TObject[], start?: null | number, count?: null | number): Promise<number> | number {
     return this._objectPool.release(objects, start, count)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void {
     return this._objectPool.tick(abortSignal)
   }
 
   use<TResult>(
     count: number,
-    func: (objects: ReadonlyArray<TObject>, abortSignal?: IAbortSignalFast) => (Promise<TResult> | TResult),
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
+    func: (objects: ReadonlyArray<TObject>, abortSignal?: null | IAbortSignalFast) => (Promise<TResult> | TResult),
+    priority?: null | Priority,
+    abortSignal?: null | IAbortSignalFast,
+    awaitPriority?: null | AwaitPriority,
   ): Promise<TResult> {
     return this._objectPool.use(count, func, priority, abortSignal, awaitPriority)
   }

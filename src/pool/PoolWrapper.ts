@@ -32,11 +32,11 @@ export class PoolWrapper implements IPool {
     return this._pool.hold(count)
   }
 
-  release(count: number, dontThrow?: boolean) {
+  release(count: number, dontThrow?: null | boolean) {
     return this._pool.release(count, dontThrow)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void {
     return this._pool.tick(abortSignal)
   }
 }

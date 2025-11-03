@@ -10,9 +10,9 @@ export interface IPool {
 
   canHold(count: number): boolean
   hold(count: number): boolean
-  release(count: number, dontThrow?: boolean): Promise<number> | number
+  release(count: number, dontThrow?: null | boolean): Promise<number> | number
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void
 }
 
 // export interface IPoolSync extends IPool {
@@ -59,7 +59,7 @@ export class Pool implements IPool {
     return true
   }
 
-  release(count: number, dontThrow?: boolean): number {
+  release(count: number, dontThrow?: null | boolean): number {
     const heldCount = this._heldCount
     if (count > heldCount) {
       if (dontThrow) {
@@ -82,7 +82,7 @@ export class Pool implements IPool {
   }
 
   private _tickPromise: CustomPromise = new CustomPromise()
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void {
     if (this._heldCount === 0) {
       return
     }
@@ -104,9 +104,9 @@ export function poolWait({
 }: {
   pool: IPool
   count: number
-  priority?: Priority
-  abortSignal?: IAbortSignalFast
-  awaitPriority?: AwaitPriority
+  priority?: null | Priority
+  abortSignal?: null | IAbortSignalFast
+  awaitPriority?: null | AwaitPriority
 }): Promise<void> {
   if (!awaitPriority) {
     awaitPriority = awaitPriorityDefault
@@ -129,9 +129,9 @@ export async function poolWaitHold({
 }: {
   pool: IPool
   count: number
-  priority?: Priority
-  abortSignal?: IAbortSignalFast
-  awaitPriority?: AwaitPriority
+  priority?: null | Priority
+  abortSignal?: null | IAbortSignalFast
+  awaitPriority?: null | AwaitPriority
 }): Promise<void> {
   await poolWait({ pool, count, priority, abortSignal, awaitPriority })
   if (!pool.hold(count)) {

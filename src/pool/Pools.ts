@@ -10,9 +10,9 @@ import {IPool, poolPriorityQueue} from './Pool'
 // export interface IPools {
 //   canHold(count: number | number[]): boolean
 //   hold(count: number | number[]): boolean
-//   release(count: number, dontThrow?: boolean): Promise<number> | number
-//   release(count: number[], dontThrow?: boolean): Promise<number[]> | number[]
-//   release(count: number | number[], dontThrow?: boolean): Promise<number | number[]> | number | number[]
+//   release(count: number, dontThrow?: null | boolean): Promise<number> | number
+//   release(count: number[], dontThrow?: null | boolean): Promise<number[]> | number[]
+//   release(count: number | number[], dontThrow?: null | boolean): Promise<number | number[]> | number | number[]
 // }
 
 export class Pools implements IPool {
@@ -49,13 +49,13 @@ export class Pools implements IPool {
     return poolsHold(this._pools, count)
   }
 
-  release(count: number, dontThrow?: boolean): Promise<number> | number
-  release(count: number[], dontThrow?: boolean): Promise<number[]> | number[]
-  release(count: number | number[], dontThrow?: boolean): Promise<number | number[]> | number | number[] {
+  release(count: number, dontThrow?: null | boolean): Promise<number> | number
+  release(count: number[], dontThrow?: null | boolean): Promise<number[]> | number[]
+  release(count: number | number[], dontThrow?: null | boolean): Promise<number | number[]> | number | number[] {
     return poolsRelease(this._pools, count, dontThrow)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void {
     return poolsTick(this._pools, abortSignal)
   }
 }
@@ -139,22 +139,22 @@ export function poolsHold(
 export function poolsRelease(
   pools: IPool[],
   count: number,
-  dontThrow?: boolean,
+  dontThrow?: null | boolean,
 ): Promise<number> | number
 export function poolsRelease(
   pools: IPool[],
   count: number[],
-  dontThrow?: boolean,
+  dontThrow?: null | boolean,
 ): Promise<number[]> | number[]
 export function poolsRelease(
   pools: IPool[],
   count: number | number[],
-  dontThrow?: boolean,
+  dontThrow?: null | boolean,
 ): Promise<number | number[]> | number | number[]
 export function poolsRelease(
   pools: IPool[],
   count: number | number[],
-  dontThrow?: boolean,
+  dontThrow?: null | boolean,
 ): Promise<number | number[]> | number | number[] {
   if (typeof count === 'number') {
     const releaseAvailable = poolsReleaseAvailable(pools)
@@ -208,7 +208,7 @@ export function poolsRelease(
 
 export function poolsTick(
   pools: IPool[],
-  abortSignal?: IAbortSignalFast,
+  abortSignal?: null | IAbortSignalFast,
 ): Promise<void> {
   let promises: Promise<void>[]
   for (let i = 0, len = pools.length; i < len; i++) {
@@ -239,9 +239,9 @@ export function poolsWait({
 }: {
   pools: IPool[]
   count: number | number[]
-  priority?: Priority
-  abortSignal?: IAbortSignalFast
-  awaitPriority?: AwaitPriority
+  priority?: null | Priority
+  abortSignal?: null | IAbortSignalFast
+  awaitPriority?: null | AwaitPriority
 }) {
   const len = pools.length
   if (typeof count !== 'number' && count.length !== len) {
@@ -271,9 +271,9 @@ export async function poolsWaitHold({
 }: {
   pools: IPool[]
   count: number | number[]
-  priority?: Priority
-  abortSignal?: IAbortSignalFast
-  awaitPriority?: AwaitPriority
+  priority?: null | Priority
+  abortSignal?: null | IAbortSignalFast
+  awaitPriority?: null | AwaitPriority
 }) {
   await poolsWait({ pools, count, priority, abortSignal, awaitPriority })
   if (!poolsHold(pools, count)) {

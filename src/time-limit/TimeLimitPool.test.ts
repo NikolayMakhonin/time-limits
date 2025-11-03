@@ -30,8 +30,8 @@ describe('time-limits > TimeLimits Old', function () {
     maxCount,
     timeMs,
   }: {
-    withPriorityQueue?: boolean,
-    timeLimitsTree?: boolean,
+    withPriorityQueue?: null | boolean,
+    timeLimitsTree?: null | boolean,
     mode: Mode,
     asyncTime: number,
     maxCount: number,
@@ -75,7 +75,7 @@ describe('time-limits > TimeLimits Old', function () {
 
       let completedCount = 0
 
-      const run = function run(result: number, delayMs: number, abortSignal?: IAbortSignalFast) {
+      const run = function run(result: number, delayMs: number, abortSignal?: null | IAbortSignalFast) {
         if (delayMs) {
           return delay(delayMs, abortSignal, timeController).then(() => {
             completedCount++
@@ -196,7 +196,7 @@ describe('time-limits > TimeLimits', function () {
 
   // region createCheckedFunc
 
-  type Func = (abortSignal?: IAbortSignalFast) => Promise<number> | number
+  type Func = (abortSignal?: null | IAbortSignalFast) => Promise<number> | number
   type CheckedFuncContext = {
     timeController: ITimeController,
     timeLog: number[]
@@ -258,7 +258,7 @@ describe('time-limits > TimeLimits', function () {
       results,
       timeLog: [],
     }
-    return async function _checkTimeLimitsFunc(abortSignal?: IAbortSignalFast) {
+    return async function _checkTimeLimitsFunc(abortSignal?: null | IAbortSignalFast) {
       checkedFuncCheckTimeLimits(context)
       try {
         const result = await func(abortSignal)

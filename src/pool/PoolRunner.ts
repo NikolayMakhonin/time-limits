@@ -7,10 +7,10 @@ export interface IPoolRunner {
   pool: IPool
   run<T>(
     count: number,
-    func: (abortSignal?: IAbortSignalFast) => Promise<T> | T,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
+    func: (abortSignal?: null | IAbortSignalFast) => Promise<T> | T,
+    priority?: null | Priority,
+    abortSignal?: null | IAbortSignalFast,
+    awaitPriority?: null | AwaitPriority,
   ): Promise<T>
 }
 
@@ -28,10 +28,10 @@ export class PoolRunner implements IPoolRunner {
 
   async run<T>(
     count: number,
-    func: (abortSignal?: IAbortSignalFast) => Promise<T> | T,
-    priority?: Priority,
-    abortSignal?: IAbortSignalFast,
-    awaitPriority?: AwaitPriority,
+    func: (abortSignal?: null | IAbortSignalFast) => Promise<T> | T,
+    priority?: null | Priority,
+    abortSignal?: null | IAbortSignalFast,
+    awaitPriority?: null | AwaitPriority,
   ): Promise<T> {
     await poolWaitHold({ pool: this._pool, count, priority, abortSignal, awaitPriority})
 

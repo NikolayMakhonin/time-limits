@@ -40,7 +40,7 @@ export class DependentPool extends PoolWrapper {
     return this._pool.hold(count)
   }
 
-  tick(abortSignal?: IAbortSignalFast): Promise<void> | void {
+  tick(abortSignal?: null | IAbortSignalFast): Promise<void> | void {
     let promises: Promise<void>[]
     const promise = this._pool.tick(abortSignal)
     if (promise) {

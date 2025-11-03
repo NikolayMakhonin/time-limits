@@ -4,7 +4,7 @@ export interface IStackPool<TObject> {
 
   get(count: number): TObject[]
 
-  release(objects: TObject[], start?: number, end?: number): void
+  release(objects: TObject[], start?: null | number, end?: null | number): void
 }
 
 function slice<T>(arr: T[], start: number, end: number): T[] {
@@ -38,7 +38,7 @@ export class StackPool<TObject> implements IStackPool<TObject> {
     return objects
   }
 
-  release(objects: TObject[], start?: number, end?: number) {
+  release(objects: TObject[], start?: null | number, end?: null | number) {
     if (start == null) {
       start = 0
     }

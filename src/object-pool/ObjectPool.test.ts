@@ -20,7 +20,7 @@ describe('object-pool > ObjectPool', function () {
     async,
     maxSize,
   }: {
-    withPriorityQueue?: boolean,
+    withPriorityQueue?: null | boolean,
     countObjects: number,
     usePools: boolean,
     heldObjects: boolean,

@@ -10,7 +10,7 @@ export interface ITimeLimitPool extends IPool {
 export type TimeLimitPoolParams = {
   pool: IPool,
   time: number,
-  timeController?: ITimeController,
+  timeController?: null | ITimeController,
 }
 
 export class TimeLimitPool extends PoolWrapper implements ITimeLimitPool {
@@ -31,7 +31,7 @@ export class TimeLimitPool extends PoolWrapper implements ITimeLimitPool {
     return this._time
   }
 
-  async release(count: number, dontThrow?: boolean) {
+  async release(count: number, dontThrow?: null | boolean) {
     await delay(this._time, null, this._timeController)
     return this._pool.release(count, dontThrow)
   }
