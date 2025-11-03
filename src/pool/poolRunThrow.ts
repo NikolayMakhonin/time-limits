@@ -1,5 +1,10 @@
 import {IPool} from './Pool'
-import {type PromiseLikeOrValue, runWithFinally} from '@flemist/async-utils'
+import {
+  type PromiseLikeOrValue,
+  type PromiseOrValue,
+  runWithFinally,
+  promiseLikeToPromise,
+} from '@flemist/async-utils'
 import {PoolHoldError} from 'src/pool/PoolHoldError'
 
 export function poolRunThrow<Result>(
@@ -11,13 +16,13 @@ export function poolRunThrow<Result>(
   pool: IPool,
   count: number,
   func: (() => PromiseLikeOrValue<Result>) | null | undefined,
-): PromiseLikeOrValue<Result>
+): PromiseOrValue<Result>
 export function poolRunThrow<Result>(
   pool: IPool,
   count: number,
   func: (() => PromiseLikeOrValue<Result>) | null | undefined,
-): PromiseLikeOrValue<Result> {
-  return runWithFinally(
+): PromiseOrValue<Result> {
+  return promiseLikeToPromise(runWithFinally(
     () => {
       const hold = pool.hold(count)
       if (!hold) {
@@ -28,6 +33,6 @@ export function poolRunThrow<Result>(
     () => {
       void pool.release(count)
     },
-  )
+  ))
 }
 

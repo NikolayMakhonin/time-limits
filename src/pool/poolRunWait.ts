@@ -4,6 +4,7 @@ import {type AwaitPriority, Priority} from '@flemist/priority-queue'
 import {
   type PromiseLikeOrValue,
   runWithFinally,
+  promiseLikeToPromise,
 } from '@flemist/async-utils'
 
 export type PoolRunWaitArgs<T> = {
@@ -23,8 +24,8 @@ export function poolRunWait<T>({
   priority,
   abortSignal,
   awaitPriority,
-}: PoolRunWaitArgs<PromiseLikeOrValue<T>>): PromiseLike<T> {
-  return runWithFinally(
+}: PoolRunWaitArgs<PromiseLikeOrValue<T>>): Promise<T> {
+  return promiseLikeToPromise(runWithFinally(
     () => {
       return poolWaitHold({ pool, count, priority, abortSignal, awaitPriority })
     },
@@ -35,5 +36,5 @@ export function poolRunWait<T>({
     () => {
       return pool.release(count)
     },
-  ) as PromiseLike<T>
+  ) as PromiseLike<T>)
 }

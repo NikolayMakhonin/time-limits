@@ -12,8 +12,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@flemist/async-utils':
-        specifier: ^1.2.2
-        version: 1.2.2
+        specifier: ^1.2.7
+        version: 1.2.7
       '@flemist/priority-queue':
         specifier: ^1.0.1
         version: 1.0.1
@@ -699,8 +699,8 @@ packages:
   '@flemist/abort-controller-fast@1.0.0':
     resolution: {integrity: sha512-umA3lbp5W025xc410C2zRbYcUkUDIW47s2TreONwzVmuekzmmRmvQ0IEmDO5aYIjU9QDnI4X0NZ+Yh5ELj6raQ==}
 
-  '@flemist/async-utils@1.2.2':
-    resolution: {integrity: sha512-vkqtNoqeihuZnDBGVxBo5twuLLusV4r8aeViKV1f/mMEp56vc/FYX4XNzpDVN2wyDOQJvcSCXkhF73A9H3M2dg==}
+  '@flemist/async-utils@1.2.7':
+    resolution: {integrity: sha512-la8rSkNaN3SUzRfuzGCZQWkaqjVAr+gQPkrM1OR79DLLeQUoY76WUCgftCbVkHSLxXuAaiWuZ2UIDt3wmFKcCw==}
     engines: {node: '>=12.9.0'}
 
   '@flemist/copy-glob-flat@0.0.5':
@@ -4305,7 +4305,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@flemist/async-utils@1.2.2':
+  '@flemist/async-utils@1.2.7':
     dependencies:
       '@flemist/abort-controller-fast': 1.0.0
       '@flemist/time-controller': 1.0.4
@@ -4328,14 +4328,14 @@ snapshots:
   '@flemist/priority-queue@1.0.1':
     dependencies:
       '@flemist/abort-controller-fast': 1.0.0
-      '@flemist/async-utils': 1.2.2
+      '@flemist/async-utils': 1.2.7
       '@flemist/pairing-heap': 1.0.0
       '@flemist/time-controller': 1.0.4
       tslib: 2.8.1
 
   '@flemist/test-utils@1.0.4(expect@30.2.0)':
     dependencies:
-      '@flemist/async-utils': 1.2.2
+      '@flemist/async-utils': 1.2.7
       '@flemist/time-controller': 1.0.4
       expect: 30.2.0
       tslib: 2.8.1
