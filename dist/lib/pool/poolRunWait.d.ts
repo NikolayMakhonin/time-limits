@@ -11,4 +11,4 @@ export declare type PoolRunWaitArgs<T> = {
     abortSignal?: null | IAbortSignalFast;
     awaitPriority?: null | AwaitPriority;
 };
-export declare function poolRunWait<T>({ pool, count, func, priority, abortSignal, awaitPriority, }: PoolRunWaitArgs<PromiseLikeOrValue<T>>): PromiseLike<T>;
+export declare function poolRunWait<T>({ pool, count, func, priority, abortSignal, awaitPriority, }: PoolRunWaitArgs<PromiseLikeOrValue<T>>): Promise<T>;

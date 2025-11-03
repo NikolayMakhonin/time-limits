@@ -8,14 +8,14 @@ require('tslib');
 require('@flemist/priority-queue');
 
 function poolRunWait({ pool, count, func, priority, abortSignal, awaitPriority, }) {
-    return asyncUtils.runWithFinally(() => {
+    return asyncUtils.promiseLikeToPromise(asyncUtils.runWithFinally(() => {
         return pool_Pool.poolWaitHold({ pool, count, priority, abortSignal, awaitPriority });
     }, () => {
         const holdPool = new pool_Pool.Pool(count);
         return func(holdPool, abortSignal);
     }, () => {
         return pool.release(count);
-    });
+    }));
 }
 
 exports.poolRunWait = poolRunWait;

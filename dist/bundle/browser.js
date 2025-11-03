@@ -116,11 +116,13 @@ l[e]=t,0===--i&&n(l)},r):(l[e]=t,0===--i&&n(l))
 }),o}function y(t,e){let n,r;e||(e=Promise)
 ;const o=new e((t,e)=>{n=t,r=e})
 ;return t.forEach(t=>{f(t)?t.then(n,r):n(t)}),o}
-function v(t,e,n){b(()=>{try{const r=e?e(t):t
-;n._resolve(r)}catch(t){n._reject(t)}})}
-function g(t,e,n){b(()=>{if(e)try{const r=e(t)
-;n._resolve(r)}catch(t){n._reject(t)
-}else n._reject(t)})}const m=function(){};class w{
+function v(t){
+return t instanceof Promise?t:f(t)?new Promise((e,n)=>{
+t.then(e,n)}):t}function g(t,e,n){b(()=>{try{
+const r=e?e(t):t;n._resolve(r)}catch(t){
+n._reject(t)}})}function m(t,e,n){b(()=>{if(e)try{
+const r=e(t);n._resolve(r)}catch(t){n._reject(t)
+}else n._reject(t)})}const w=function(){};class j{
 constructor(t){
 this.status="pending",this.value=void 0,this.reason=void 0,this._handlers=null
 ;const e=this._resolve,n=this._reject,r=this._resolveAsync,o=this._rejectAsync,i=this
@@ -135,27 +137,27 @@ f(t)?t.then(this._resolveAsync,this._rejectAsync):this._resolveSync(t)
 }_resolveSync(t){const e=this._handlers
 ;if(this.value=t,null!=e){this._handlers=null
 ;for(let n=0,r=e.length;n<r;n++){const[r,,o]=e[n]
-;v(t,r,o)}}}_reject(t){
+;g(t,r,o)}}}_reject(t){
 "pending"===this.status&&this._rejectAsync(t)}
 _rejectAsync(t){
 this.status="rejected",f(t)?t.then(this._rejectAsync,this._rejectAsync):this._rejectSync(t)
 }_rejectSync(t){const e=this._handlers
 ;if(this.reason=t,null!=e){this._handlers=null
 ;for(let n=0,r=e.length;n<r;n++){const[,r,o]=e[n]
-;g(t,r,o)}}}then(t,e){const n=new w(m)
+;m(t,r,o)}}}then(t,e){const n=new j(w)
 ;return"pending"===this.status?(null==this._handlers&&(this._handlers=[]),
-this._handlers.push([t,e,n])):"fulfilled"===this.status?v(this.value,t,n):g(this.reason,e,n),
+this._handlers.push([t,e,n])):"fulfilled"===this.status?g(this.value,t,n):m(this.reason,e,n),
 n}catch(t){return this.then(void 0,t)}finally(t){
 const e=t&&function(e){const n=t()
-;return f(n)?n.then(()=>e):w.resolve(e)
+;return f(n)?n.then(()=>e):j.resolve(e)
 },n=t&&function(e){const n=t()
-;return f(n)?n.then(()=>w.reject(e)):w.reject(e)}
+;return f(n)?n.then(()=>j.reject(e)):j.reject(e)}
 ;return this.then(e,n)}static resolve(t){
-const e=new w(m);return e._resolve(t),e}
-static reject(t){const e=new w(m)
+const e=new j(w);return e._resolve(t),e}
+static reject(t){const e=new j(w)
 ;return e._reject(t),e}get[Symbol.toStringTag](){
 return"Promise"}static get[Symbol.species](){
-return w}static all(t){return _(t,w)}
+return j}static all(t){return _(t,j)}
 static allSettled(t){return function(t,e){let n
 ;e||(e=Promise);const r=new e((t,e)=>{n=t})
 ;let o=t.length;const i=[]
@@ -163,16 +165,16 @@ static allSettled(t){return function(t,e){let n
 status:"fulfilled",value:t},0===--o&&n(i)},t=>{
 i[e]={status:"rejected",reason:t},0===--o&&n(i)
 }):(i[e]={status:"fulfilled",value:t
-},0===--o&&n(i))}),r}(t,w)}static any(t){
+},0===--o&&n(i))}),r}(t,j)}static any(t){
 return function(t,e){let n,r;e||(e=Promise)
 ;const o=new e((t,e)=>{n=t,r=e});let i=t.length
 ;const l=[];return t.forEach((t,e)=>{
 f(t)?t.then(n,t=>{
 l[e]=t,0===--i&&r(new AggregateError(l))}):n(t)
-}),o}(t,w)}static race(t){return y(t,w)}}
-const j=function(){};class P{constructor(t){
-if(this._status="pending",t&&t.aborted)this.promise=w.reject(t.reason),
-this.resolve=j,this.reject=j;else{let e,n
+}),o}(t,j)}static race(t){return y(t,j)}}
+const P=function(){};class O{constructor(t){
+if(this._status="pending",t&&t.aborted)this.promise=j.reject(t.reason),
+this.resolve=P,this.reject=P;else{let e,n
 ;if(this.promise=new Promise(function(t){
 e=t,n=function(e){a(t,e)}}),t){
 const r=t.subscribe(function(t){n(t)})
@@ -181,7 +183,7 @@ const r=t.subscribe(function(t){n(t)})
 }else this.resolve=e,this.reject=n}
 this.promise.then(()=>{this._status="resolved"
 },()=>{this._status="rejected"})}get state(){
-return this._status}}function O(t,e,n){
+return this._status}}function C(t,e,n){
 function r(t){if(!n)return e(t);try{const r=e(t)
 ;if(!f(r)){const t=n();return f(t)?t.then(()=>r):r
 }return function(t,e){return e?t.then(t=>{
@@ -190,7 +192,7 @@ const n=e();if(!f(n))throw t;return n.then(()=>{
 throw t})}):t}(r,n)}catch(t){const e=n()
 ;if(!f(e))throw t;return e.then(()=>{throw t})}}
 const o=t?t():void 0;return f(o)?o.then(r):r(o)}
-var C="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{}
+var x="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{}
 ;!function(t){if(!t.setImmediate){
 var e,n,r,o,i,l=1,s={},u=!1,c=t.document,a=Object.getPrototypeOf&&Object.getPrototypeOf(t)
 ;a=a&&a.setTimeout?a:t,
@@ -224,25 +226,25 @@ var e=t.callback,n=t.args;switch(n.length){case 0:
 e();break;case 1:e(n[0]);break;case 2:e(n[0],n[1])
 ;break;case 3:e(n[0],n[1],n[2]);break;default:
 e.apply(void 0,n)}}(e)}finally{h(t),u=!1}}}}
-}("undefined"==typeof self?C:self);class x{
+}("undefined"==typeof self?x:self);class k{
 constructor(t,e){
 this._branch=null,this.order=t,this.parent=e}
 get branch(){if(!this._branch){
 const t=[this.order];let e=this.parent
 ;for(;null!=e;)t.push(e.order),e=e.parent
 ;this._branch=t}return this._branch}}
-const k=function(t){return t};function E(t,e){
+const E=function(t){return t};function A(t,e){
 return function(t,e){
 const n=t&&t.branch,r=e&&e.branch,o=n?n.length:0,i=r?r.length:0,l=o>i?o:i
 ;for(let t=0;t<l;t++){
 const e=t>=o?0:n[o-1-t],l=t>=i?0:r[i-1-t]
 ;if(e!==l)return e>l?1:-1}return 0
-}(t.priority,e.priority)<0}let A=1;class T{
-constructor(){this._queue=new s({lessThanFunc:E})}
+}(t.priority,e.priority)<0}let T=1;class S{
+constructor(){this._queue=new s({lessThanFunc:A})}
 run(t,e,n){return this._run(!1,t,e,n)}
 runTask(t,e,n){return this._run(!0,t,e,n)}
-_run(t,e,n,r){const o=new P(r),i={
-priority:(l=A++,s=n,null==l?null==s?null:s:new x(l,s)),
+_run(t,e,n,r){const o=new O(r),i={
+priority:(l=T++,s=n,null==l?null==s?null:s:new k(l,s)),
 func:e,abortSignal:r,resolve:o.resolve,
 reject:o.reject,readyToRun:!t};var l,s
 ;if(this._queue.add(i),t){const t=this;return{
@@ -253,7 +255,7 @@ return this._inProcess||(this._inProcess=!0,this._process()),o.promise
 }_process(){
 return r(this,void 0,void 0,function*(){
 const t=this._queue
-;for(yield Promise.resolve().then(k);;){
+;for(yield Promise.resolve().then(E);;){
 if(yield 0,t.isEmpty){this._inProcess=!1;break}
 let e=t.getMin()
 ;if(e.readyToRun)t.deleteMin();else{let n
@@ -263,11 +265,11 @@ e=n.item,t.delete(n)}
 if(e.abortSignal&&e.abortSignal.aborted)e.reject(e.abortSignal.reason);else try{
 let t=e.func&&e.func(e.abortSignal)
 ;t&&"function"==typeof t.then&&(t=yield t),e.resolve(t)
-}catch(t){e.reject(t)}}})}}const S=function(){
-const t=new T;return function(e,n){
-return t.run(void 0,e,n)}}();var M=function(){
+}catch(t){e.reject(t)}}})}}const M=function(){
+const t=new S;return function(e,n){
+return t.run(void 0,e,n)}}();var H=function(){
 function t(t){
-if(this._heldCountMax=0,this._heldCount=0,this._tickPromise=new P,
+if(this._heldCountMax=0,this._heldCount=0,this._tickPromise=new O,
 !t)throw new Error("[Pool][constructor] heldCountMax should be > 0")
 ;this._heldCountMax=t}
 return Object.defineProperty(t.prototype,"heldCountMax",{
@@ -296,29 +298,29 @@ if(t>0&&(this._heldCount=n-t,this._tickPromise)){
 var r=this._tickPromise
 ;this._tickPromise=null,r.resolve()}return t
 },t.prototype.tick=function(t){
-if(0!==this._heldCount)return this._tickPromise||(this._tickPromise=new P),
+if(0!==this._heldCount)return this._tickPromise||(this._tickPromise=new O),
 function(t,e){return t?new Promise(function(n){
 if(t&&t.aborted)return void a(n,t.reason);let r,o
 ;function i(t){o||(o=!0,r&&r(),a(n,t))}
 e.then(function(t){r&&r(),n(t)
 }).catch(i),t&&(r=t.subscribe(i))}):e
-}(t,this._tickPromise.promise)},t}(),H=new T
-;function W(t){
+}(t,this._tickPromise.promise)},t}(),W=new S
+;function R(t){
 var e=this,n=t.pool,i=t.count,l=t.priority,s=t.abortSignal,u=t.awaitPriority
-;return u||(u=S),H.run(function(t){
+;return u||(u=M),W.run(function(t){
 return r(e,void 0,void 0,function(){
 return o(this,function(e){switch(e.label){case 0:
 return n.canHold(i)?[3,3]:[4,n.tick(t)];case 1:
 return e.sent(),[4,u(l,t)];case 2:
 return e.sent(),[3,0];case 3:return[2]}})})},l,s)}
-function R(t){
+function F(t){
 var e=t.pool,n=t.count,i=t.priority,l=t.abortSignal,s=t.awaitPriority
 ;return r(this,void 0,void 0,function(){
 return o(this,function(t){switch(t.label){case 0:
-return[4,W({pool:e,count:n,priority:i,
+return[4,R({pool:e,count:n,priority:i,
 abortSignal:l,awaitPriority:s})];case 1:
 if(t.sent(),!e.hold(n))throw new Error("[poolHoldWait] Unexpected behavior")
-;return[2]}})})}var F=function(){function t(){
+;return[2]}})})}var U=function(){function t(){
 for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e]
 ;if(!(null==t?void 0:t.length))throw new Error("[Pools][constructor] pools should not be empty")
 ;this._pools=t}
@@ -340,26 +342,26 @@ var o=t[n].holdAvailable;(0===n||o<e)&&(e=o)}
 return e}(this._pools)},enumerable:!1,
 configurable:!0
 }),Object.defineProperty(t.prototype,"releaseAvailable",{
-get:function(){return U(this._pools)},
+get:function(){return z(this._pools)},
 enumerable:!1,configurable:!0
 }),t.prototype.canHold=function(t){
-return z(this._pools,t)
-},t.prototype.hold=function(t){
 return q(this._pools,t)
+},t.prototype.hold=function(t){
+return I(this._pools,t)
 },t.prototype.release=function(t,e){
-return I(this._pools,t,e)
+return D(this._pools,t,e)
 },t.prototype.tick=function(t){
-return D(this._pools,t)},t}();function U(t){
+return L(this._pools,t)},t}();function z(t){
 for(var e,n=0,r=t.length;n<r;n++){
 var o=t[n].heldCount;(0===n||o<e)&&(e=o)}return e}
-function z(t,e){var n=t.length
+function q(t,e){var n=t.length
 ;if("number"!=typeof e&&e.length!==n)throw new Error("[poolsCanHold] count.length (".concat(e.length,") !== pools.length (").concat(n,")"))
 ;for(var r=0;r<n;r++){var o=t[r]
 ;if(0!==o.heldCount&&("number"==typeof e?e:e[r])>o.holdAvailable)return!1
-}return!0}function q(t,e){if(!z(t,e))return!1
+}return!0}function I(t,e){if(!q(t,e))return!1
 ;for(var n=0,r=t.length;n<r;n++)if(!t[n].hold("number"==typeof e?e:e[n]))throw new Error("[poolsHold] Unexpected behavior")
-;return!0}function I(t,e,n){
-if("number"==typeof e){var r=U(t);if(e>r){
+;return!0}function D(t,e,n){
+if("number"==typeof e){var r=z(t);if(e>r){
 if(!n)throw new Error("[poolsRelease] count (".concat(e," > releaseAvailable (").concat(r,"))"))
 ;e=r}if(0===e)return 0}else{var o=t.length
 ;if(e.length!==o)throw new Error("[poolsRelease] count.length (".concat(e.length,") !== pools.length (").concat(o,")"))
@@ -370,19 +372,19 @@ r=t[i].releaseAvailable
 var s=t[i].release("number"==typeof e?e:e[i],n)
 ;f(s)&&(l?l.push(s):l=[s])}if(l){var u=_(l)
 ;return"number"==typeof e?u.then(function(){
-return e}):u}return e}function D(t,e){
+return e}):u}return e}function L(t,e){
 for(var n,r=0,o=t.length;r<o;r++){
 var i=t[r].tick(e);i&&(n?n.push(i):n=[i])}
-return n?y(n):null}function L(t){
+return n?y(n):null}function N(t){
 var e=this,n=t.pools,i=t.count,l=t.priority,s=t.abortSignal,u=t.awaitPriority,c=n.length
 ;if("number"!=typeof i&&i.length!==c)throw new Error("[poolsHoldWait] count.length (".concat(i.length,") !== pools.length (").concat(c,")"))
-;return u||(u=S),H.run(function(t){
+;return u||(u=M),W.run(function(t){
 return r(e,void 0,void 0,function(){
 return o(this,function(e){switch(e.label){case 0:
-return z(n,i)?[3,4]:[4,D(n,t)];case 1:
+return q(n,i)?[3,4]:[4,L(n,t)];case 1:
 return e.sent(),u?[4,u(l,t)]:[3,3];case 2:
 e.sent(),e.label=3;case 3:return[3,0];case 4:
-return[2]}})})},l,s)}var N=function(){
+return[2]}})})},l,s)}var Y=function(){
 function t(t){this._pool=t}
 return Object.defineProperty(t.prototype,"pool",{
 get:function(){return this._pool},enumerable:!1,
@@ -390,13 +392,13 @@ configurable:!0
 }),t.prototype.run=function(t,e,n,i,l){
 return r(this,void 0,void 0,function(){
 return o(this,function(r){switch(r.label){case 0:
-return[4,R({pool:this._pool,count:t,priority:n,
+return[4,F({pool:this._pool,count:t,priority:n,
 abortSignal:i,awaitPriority:l})];case 1:
 r.sent(),r.label=2;case 2:
 return r.trys.push([2,,4,5]),[4,e(i)];case 3:
 return[2,r.sent()];case 4:
 return this._pool.release(t),[7];case 5:return[2]}
-})})},t}(),Y=function(){function t(t){this._pool=t
+})})},t}(),$=function(){function t(t){this._pool=t
 }
 return Object.defineProperty(t.prototype,"heldCountMax",{
 get:function(){return this._pool.heldCountMax},
@@ -417,11 +419,11 @@ return this._pool.hold(t)
 },t.prototype.release=function(t,e){
 return this._pool.release(t,e)
 },t.prototype.tick=function(t){
-return this._pool.tick(t)},t}(),$=function(t){
+return this._pool.tick(t)},t}(),G=function(t){
 function e(e){
 var n=t.call(this,"Pool hold(".concat(e,") failed"))||this
 ;return n.count=e,n}return n(e,t),e}(Error)
-;var G=function(t){function e(e){
+;var K=function(t){function e(e){
 for(var n=[],r=1;r<arguments.length;r++)n[r-1]=arguments[r]
 ;var o=t.call(this,e)||this;return o._pools=n,o}
 return n(e,t),Object.defineProperty(e.prototype,"heldCount",{
@@ -440,8 +442,8 @@ return!!this.canHold(t)&&this._pool.hold(t)
 var e,n=this._pool.tick(t);n&&(e=[n])
 ;for(var r=0,o=this._pools.length;r<o;r++){
 var i=this._pools[r].tick(t)
-;i&&(e?e.push(i):e=[i])}return e?y(e):null},e}(Y)
-;var K=function(){function t(){this._objects=[]}
+;i&&(e?e.push(i):e=[i])}return e?y(e):null},e}($)
+;var Q=function(){function t(){this._objects=[]}
 return Object.defineProperty(t.prototype,"objects",{
 get:function(){return this._objects},
 enumerable:!1,configurable:!0
@@ -458,11 +460,11 @@ for(var r=n-e,o=new Array(r),i=0;i<r;i++)o[i]=t[e+i]
 null==e&&(e=0),null==n&&(n=t.length)
 ;for(var r=e;r<n;r++){var o=t[r]
 ;null!=o&&this._objects.push(o)}},t
-}(),Q=function(){function t(t){
+}(),B=function(){function t(t){
 var e=t.pool,n=t.availableObjects,r=t.heldObjects,o=t.destroy,i=t.create
-;this._allocatePool=new M(e.heldCountMax),
-this._pool=new F(e,this._allocatePool),
-this._availableObjects=n||new K,this._heldObjects=!0===r?new Set:r||null,
+;this._allocatePool=new H(e.heldCountMax),
+this._pool=new U(e,this._allocatePool),
+this._availableObjects=n||new Q,this._heldObjects=!0===r?new Set:r||null,
 this._create=i,this._destroy=o}
 return Object.defineProperty(t.prototype,"pool",{
 get:function(){return this._pool},enumerable:!1,
@@ -491,7 +493,7 @@ return this._pool.tick(t)
 },t.prototype.getWait=function(t,e,n,i){
 return r(this,void 0,void 0,function(){
 return o(this,function(r){switch(r.label){case 0:
-return[4,R({pool:this._pool,count:t,priority:e,
+return[4,F({pool:this._pool,count:t,priority:e,
 abortSignal:n,awaitPriority:i})];case 1:
 return r.sent(),[2,this.get(t)]}})})
 },t.prototype.use=function(t,e,n,i,l){
@@ -537,7 +539,7 @@ return[4,t];case 1:return e=n.sent(),l+=e,[2]}})})
 var p=this._release([h],this._allocatePool)
 ;f(p)&&e.push(c(p))}}
 return e.length?_(e).then(function(t){return l}):l
-},t}(),B=function(){function t(t){
+},t}(),J=function(){function t(t){
 this._objectPool=t}
 return Object.defineProperty(t.prototype,"availableObjects",{
 get:function(){
@@ -558,7 +560,7 @@ return this._objectPool.release(t,e,n)
 return this._objectPool.tick(t)
 },t.prototype.use=function(t,e,n,r,o){
 return this._objectPool.use(t,e,n,r,o)},t
-}(),J=function(t){function e(e){
+}(),V=function(t){function e(e){
 var n=e.pool,r=e.time,o=e.timeController,l=t.call(this,n)||this
 ;return l._time=r,l._timeController=o||i,l}
 return n(e,t),Object.defineProperty(e.prototype,"time",{
@@ -570,28 +572,28 @@ return o(this,function(n){switch(n.label){case 0:
 return[4,h(this._time,null,this._timeController)]
 ;case 1:
 return n.sent(),[2,this._pool.release(t,e)]}})})
-},e}(Y)
-;t.DependentPool=G,t.ObjectPool=Q,t.ObjectPoolWrapper=B,t.Pool=M,t.PoolHoldError=$,
-t.PoolRunner=N,
-t.PoolWrapper=Y,t.Pools=F,t.StackPool=K,t.TimeLimitPool=J,t.poolPriorityQueue=H,
+},e}($)
+;t.DependentPool=K,t.ObjectPool=B,t.ObjectPoolWrapper=J,t.Pool=H,t.PoolHoldError=G,
+t.PoolRunner=Y,
+t.PoolWrapper=$,t.Pools=U,t.StackPool=Q,t.TimeLimitPool=V,t.poolPriorityQueue=W,
 t.poolRunThrow=function(t,e,n){
-return O(function(){if(!t.hold(e))throw new $(e)
-},n,function(){t.release(e)})
+return v(C(function(){if(!t.hold(e))throw new G(e)
+},n,function(){t.release(e)}))
 },t.poolRunWait=function(t){
 var e=t.pool,n=t.count,r=t.func,o=t.priority,i=t.abortSignal,l=t.awaitPriority
-;return O(function(){return R({pool:e,count:n,
+;return v(C(function(){return F({pool:e,count:n,
 priority:o,abortSignal:i,awaitPriority:l})
-},function(){var t=new M(n);return r(t,i)
-},function(){return e.release(n)})
-},t.poolWait=W,t.poolWaitHold=R,t.poolsCanHold=z,
-t.poolsHold=q,t.poolsRelease=I,
-t.poolsTick=D,t.poolsWait=L,t.poolsWaitHold=function(t){
+},function(){var t=new H(n);return r(t,i)
+},function(){return e.release(n)}))
+},t.poolWait=R,t.poolWaitHold=F,t.poolsCanHold=q,
+t.poolsHold=I,t.poolsRelease=D,
+t.poolsTick=L,t.poolsWait=N,t.poolsWaitHold=function(t){
 var e=t.pools,n=t.count,i=t.priority,l=t.abortSignal,s=t.awaitPriority
 ;return r(this,void 0,void 0,function(){
 return o(this,function(t){switch(t.label){case 0:
-return[4,L({pools:e,count:n,priority:i,
+return[4,N({pools:e,count:n,priority:i,
 abortSignal:l,awaitPriority:s})];case 1:
-if(t.sent(),!q(e,n))throw new Error("[poolsHoldWait] Unexpected behavior")
+if(t.sent(),!I(e,n))throw new Error("[poolsHoldWait] Unexpected behavior")
 ;return[2]}})})
 },Object.defineProperty(t,"__esModule",{value:!0})
 }({});
