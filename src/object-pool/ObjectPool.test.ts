@@ -96,7 +96,7 @@ describe('object-pool > ObjectPool', function () {
       assert.strictEqual(objectPool.heldObjects, null)
     }
     assert.strictEqual(objectPool.availableObjects.length, 0)
-    if (preAllocateSize !== void 0) {
+    if (preAllocateSize != null) {
       await Promise.race([
         objectPool.allocate(preAllocateSize),
         awaitTime(timeController, 1, 4)
@@ -255,8 +255,8 @@ describe('object-pool > ObjectPool', function () {
       assert.strictEqual(results[i], i + 10000 * iteration)
     }
 
-    // if (abort && preAllocateSize !== null) {
-    //   assert.strictEqual(objectPool.availableObjects.length, Math.min(maxSize, preAllocateSize || 0))
+    // if (abort && preAllocateSize != null) {
+    //   assert.strictEqual(objectPool.availableObjects.length, Math.min(maxSize, preAllocateSize ?? 0))
     // }
     // else {
     //   assert.strictEqual(objectPool.availableObjects.length, maxSize - (objectsCount && maxSize % objectsCount))
