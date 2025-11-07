@@ -1,6 +1,6 @@
 {
   "name": "@flemist/time-limits",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "TODO",
   "main": "dist/lib/index.cjs",
   "module": "dist/lib/index.mjs",

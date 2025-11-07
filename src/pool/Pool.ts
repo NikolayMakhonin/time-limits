@@ -98,12 +98,14 @@ export const poolPriorityQueue = new PriorityQueue()
 export function poolWait({
   pool,
   count,
+  hold,
   priority,
   abortSignal,
   awaitPriority,
 }: {
   pool: IPool
   count: number
+  hold?: null | boolean | number
   priority?: null | Priority
   abortSignal?: null | IAbortSignalFast
   awaitPriority?: null | AwaitPriority
@@ -117,24 +119,11 @@ export function poolWait({
       await pool.tick(abortSignal)
       await awaitPriority(priority, abortSignal)
     }
+    if (hold != null && hold !== false) {
+      const holdCount = typeof hold === 'number' ? hold : count
+      if (!pool.hold(holdCount)) {
+        throw new Error('[poolWait] Unexpected unable to hold pool')
+      }
+    }
   }, priority, abortSignal)
-}
-
-export async function poolWaitHold({
-  pool,
-  count,
-  priority,
-  abortSignal,
-  awaitPriority,
-}: {
-  pool: IPool
-  count: number
-  priority?: null | Priority
-  abortSignal?: null | IAbortSignalFast
-  awaitPriority?: null | AwaitPriority
-}): Promise<void> {
-  await poolWait({ pool, count, priority, abortSignal, awaitPriority })
-  if (!pool.hold(count)) {
-    throw new Error('[poolHoldWait] Unexpected behavior')
-  }
 }

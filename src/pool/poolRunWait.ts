@@ -1,4 +1,4 @@
-import {IPool, Pool, poolWaitHold} from './Pool'
+import {IPool, Pool, poolWait} from './Pool'
 import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {type AwaitPriority, Priority} from '@flemist/priority-queue'
 import {
@@ -27,7 +27,7 @@ export function poolRunWait<T>({
 }: PoolRunWaitArgs<PromiseLikeOrValue<T>>): Promise<T> {
   return promiseLikeToPromise(runWithFinally(
     () => {
-      return poolWaitHold({ pool, count, priority, abortSignal, awaitPriority })
+      return poolWait({ pool, count, hold: true, priority, abortSignal, awaitPriority })
     },
     () => {
       const holdPool = new Pool(count)
