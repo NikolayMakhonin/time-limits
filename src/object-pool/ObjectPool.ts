@@ -138,7 +138,9 @@ export class ObjectPool<TObject extends object> implements IObjectPool<TObject> 
     abortSignal?: null | IAbortSignalFast,
     awaitPriority?: null | AwaitPriority,
   ): Promise<TObject[]> {
-    await poolWait({ pool: this._pool, count, hold: true, priority, abortSignal, awaitPriority })
+    await poolWait({
+      pool: this._pool, count, hold: true, priority, abortSignal, awaitPriority,
+    })
     return this.get(count)
   }
 

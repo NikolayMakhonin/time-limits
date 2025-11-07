@@ -27,7 +27,9 @@ export function poolRunWait<T>({
 }: PoolRunWaitArgs<PromiseLikeOrValue<T>>): Promise<T> {
   return promiseLikeToPromise(runWithFinally(
     () => {
-      return poolWait({ pool, count, hold: true, priority, abortSignal, awaitPriority })
+      return poolWait({
+        pool, count, hold: true, priority, abortSignal, awaitPriority,
+      })
     },
     () => {
       const holdPool = new Pool(count)

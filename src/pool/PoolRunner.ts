@@ -33,7 +33,9 @@ export class PoolRunner implements IPoolRunner {
     abortSignal?: null | IAbortSignalFast,
     awaitPriority?: null | AwaitPriority,
   ): Promise<T> {
-    await poolWait({ pool: this._pool, count, hold: true, priority, abortSignal, awaitPriority})
+    await poolWait({
+      pool: this._pool, count, hold: true, priority, abortSignal, awaitPriority,
+    })
 
     try {
       const result = await func(abortSignal)
