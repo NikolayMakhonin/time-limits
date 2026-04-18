@@ -111,10 +111,7 @@ export function poolsCanHold(pools: IPool[], count: number | number[]): boolean 
   }
   for (let i = 0; i < len; i++) {
     const pool = pools[i]
-    if (
-      pool.heldCount !== 0
-      && (typeof count === 'number' ? count : count[i]) > pool.holdAvailable
-    ) {
+    if (!pool.canHold(typeof count === 'number' ? count : count[i])) {
       return false
     }
   }
