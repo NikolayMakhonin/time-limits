@@ -24,8 +24,8 @@ export class Pool implements IPool {
   private _heldCount: number = 0
 
   constructor(heldCountMax: number) {
-    if (!heldCountMax) {
-      throw new Error('[Pool][constructor] heldCountMax should be > 0')
+    if (heldCountMax < 0) {
+      throw new Error('[Pool][constructor] heldCountMax should be >= 0')
     }
     this._heldCountMax = heldCountMax
   }
@@ -60,17 +60,17 @@ export class Pool implements IPool {
   }
 
   release(count: number, dontThrow?: null | boolean): number {
-    const heldCount = this._heldCount
-    if (count > heldCount) {
+    const releaseAvailable = this.releaseAvailable
+    if (count > releaseAvailable) {
       if (dontThrow) {
-        count = heldCount
+        count = releaseAvailable
       }
       else {
-        throw new Error(`[Pool][release] count (${count} > heldCount (${heldCount}))`)
+        throw new Error(`[Pool][release] count (${count} > releaseAvailable (${releaseAvailable}))`)
       }
     }
     if (count > 0) {
-      this._heldCount = heldCount - count
+      this._heldCount -= count
 
       if (this._tickPromise) {
         const tickPromise = this._tickPromise
