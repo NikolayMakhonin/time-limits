@@ -4,26 +4,31 @@ import {IPool, Pool} from './Pool'
 import {PoolMult} from './PoolMult'
 import {Pools} from './Pools'
 
+/**
+ * A map of pools, where each key has its own pool
+ * Inherited IPool methods operate in bulk: hold(1) holds all keys at once
+ */
 export interface IPoolMap<Key> extends IPool {
   get(key: Key): IPool
 }
 
 export type PoolMapOptions<Key> = {
-  heldCountMax?: null | number
+  /** Shared pool for all keys, used for hold/release all keys at once, and limit total hold count across all keys */
+  commonPool: IPool
   createKeyPool?: null | ((key: Key) => IPool)
 }
 
+/** Each get(key) pool is limited by both its own key pool and the commonPool */
 export class PoolMap<Key> implements IPoolMap<Key> {
   private readonly _commonPool: IPool
   private readonly _bulkPool: IPool
   private readonly _createKeyPool: (key: Key) => IPool
   private readonly _keyPools: WeakOrMapFull<Key, IPool> = new WeakOrMapFull()
 
-  constructor(options?: null | PoolMapOptions<Key>) {
-    const heldCountMax = options?.heldCountMax ?? Number.MAX_SAFE_INTEGER
-    this._commonPool = new Pool(heldCountMax)
-    this._bulkPool = new PoolMult(this._commonPool, heldCountMax)
-    this._createKeyPool = options?.createKeyPool ?? createKeyPoolDefault
+  constructor(options: PoolMapOptions<Key>) {
+    this._commonPool = options.commonPool
+    this._bulkPool = new PoolMult(this._commonPool, this._commonPool.heldCountMax)
+    this._createKeyPool = options.createKeyPool ?? createKeyPoolDefault
   }
 
   get(key: Key): IPool {

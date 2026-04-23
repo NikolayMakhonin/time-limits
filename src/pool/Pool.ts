@@ -2,6 +2,10 @@ import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {CustomPromise, promiseToAbortable} from '@flemist/async-utils'
 import {type AwaitPriority, awaitPriorityDefault, Priority, PriorityQueue} from '@flemist/priority-queue'
 
+/**
+ * Hold of any count always succeeds on an empty pool;
+ * heldCountMax restricts hold exclusively when the pool is non-empty
+ */
 export interface IPool {
   readonly heldCountMax: number
   readonly heldCount: number

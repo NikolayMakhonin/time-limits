@@ -2,6 +2,7 @@ import {type IAbortSignalFast} from '@flemist/abort-controller-fast'
 import {isPromiseLike} from '@flemist/async-utils'
 import {IPool} from './Pool'
 
+/** Pool where each hold unit equals multiplier holds in the underlying pool */
 export class PoolMult implements IPool {
   private readonly _pool: IPool
   private readonly _multiplier: number
