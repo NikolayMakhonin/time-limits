@@ -8,8 +8,8 @@ export class PoolMult implements IPool {
   private readonly _multiplier: number
 
   constructor(pool: IPool, multiplier: number) {
-    if (!Number.isInteger(multiplier) || multiplier < 1) {
-      throw new Error(`[PoolMult][constructor] multiplier (${multiplier}) should be a positive integer`)
+    if (!Number.isInteger(multiplier) || multiplier <= 0) {
+      throw new Error(`[PoolMult][constructor] multiplier (${multiplier}) should be an integer > 0`)
     }
     this._pool = pool
     this._multiplier = multiplier

@@ -28,8 +28,8 @@ export class Pool implements IPool {
   private _heldCount: number = 0
 
   constructor(heldCountMax: number) {
-    if (heldCountMax < 0) {
-      throw new Error('[Pool][constructor] heldCountMax should be >= 0')
+    if (!Number.isInteger(heldCountMax) || heldCountMax < 0) {
+      throw new Error(`[Pool][constructor] heldCountMax (${heldCountMax}) should be an integer >= 0`)
     }
     this._heldCountMax = heldCountMax
   }

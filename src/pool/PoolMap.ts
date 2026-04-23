@@ -27,7 +27,9 @@ export class PoolMap<Key> implements IPoolMap<Key> {
 
   constructor(options: PoolMapOptions<Key>) {
     this._commonPool = options.commonPool
-    this._bulkPool = new PoolMult(this._commonPool, this._commonPool.heldCountMax)
+    this._bulkPool = this._commonPool.heldCountMax > 0
+      ? new PoolMult(this._commonPool, this._commonPool.heldCountMax)
+      : this._commonPool
     this._createKeyPool = options.createKeyPool ?? createKeyPoolDefault
   }
 
