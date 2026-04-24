@@ -96,7 +96,7 @@ function poolsHoldAvailable(pools: IPool[]) {
 function poolsReleaseAvailable(pools: IPool[]): number {
   let min: number
   for (let i = 0, len = pools.length; i < len; i++) {
-    const value = pools[i].heldCount
+    const value = pools[i].releaseAvailable
     if (i === 0 || value < min) {
       min = value
     }
