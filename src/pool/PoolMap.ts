@@ -35,7 +35,7 @@ export class PoolMap<Key> implements IPoolMap<Key> {
 
   get(key: Key): IPool {
     let pool = this._keyPools.get(key)
-    if (!pool) {
+    if (pool == null) {
       pool = new Pools(this._commonPool, this._createKeyPool(key))
       this._keyPools.set(key, pool)
     }

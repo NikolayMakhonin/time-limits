@@ -160,7 +160,7 @@ export function poolsRelease(
         count = releaseAvailable
       }
       else {
-        throw new Error(`[poolsRelease] count (${count} > releaseAvailable (${releaseAvailable}))`)
+        throw new Error(`[poolsRelease] count (${count}) > releaseAvailable (${releaseAvailable})`)
       }
     }
     if (count === 0) {
@@ -177,7 +177,7 @@ export function poolsRelease(
       for (let i = 0; i < len; i++) {
         const releaseAvailable = pools[i].releaseAvailable
         if (count[i] > releaseAvailable) {
-          throw new Error(`[poolsRelease] count[${i}] (${count[i]} > releaseAvailable (${releaseAvailable}))`)
+          throw new Error(`[poolsRelease] count[${i}] (${count[i]}) > releaseAvailable (${releaseAvailable})`)
         }
       }
     }

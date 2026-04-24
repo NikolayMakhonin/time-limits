@@ -70,7 +70,7 @@ export class Pool implements IPool {
         count = releaseAvailable
       }
       else {
-        throw new Error(`[Pool][release] count (${count} > releaseAvailable (${releaseAvailable}))`)
+        throw new Error(`[Pool][release] count (${count}) > releaseAvailable (${releaseAvailable})`)
       }
     }
     if (count > 0) {
