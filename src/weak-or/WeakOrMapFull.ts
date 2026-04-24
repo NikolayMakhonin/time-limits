@@ -9,23 +9,28 @@ type HeldKey<K> = K | WeakRef<K & object>
  * when the value is garbage collected
  */
 export class WeakOrMapFull<K, V> implements IWeakOrMap<K, V> {
-  private readonly _entries: IWeakOrMap<K, V | WeakRef<V & object>> = new WeakOrMap()
-  private readonly _registry: FinalizationRegistry<HeldKey<K>> = new FinalizationRegistry<HeldKey<K>>(heldKey => {
-    let key: K
-    if (heldKey instanceof WeakRef) {
-      key = heldKey.deref()
-      if (key === void 0) {
-        return
+  private readonly _entries: IWeakOrMap<K, V | WeakRef<V & object>>
+  private readonly _registry: FinalizationRegistry<HeldKey<K>>
+
+  constructor() {
+    this._entries = new WeakOrMap()
+    this._registry = new FinalizationRegistry<HeldKey<K>>(heldKey => {
+      let key: K
+      if (heldKey instanceof WeakRef) {
+        key = heldKey.deref()
+        if (key === void 0) {
+          return
+        }
       }
-    }
-    else {
-      key = heldKey
-    }
-    const entry = this._entries.get(key)
-    if (entry instanceof WeakRef && entry.deref() === void 0) {
-      this._entries.delete(key)
-    }
-  })
+      else {
+        key = heldKey
+      }
+      const entry = this._entries.get(key)
+      if (entry instanceof WeakRef && entry.deref() === void 0) {
+        this._entries.delete(key)
+      }
+    })
+  }
 
   get(key: K): V | undefined {
     const entry = this._entries.get(key)
