@@ -26,7 +26,7 @@ export class DependentPool extends PoolWrapper {
   }
 
   get holdAvailable() {
-    return Math.min(0, this.heldCountMax - this.heldCount)
+    return Math.max(0, this.heldCountMax - this.heldCount)
   }
 
   canHold(count: number): boolean {
